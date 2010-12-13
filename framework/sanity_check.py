@@ -22,6 +22,7 @@ import stat
 
 sys.path.append("../")
 from framework import constants as c
+from framework.helper_functions import confirm
 
 def dirs():
     # base directory check:
@@ -42,11 +43,18 @@ def dirs():
     missing_dirs = [dir for dir in critical_777_dirs if not os.path.exists(critical_777_dirs[dir])]
 
     if len(missing_dirs):
-        print "Some directories are missing. Please make it sure that constants.py is updated and accurate:\n"
+        print "Some directories are missing:\n"
         for dir in missing_dirs:
             print " * %s (%s)" % (dir, critical_777_dirs[dir])
         print
-        sys.exit(-1)
+
+        if confirm("Would you like framework to create them?", resp=True):
+            for dir in missing_dirs:
+                os.makedirs(critical_777_dirs[dir])
+            print "Done.\n"
+        else:
+            print "Exiting.\n"
+            sys.exit(-1)
 
     wrong_perms = [dir for dir in critical_777_dirs if not os.stat(critical_777_dirs[dir])[stat.ST_MODE] & stat.S_IWOTH]
 
@@ -55,7 +63,14 @@ def dirs():
         for dir in wrong_perms:
             print " * %s (%s)" % (dir, critical_777_dirs[dir])
         print
-        sys.exit(-1)
+
+        if confirm("Would you like framework to setup permissions?", resp=True):
+            for dir in wrong_perms:
+                os.chmod(critical_777_dirs[dir], 0777)
+            print "Done.\n"
+        else:
+            print "Exiting.\n"
+            sys.exit(-1)
 
 def all():
     print "Checking dirs.."

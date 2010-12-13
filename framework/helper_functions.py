@@ -300,3 +300,25 @@ def get_sample_map_dict(p):
                        'group_colors'           : group_colors}
 
     return sample_map_dict
+
+def confirm(prompt=None, resp=False):
+    """courtesy of http://code.activestate.com/recipes/541096/"""
+    if prompt is None:
+        prompt = 'Confirm'
+
+    if resp:
+        prompt = '%s [%s] | %s: ' % (prompt, 'Y', 'n')
+    else:
+        prompt = '%s [%s] | %s: ' % (prompt, 'N', 'y')
+
+    while True:
+        ans = raw_input(prompt)
+        if not ans:
+            return resp
+        if ans not in ['y', 'Y', 'n', 'N']:
+            print 'please enter y or n.'
+            continue
+        if ans == 'y' or ans == 'Y':
+            return True
+        if ans == 'n' or ans == 'N':
+            return False
