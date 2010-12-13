@@ -164,10 +164,17 @@ def heatmap_detail(request, analysis_id, instance, rank):
 
     server_request = {'request': 'get_sample_map_name', 'analysis_id': analysis_id, 'instance': instance}
     server_response = server(server_request)
+
+
     sample_map_name = server_response['name']
 
     server_request = {'request': 'heatmap_options', 'analysis_id': analysis_id, 'instance': instance, 'rank': rank}
-    options = server(server_request)['options']
+    server_response = server(server_request)
+
+    if server_err(server_response):
+        return err_response(server_response)
+
+    options = server_response['options']
 
     if request.method == 'POST':
         width, height = 0, 0
