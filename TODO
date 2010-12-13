@@ -33,7 +33,4 @@ important stuff that should not be forgotten.
 
 (*)
 
- - It is no longer "Meren's Framework", changes need to be done use the new
-name, Viamics (Visual and statistical analysis framework for microbial
-communities) everywhere in the framework.
  - helper_functions.py should go into the tools directory.
