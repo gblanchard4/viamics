@@ -1,5 +1,5 @@
 
-  Viamics, pre-Alpha
+  Viamics
 
   "Visual and statistical analysis framework for microbial communities, and more".
 
@@ -11,12 +11,15 @@
 visualization framework that has been developed mainly for microbial community
 and microbial ecology studies.
 
- Static snapshot of the framework can be found here along with some basic
-information about it's purpose:
+ Publication of this study, titled "A framework for analysis of metagenomic
+sequencing data", is here:
+
+    http://www.ncbi.nlm.nih.gov/pubmed/21121041
+
+ Also a static snapshot of the framework, along with some basic information
+about it's purpose, could be found here:
 
     http://meren.org/framework/
-
- Once the paper is out, there will be more information here..
 
 
 
@@ -43,17 +46,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ===============================================================================
 
  Installation from source might be a little bit tricky for novice users.
-Beta release of the Framework will provide a better installation. This part,
-though, is for programmers and command line enthusiasts who like to get 
+
+ Beta release of the Framework will provide a better installation. This part,
+though, is for programmers and command line enthusiasts who like to get
 framework running.
 
- I tried to maintain this list, but this may not be the complete list of
-commands in order to get framework running. If you have any trouble or any
-questions please don't hesitate to send an e-mail to a.murat.eren / gmail.com
+ I tried to maintain following recipe, but this may not be the complete list of
+commands in order to get framework running. If you have been trying to install
+Viamics and if you need any help please don't hesitate to send an e-mail to:
+
+    a.murat.eren / gmail.com
 
  Sorry for this temporary mess and inconvenience.
 
-----
+--
 
 # The framework was developed and tested on Pardus Corporate (64 bit) version.
 # It should work on any Linux distribution and even Mac, but most of the
