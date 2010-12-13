@@ -1,0 +1,3 @@
+this is the directory of modules for different sorts of handling methods for an input data.
+
+input data could be sequence data. or qpcr data. the way different data is being handled should be abstractad from the rest of the framework.

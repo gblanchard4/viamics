@@ -1,0 +1,27 @@
+{% extends "base.tmpl" %}
+
+{% block title %}Viamics ({{analyses|length}} analys{{ analyses|length|pluralize:"is,es" }}){% endblock %}
+
+{% block content %}
+
+<div class="head">Viamics</div>
+<div class="title">Visual and statistical analysis framework for microbial communities, and probably more...</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+
+<p class="info">There {{ analyses|length|pluralize:"is,are" }} {{analyses|length}} analys{{ analyses|length|pluralize:"is,es" }} on the server:
+
+<div class="form">
+<table width="800">
+{% for analysis in analyses %}
+    <tr>
+        <td width="30" valign="top" style="padding-top: 20px;"><img src="{{ request.META.HTTP_HOST }}/static/{{ analysis.state }}.gif"></td>
+        <td>
+            <div class="smallheadindex" style="background: url(/static/{{ analysis.type }}.png) bottom right no-repeat;">{{ analysis.name }} {% ifequal analysis.state "done" %}<a href="./info/{{ analysis.id }}">»</a>{% endifequal %}</div>
+            <div class="smalltitle">id: {{ analysis.id }}</div>
+            <div class="logs">{% for log in analysis.log %}{{ log }}<br />{% endfor %}</div>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}

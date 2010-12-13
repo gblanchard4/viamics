@@ -1,0 +1,35 @@
+{% extends "base.tmpl" %}
+{% load dict_get %}
+
+{% block title %}Refresh files...{% endblock %}
+
+{% block content %}
+
+<div class="head">Refresh Files</div>
+<div class="title">A framework that is not quite ready to use yet..</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+
+<div class="smallhead">Refresh Options</div>
+<p class="smallheadtitle">» Please select the items you'd like re-generated. It may take a while to see everything updated on the info page depending on the selection.
+
+<div class="form" style="padding-left: 100px;">
+<form method="post" action="{{ request.META.HTTP_HOST }}/refresh/{{ analysis_id }}/">
+<table style="text-align: left;">
+{% for option in refresh_options %}
+    <tr>
+        <td><input type="checkbox" name="{{ option }}"> {{ functions_dict|dict_get:option|dict_get:"desc" }} (<i>{{ option }}</i>)</td>
+    </tr>
+{% endfor %}
+    <tr>
+        <td colspan=2><br><input type="submit" value="Next" /></td>
+    </tr>
+
+</table>
+</form>
+</div>
+
+
+
+{% endblock %}
+

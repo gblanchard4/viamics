@@ -1,0 +1,26 @@
+{% extends "base.tmpl" %}
+
+{% block title %}New Sample Map{% endblock %}
+
+{% block content %}
+<div class="head">New Map: {{ values_dict.sample_map_name }}</div>
+<div class="title">New sample map for "{{ analysis_name }}" ({{ analysis_id }}).</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+<p class="info">This is your final sample map. If you want to change something you can do it by going back. Once you click sybmit button this sample map will be submitted to the server to get analyzed.
+
+<div class="form">
+<form enctype="multipart/form-data" method="post" action="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis_id }}/{{ next_step }}">
+<input type="hidden" name="values_obj" value="{{ values_obj }}">
+<table style="text-align: left; width 600px;border-bottom: 1px solid black; border-top: 1px solid black;">
+{% for map in sample_map_dict.sample_map_list %}
+<tr><td style="width: 200px;">{{ map.sample }}</td><td style="width: 100px;">{{ map.group }}</td><td style="width: 50px; margin-top: 20px; margin-bottom:20px;" bgcolor="{{ map.color }}">&nbsp;</td></tr>
+{% endfor %}
+</table>
+
+<br>
+
+<input type="submit" value="Submit" />
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.tmpl" %}
+{% load tablecols %}
+{% load dict_get %}
+
+{% block title %}Samples dendrogram for "{{ map.name }}", at {{ rank|capfirst }} Level{% endblock %}
+
+{% block content %}
+
+<div class="head">Dendrogram » <i>{{ map.name }}</i> in <i>{{ analysis_name }}</i></div>
+<div class="title">{{ analysis_id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_name }}</b>" Info Page</a> / <a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ instance }}/">Back to "<b>{{ map.name }}</b>" Sample Map Page</a></div>
+
+<div class="smallhead">Dendrogram for {{ rank|capfirst }} Level</div>
+<p class="smallheadtitle">» See dendrograms at other taxonomic levels: {% for r in ranks %}{% ifnotequal r rank %}<a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/{{ instance }}/dendrogram/{{ r }}/">{{ r|capfirst }}</a> {% endifnotequal %}{% endfor %}
+<br />
+<center>
+    <div style="width: 1000px; border-bottom: 1px solid #999; padding-bottom: 20px;">
+    <table style="text-align: left; width 1000px;">
+    <tr>
+        <td style="text-align: center;">
+            <p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.dendrograms|dict_get:rank }}">
+        </div>
+    </tr>
+    </table>
+    </div>
+</center>
+
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.tmpl" %}
+{% load tablecols %}
+{% load dict_get %}
+
+{% block title %}Classification Confidence per OTU{% endblock %}
+
+{% block content %}
+
+<div class="head">Sample Dendrograms » <i>{{ analysis_name }}</i></div><a name="top"></a>
+<div class="title">{{ analysis_id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_name }}</b>" Info Page</a></div>
+
+<div class="smallhead">Confidence at {{ rank|capfirst }} Level</div>
+<p class="smallheadtitle">» Figures show box plots for RDP confidence values for every sequence in a particular sample for the given OTU.
+
+<center>
+<table width="1000">
+{% for tuple in otu_confidence_tuples %}
+<tr>
+<td>
+    <p class="smallheadtitle">» {{ tuple.0 }}
+    <p aling="center"><div style="width: 100%; text-align: center;"><img src="{{ request.META.HTTP_HOST }}/media/{{ relative_type_specific_data_dir }}/{{ tuple.1 }}" ></div>
+</td>
+</tr>
+{% endfor %}
+</table>
+</center>
+
+
+{% endblock %}

@@ -1,0 +1,39 @@
+
+ TODO list for Viamics:
+
+ Features waiting to be implemented, things asking for attention and other
+important stuff that should not be forgotten.
+
+--
+
+(****)
+
+ - Installation shouldn't be a big hassle.
+ - User manual with some toy runs, hypothesis testing examples, et cetera.
+ - Exception handling should be improved.
+ - TAB delimited batch meta-data submission and meta-data management
+ interface.
+ - UNIFRAC analysis and introspection (fairly easy, QIIME could provide
+ enough inspiration).
+ - Interface for exporting analysis results (as PDF or, stand-alone static
+ web page).
+
+--
+
+(***)
+
+ - Code needs serious documentation.
+ - Unit tests should be finished and complete.
+ - User inputs should be checked (is_fasta(), is_qpcr(), is_env(),
+ is_sample_map_valid() and similar control functions should be implemented).
+ - ANOVA/MANOVA analysis for sample maps comparing more than 2 groups.
+ - OTU exclusion (just like sample exclusion) while defining a sample map.
+ - Support for PhyloCHIP and MicroArray data.
+--
+
+(*)
+
+ - It is no longer "Meren's Framework", changes need to be done use the new
+name, Viamics (Visual and statistical analysis framework for microbial
+communities) everywhere in the framework.
+ - helper_functions.py should go into the tools directory.

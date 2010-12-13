@@ -1,0 +1,35 @@
+{% extends "base.tmpl" %}
+{% load tablecols %}
+{% load dict_get %}
+
+{% block title %}Dot plots for "{{ sample_map_name }}", at {{ rank|capfirst }} Level{% endblock %}
+
+{% block content %}
+
+<div class="head">Dot Plots w/ Real Abundance » <i>{{ sample_map_name }}</i> in <i>{{ analysis_name }}</i></div>
+<div class="title">{{ analysis_id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_name }}</b>" Info Page</a> / <a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ instance }}/">Back to "<b>{{ sample_map_name }}</b>" Sample Map Page</a></div>
+
+<div class="smallhead">Dot Plots for {{ rank|capfirst }} Level</div>
+<p class="smallheadtitle">» See dot plots at other taxonomic levels: {% for r in ranks %}{% ifnotequal r rank %}<a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ instance }}/dot/{{ r }}/">{{ r|capfirst }}</a> {% else %} {{ r|capfirst }} {% endifnotequal %}{% endfor %}
+<br />
+<center>
+{% for row in otu_t_p_tuple_list|tablecols:3 %}
+    <div style="width: 1000px; border-bottom: 1px solid #999; padding-bottom: 20px;">
+    <table style="text-align: left; width 1000px;">
+    <tr>
+    {% for tuple in row %}
+        <td style="width: 330px; text-align: center;">
+            <img src="{{ request.META.HTTP_HOST }}/media/{{ taxon_charts_dir }}/{{ rank }}_{{ tuple.1 }}_real_abundance.png" title="{{ tuple.0 }}">
+            <br />
+            <i>t: <b>{{ tuple.2 }}</b>, p: <b>{{ tuple.3 }}</b></i>
+    {% endfor %}
+        </div>
+    </tr>
+    </table>
+    </div>
+{% endfor %}
+</center>
+
+
+{% endblock %}

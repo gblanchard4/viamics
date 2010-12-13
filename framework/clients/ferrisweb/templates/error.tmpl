@@ -1,0 +1,24 @@
+{% extends "base.tmpl" %}
+
+{% block content %}
+
+<div class="head">Well. This is embarrassing :(</div>
+<div class="title">..</div>
+
+<div class="smallheadindex">There was an error and framework couldn't handle it..</div>
+
+<p class="errorinfo">Something went wrong with what you were trying to do. {% if content %}<br /><br />Here is the problem: "<b>{{ content }}</b>".{% endif %}{% if exception %}<br /><br />Fortunately we have a traceback. Read the traceback. If this traceback makes any sense to you, you may go back and try to do the same thing with different values. Otherwise please copy and send traceback information to a.murat.eren@gmail.com.
+
+<div class="error"><pre>
+Traceback:
+
+{{ exception }}
+
+</pre></div>
+{% endif %}
+
+{% if time_stamp %}
+<p class="errorinfo">Traceback of the problem is also stored in errors dir. It could be reached with this time stamp: <b>{{ time_stamp }}</b>
+{% endif %}
+
+{% endblock %}

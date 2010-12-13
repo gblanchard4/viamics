@@ -1,0 +1,28 @@
+{% extends "base.tmpl" %}
+
+{% block title %}New Sample Map{% endblock %}
+
+{% block content %}
+<div class="head">New Map: "{{ sample_map_name }}"</div>
+<div class="title">New sample map for "{{ analysis_name }}" ({{ analysis_id }}).</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+<p class="info">Now you should pick colors for the groups you have. Once you submit this information analysis of this set will start.
+
+<form enctype="multipart/form-data" method="post" action="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis_id }}/{{ next_step }}">
+
+<input type="hidden" name="values_obj" value="{{ values_obj }}">
+
+
+<table style="text-align: left;">
+
+{% for group in groups %}
+
+<tr><td width="200"><label for="id_{{ group }}">{{ group }}</label></td><td>: <select name="{{ group }}">{% include "colors.tmpl" %}</select></td></tr>
+
+{% endfor %}
+</table>
+<br>
+<input type="submit" value="Next" />
+</form>
+{% endblock %}

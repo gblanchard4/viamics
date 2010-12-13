@@ -1,0 +1,164 @@
+{% extends "base.tmpl" %}
+{% load tablecols %}
+{% load dict_get %}
+
+{% block title %}Sample Map: {{ map.name }}{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+<!--
+    function toggle_visibility(id) {
+       var e = document.getElementById(id);
+       if(e.style.display == 'block')
+          e.style.display = 'none';
+       else
+          e.style.display = 'block';
+    }
+//-->
+</script>
+
+<div class="head">Sample Map » <i>{{ map.name }}</i> in <i>{{ analysis_info.name }}</i></div>
+<div class="title">{{ analysis_id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_info.name }}</b>" Info Page</a></div>
+
+<div class="smallhead">Data</div>
+<br />
+<p class="smallsmallheadtitle">» Samples in the original library: {{ analysis_info.all_unique_samples_list|length }}
+<p class="smallsmallheadtitle">» Included Samples ({{ map.included|length }}):
+{% for group, samples in map.sample_groups.items %}
+<p class="smallsmallheadtitle" style="padding-left: 20px;"><span style="border: 1px solid #666; padding-left: 10px; background-color: {{map.group_colors|dict_get:group}}">&nbsp;</span> <b>{{ group }}</b>:
+    {% for sample in samples %}
+    <a class="boxpopup3" href="#">{{ sample }}<span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
+    <div class="spiffyfg">
+    {% for key, value in samples_genus_OTUs.items %}
+        {% ifequal key sample %}
+            {% for otu, count in value %}
+                <i>{{ otu }}:</i> <b>{{ count }}</b><br />
+            {% endfor %}
+        {% endifequal %}
+    {% endfor %}
+    </div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
+    {% endfor %}
+{% endfor %}
+
+<p class="smallsmallheadtitle">» Excluded Samples ({{ map.excluded|length }}): {% ifnotequal map.excluded|length 0 %} {% for sample in map.excluded %}
+<a class="boxpopup3" href="#">{{ sample }}<span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
+<div class="spiffyfg">
+{% for key, value in samples_genus_OTUs.items %}
+    {% ifequal key sample %}
+        {% for otu, count in value %}
+            <i>{{ otu }}:</i> <b>{{ count }}</b><br />
+        {% endfor %}
+    {% endifequal %}
+{% endfor %}
+</div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
+{% endfor %} {% else %} None {% endifnotequal %}
+
+
+<div class="smallhead">Heat Maps</div>
+<p class="smallheadtitle">» Images below are the thumbnails of actual heatmaps. You can click on the images to re-generate them with new parameters. You can also download the percent abundance files that has been used to generate these heatmaps by clicking the links next to the taxonomic ranks.
+
+<center>
+<table style="text-align: left; width 1000px;">
+    <table style="width: 100%;">
+    <tr>
+    {% for rank in map.ranks %}
+        <td width="199">
+            <p align="center"><b>{{ rank|capfirst }}</b> {% for k, v in map.percent_abundance_files.items %}{% ifequal k rank %}<small><a href="{{ request.META.HTTP_HOST }}/media/{{ v }}" title="download percent abundance file">#</small></a>{% endifequal %}{% endfor %}
+            <p align="center"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/{{ map.instance }}/heatmap/{{ rank }}/"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.heatmaps|dict_get:rank }}" style="max-height: 200px; max-width: 200px; overflow: none;" border="0"></a>
+
+        </td>
+    {% endfor %}
+    </tr>
+    </table>
+</table>
+</center>
+
+
+<div class="smallhead">Dendrograms</div>
+<p class="smallheadtitle">» Images below are the thumbnails of actual dendrograms.
+<center>
+<table style="text-align: left; width 1000px;">
+    <table style="width: 100%;">
+    <tr>
+    {% for rank in map.ranks %}
+        <td width="199">
+            <p align="center"><b>{{ rank|capfirst }}</b>
+            <p align="center"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/{{ map.instance }}/dendrogram/{{ rank }}/"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.dendrograms|dict_get:rank }}" style="max-height: 300px; max-width: 200px; overflow: none;" border="0"></a>
+        </td>
+    {% endfor %}
+    </tr>
+    </table>
+</table>
+</center>
+
+<div class="smallhead">Diversity Indicies</div>
+<p class="smallheadtitle">» Images below show the diversity of samples according to Shannon and Simpson's.
+<center>
+<table style="text-align: left; width 1000px;">
+    <table style="width: 100%;">
+    <tr>
+        <td>
+            <p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.shannons }}" style="max-height: 400px; overflow: none;" border="0"> <img src="{{ request.META.HTTP_HOST }}/media/{{ map.simpsons }}" style="max-height: 400px; overflow: none;" border="0">
+        </td>
+    </tr>
+    </table>
+</table>
+</center>
+
+
+
+
+<div class="smallhead">Dot Plots</div>
+<p class="smallheadtitle">» Images below show how samples scattered among the groups for every OTU. They are sorted according to their student's t-test significance. If you click 'show all' you can see all of them in full size with associated t and p values.
+<br />
+
+{% for rank in map.ranks %}
+    <p class="smallsmallheadtitle">» {{ rank|capfirst }} Level (<a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ map.instance }}/dot/{{ rank }}/">show all</a>)
+    <center>
+    <table style="text-align: left; width 1000px;">
+        <table>
+            <tr>
+            {% for otu, otu_fs, t, p in otu_t_p_tuple_dict|dict_get:rank|slice:"0:6" %}
+                <td style="width: 150px; text-align: center;"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.taxon_charts_dir }}/{{ rank }}_{{ otu_fs }}.png" title="{{ otu }}" width="150"></td>
+            {% endfor %}
+                <td style="width: 120px; text-align: center;">
+                    <a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ map.instance }}/dot/{{ rank }}/"><small><i>({{ otu_t_p_tuple_dict|dict_get:rank|slice:"5:"|length }} more..)</i></small></a>
+                </td>
+            </tr>
+        </table>
+    </table>
+    </center>
+    <br /><br />
+{% endfor %}
+
+{% ifequal analysis_info.type "qpcr" %}
+
+<div class="smallhead">Dot Plots with Real Abundance</div>
+<p class="smallheadtitle">» Images below show how samples scattered among the groups for every OTU. They are sorted according to their student's t-test significance. If you click 'show all' you can see all of them in full size with associated t and p values.
+<br />
+
+{% for rank in map.ranks %}
+    <p class="smallsmallheadtitle">» {{ rank|capfirst }} Level (<a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ map.instance }}/dot/{{ rank }}/real/">show all</a>)
+    <center>
+    <table style="text-align: left; width 1000px;">
+        <table>
+            <tr>
+            {% for otu, otu_fs, t, p in otu_t_p_tuple_dict|dict_get:rank|slice:"0:6" %}
+                <td style="width: 150px; text-align: center;"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.taxon_charts_dir }}/{{ rank }}_{{ otu_fs }}_real_abundance.png" title="{{ otu }}" width="150"></td>
+            {% endfor %}
+                <td style="width: 120px; text-align: center;">
+                    <a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ map.instance }}/dot/{{ rank }}/real/"><small><i>({{ otu_t_p_tuple_dict|dict_get:rank|slice:"5:"|length }} more..)</i></small></a>
+                </td>
+            </tr>
+        </table>
+    </table>
+    </center>
+    <br /><br />
+{% endfor %}
+
+{% endifequal %}
+
+
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "base.tmpl" %}
+{% load tablecols %}
+{% load dict_get %}
+
+{% block title %}Info..{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+<!--
+    function toggle_visibility(id) {
+       var e = document.getElementById(id);
+       if(e.style.display == 'block')
+          e.style.display = 'none';
+       else
+          e.style.display = 'block';
+    }
+//-->
+</script>
+
+<a name="top"></a>
+<div class="head" style="background: url(/static/{{ analysis.info.type }}.png) bottom right no-repeat;">Info » {{ analysis.info.name }}</div>
+<div class="title">{{ analysis.info.id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis.info.id }}/0">Create New Sample Map</a></div>
+
+<div class="smallhead">Table of Contents</div>
+<div class="toc">
+    <ul>
+        <li class="fancy"><a href="#samples">Samples in the Original Library</a>
+        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="#confidence">Classification Confidence</a>{% endifequal %}
+        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="#confidence_per_sample">Classification Confidence per Sample</a>{% endifequal %}
+        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/confidence/genus/">Classification Confidence per OTU</a>{% endifequal %}
+        <li class="fancy"><a href="#sequence_distribution">Sequence Distribution</a>
+        <li class="fancy"><a href="#simpsons_diversity_index">Simpson's Diversity Index</a>
+        <li class="fancy"><a href="#shannon_diversity_index">Shannon Diversity Index</a>
+        <li class="fancy"><a href="#rarefaction_curves_sect">Rarefaction Curves</a>
+        <li class="fancy"><a href="#pie_charts">Pie Charts</a>
+        <li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/dendrograms/">Dendrograms (Sample Clusters)</a>
+        <br />
+        <br />
+        <li class="fancy">{% ifequal sample_map_info.instances|length 0 %}There aren't any sample maps yet (<a href="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis.info.id }}/0">create one?</a>){% else %}User Generated Sample Maps for this Analysis:
+            <ul>
+            {% for instance in sample_map_info.instances %}
+                <li class="fancy"> <a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis.info.id }}/{{ instance }}/">{{ sample_map_info.meta|dict_get:instance|dict_get:"name"|capfirst }}</a>
+                    <ul>
+                    {% for group in sample_map_info.meta|dict_get:instance|dict_get:"sample_groups" %}
+                        <li class="notype"> <span style="border: 1px solid #666; padding-left: 10px; background-color: {{ sample_map_info.meta|dict_get:instance|dict_get:"group_colors"|dict_get:group }}">&nbsp;</span> <span class="info-page-samples"><b>{{ group|capfirst }}</b>: {{ sample_map_info.meta|dict_get:instance|dict_get:"sample_groups"|dict_get:group|join:", " }}</span>
+                    {% endfor %}
+                    </ul>
+            {% endfor %}
+            </ul>
+        {% endifequal %}
+    </ul>
+</div>
+
+
+
+<div class="smallhead">Samples in the Original Library <span style="font-size: 0.4em;"><a name="samples" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» Basic information about samples. Mouse-over pop-up will give you the numbers of {% ifequal analysis.info.type "qpcr" %}species{% else %}genus{% endifequal %} level taxonomic units.
+
+<div class="sampleslist">
+{% for sample in analysis.info.all_unique_samples_list %}
+<a class="boxpopup3" href="#">{{ sample }}<span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
+<div class="spiffyfg">
+{% for key, value in samples_genus_OTUs.items %}
+    {% ifequal key sample %}
+        {% for otu, count in value %}
+            <i>{{ otu }}:</i> <b>{{ count }}</b><br />
+        {% endfor %}
+    {% endifequal %}
+{% endfor %}
+</div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
+{% endfor %}
+</div>
+
+{% ifequal analysis.info.type "rdp" %}
+<div class="smallhead">Classification Confidence <span style="font-size: 0.4em;"><a name="confidence" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» Image below shows the classification confidence of the sequenses at different taxonomic levels along with the box plots. Every dot represents the confidence of a particular sequence. This figure is supposed to give an idea about the expected accuracy of the classification and the quality of the 454 reads.
+<p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/rdp_confidence.png">
+
+<div class="smallhead">Classification Confidence per Sample<span style="font-size: 0.4em;"><a name="confidence_per_sample" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» Image below shows the classification confidence of the sequences at genus level per sample.
+<p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/rdp_confidence_per_sample.png">
+
+
+{% endifequal %}
+
+<div class="smallhead">Sequence Distribution <span style="font-size: 0.4em;"><a name="sequence_distribution" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» Image below is the sequence distribution in the library. Bars show the number of the sequences acquired for a given sample. When you <a href="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis.info.id }}/0">create a new sample map</a> for this analysis you can discard the samples that are not represented by substantial amount of sequences. 
+<p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.samples_sequences_bar }}">
+
+<div class="smallhead">Simpson's Diversity Index <span style="font-size: 0.4em;"><a name="simpsons_diversity_index" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» Eeach bar in the image shows the diversity index of the given sample. Click <a href=" {{ request.META.HTTP_HOST }}/media/{{ analysis.info.simpsons_diversity_index_data }} ">here</a> to download the data behind this figure (TAB delimited, text file).
+<p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.simpsons_diversity_index_img }}">
+
+<div class="smallhead">Shannon Diversity Index <span style="font-size: 0.4em;"><a name="shannon_diversity_index" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» Eeach bar in the image shows the diversity index of the given sample. Click <a href=" {{ request.META.HTTP_HOST }}/media/{{ analysis.info.shannon_diversity_index_data }} ">here</a> to download the data behind this figure (TAB delimited, text file).
+<p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.shannon_diversity_index_img }}">
+
+
+<div class="smallhead">Rarefaction Curves <span style="font-size: 0.4em;"><a name="rarefaction_curves_sect" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» All Samples: Eeach curve on the image shows the rarefaction curve of the sample compared to others. Curves may not be very informative due to scaling.
+{% ifnotequal analysis.info.type "rdp" %}
+    <p class="info">Rarefaction curves are not being computed for this type of analysis.
+{% else %}
+    {% ifequal analysis.info.rarefaction_all_samples_exists 0 %}
+        <p class="info">Rarefaction curves are being computed. It may take a while.
+        <p align="center"><img src="{{ request.META.HTTP_HOST }}/static/running.gif">
+    {% else %}
+
+        <p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.rarefaction_all_samples }}">
+
+        <p class="smallheadtitle" id="rarefaction_curves">» Individual Samples. <a href="#rarefaction_curves" onclick="toggle_visibility('rarefaction-curves'); toggle_visibility('rarefaction-curves-preview')">Show / Hide</a>
+
+        <div class="rarefaction_curves" id="rarefaction-curves-preview" style="display: block">
+            <table>
+            {% for samples_row in analysis.info.all_unique_samples_list|slice:":5"|tablecols:5 %}
+            <tr>
+                {% for sample in samples_row %}
+                    <td>
+                        <img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.rarefaction_curves_dir }}/{{ analysis.info.rarefaction_prefix }}{{ sample }}{{ analysis.info.rarefaction_postfix }}" title="{{ sample }}" width="239">
+                    </td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+
+        <div class="rarefaction_curves" id="rarefaction-curves" style="display: none">
+            <table>
+            {% for sample in analysis.info.all_unique_samples_list %}
+            <tr>
+                <td>
+                    <p class="smallsmallheadtitle">» {{ sample }}
+                    <p><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.rarefaction_curves_dir }}/{{ analysis.info.rarefaction_prefix }}{{ sample }}{{ analysis.info.rarefaction_postfix }}" title="{{ sample }}"><p align="right"><a href="#rarefaction_curves" onclick="toggle_visibility('rarefaction-curves'); toggle_visibility('rarefaction-curves-preview')"><span style="font-size: 0.6em;">.. hide ..</span></a>
+                </td>
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+    {% endifequal %}
+{% endifnotequal %}
+
+
+<div class="smallhead">Pie Charts <span style="font-size: 0.4em;"><a name="pie_charts" href="#top" title="top">^</a></span></div>
+{% for rank in analysis.info.ranks %}
+    <p class="smallheadtitle">» {{ rank|capfirst }} Level <a href="#pie-{{ rank }}" onclick="toggle_visibility('{{ rank }}-rest'); toggle_visibility('{{ rank }}-first-row')">Show / Hide</a>
+    <div class="piecharts" id="{{ rank }}-first-row" style="display: block">
+        <table>
+        {% for samples_row in analysis.info.all_unique_samples_list|slice:":16"|tablecols:16 %}
+            <tr>
+            {% for sample in samples_row %}
+                <td>
+                    <img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.pie_charts_dir }}/piechart_{{ rank }}_{{ sample }}.png" title="{{ sample }}" width="74">
+                </td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+    <div class="piecharts" id="{{ rank }}-rest" style="display: none">
+        <table>
+        {% for samples_row in analysis.info.all_unique_samples_list|tablecols:3 %}
+            <tr>
+            {% for sample in samples_row %}
+                <td>
+                    <a class="boxpopup3" href="#"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.pie_charts_dir }}/piechart_{{ rank }}_{{ sample }}.png" title="{{ sample }}" border="0"><span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
+                    <div class="spiffyfg">
+                    {% for key, value in samples_genus_OTUs.items %}
+                        {% ifequal key sample %}
+                            {% for otu, count in value %}
+                                <i>{{ otu }}:</i> <b>{{ count }}</b><br />
+                            {% endfor %}
+                        {% endifequal %}
+                    {% endfor %}
+                    </div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
+                </td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+        <p align="center"><small><a href="#pie-{{ rank }}" onclick="toggle_visibility('{{ rank }}-rest'); toggle_visibility('{{ rank }}-first-row')">Hide</a></small></p>
+    </div>
+{% endfor %}
+
+
+{% endblock %}

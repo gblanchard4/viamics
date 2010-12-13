@@ -1,0 +1,20 @@
+{% extends "base.tmpl" %}
+
+{% block title %}Info..{% endblock %}
+
+{% block content %}
+<div class="head">Viamics » New QPCR Analysis</div>
+<div class="title">Hmm..</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+<p class="info">Hai there.
+
+<div class="form">
+<form enctype="multipart/form-data" method="post" action="/new/qpcr/">
+<table>
+{{ form.as_table }}
+</table>
+<input type="submit" value="Submit" />
+</form>
+</div>
+{% endblock %}

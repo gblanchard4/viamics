@@ -1,0 +1,79 @@
+{% extends "base.tmpl" %}
+
+{% block title %}Heatmap Detail{% endblock %}
+
+{% block meta %}<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE"><META HTTP-EQUIV="Expires" CONTENT="-1">{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+function resizeImages(maxHeight, maxWidth)
+{
+   var img = document.images;
+
+   for (var i = 0; i < img.length; i++) {
+      if (img[i].width > maxWidth){
+         img[i].width = maxWidth;
+        }
+      if (img[i].height > maxHeight) {
+         img[i].height = maxHeight;
+        continue;
+        }
+   }
+}
+</script>
+{% endblock %}
+
+{% block bodyparams %}onload="resizeImages(2000, 900);"{% endblock %}
+
+{% block content %}
+<div class="head">Heatmap Detail » {{ rank|capfirst }} in {{ sample_map_name|capfirst }}</div>
+<div class="title">analysis: "{{ analysis_name }}" / id: {{ analysis_id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_name }}</b>" Info Page</a> / <a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ instance }}/">Back to "<b>{{ sample_map_name|capfirst }}</b>" Sample Map Page</a></div>
+
+<p class="info">Warning: Image below may be resized to fit into the box and may seem smaller than the actual size of it.
+
+<center>
+<table width="1200">
+    <tr>
+        <td width="900">
+            <p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ image }}">
+        </td>
+        <td width="300" valign="top">
+            <form enctype="multipart/form-data" method="post" action="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/{{ instance }}/heatmap/{{ rank }}/">
+            <div style="padding-left: 10px; border-left: 1px solid #343434;">
+            <p class="sminfo">Minimum total percentage of an OTU in all samples (can be bigger than 100)
+            <table width="100%">
+                <tr><td width="180">Min pecentage</td><td>: <input size="5" type="text" name="min_percentage" value="{{ options.min_percentage }}" /></td></tr>
+            </table>
+            <p class="sminfo">Minimum total number of samples have any OTU (if any OTU would be presented in less than number of samples provided, OTU wouldn't be included in heatmaps)
+            <table width="100%">
+                <tr><td width="180">Min present</td><td>: <input size="5" type="text" name="min_present" value="{{ options.min_present }}" /></td></tr>
+            </table>
+            <p class="sminfo">"True" to apply log10 to abundance percentages (log(abundance percentage + 1)) in order to amplify low percentages
+            <table width="100%">
+                <tr><td width="180">Logarithmic</td><td>: <select name="log"><option value="False" {% ifequal options.log 0 %}selected{% endifequal %}>False</option><option value="True" {% ifequal options.log 1 %}selected{% endifequal %}>True</option></select></td></tr>
+            </table>
+            <p class="sminfo">Leave them empty if you want them to be calculated automatically. If you change width or weight, you might need to change margins and text sizes as well:
+            <table width="100%">
+                <tr><td width="180">Width</td><td>: <input size="5" type="text" name="width" value="{{ options.width }}" /></td></tr>
+                <tr><td width="180">Height</td><td>: <input size="5" type="text" name="height" value="{{ options.height }}"/></td></tr>
+            </table>
+            <p class="sminfo">Text area between the map and the right side or the bottom of the image, respectively
+            <table width="100%">
+                <tr><td width="180">Margin right</td><td>: <input size="5" type="text" name="margin_right" value="{{ options.margin_right }}" /></td></tr>
+                <tr><td width="180">Margin bottom</td><td>: <input size="5" type="text" name="margin_bottom" value="{{ options.margin_bottom }}" /></td></tr>
+            </table>
+            <p class="sminfo">Text size of OTUs and samples
+            <table width="100%">
+                <tr><td width="180">OTU text size</td><td>: <input size="5" type="text" name="cexRow" value="{{ options.cexRow }}" /></td></tr>
+                <tr><td width="180">Sample text size</td><td>: <input size="5" type="text" name="cexCol" value="{{ options.cexCol }}" /></td></tr>
+            </table>
+            <p align="center"><input type="submit" value="Re-create Image" />
+            </div>
+            </form>
+        </td>
+    </tr>
+</table>
+</center>
+
+{% endblock %}

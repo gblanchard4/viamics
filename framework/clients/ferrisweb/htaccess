@@ -1,0 +1,16 @@
+AddHandler mod_python .py
+SetHandler python-program
+
+Header set Pragma "no-cache"
+Header set Cache-Control "no-cache"
+Header set Expires "-1"
+
+# assume framework is under '/path/to/viamics/framework/' and
+# edit these directories accordingly and copy this file into the
+# necessary directory and rename it to '.htaccess':
+
+PythonPath "['/path/to/viamics/', '/path/to/viamics/framework', '/path/to/viamics/framework/clients'] + sys.path"
+
+PythonHandler django.core.handlers.modpython
+SetEnv DJANGO_SETTINGS_MODULE ferrisweb.settings
+PythonDebug On

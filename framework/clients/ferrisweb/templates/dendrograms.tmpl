@@ -1,0 +1,40 @@
+{% extends "base.tmpl" %}
+{% load tablecols %}
+{% load dict_get %}
+
+{% block title %}Sample Dendrograms{% endblock %}
+
+{% block content %}
+
+<div class="head">Sample Dendrograms » <i>{{ analysis_name }}</i></div><a name="top"></a>
+<div class="title">{{ analysis_id }}</div>
+<div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_name }}</b>" Info Page</a></div>
+
+<div class="smallhead">Dendrograms</div>
+<p class="smallheadtitle">» Average linkage hierarchical cluster analysis of samples based on percent abundace information at given taxonomic level.
+
+<center>
+<table width="1000">
+<tr>
+{% for rank in ranks %}
+<td>
+    <p class="smallheadtitle">» <a href="#{{ rank }}">{{ rank|capfirst }}</a>
+    <p aling="center"><div style="width: 100%; text-align: center;"><img src="{{ request.META.HTTP_HOST }}/media/{{ piechart_dendrograms_dir }}/{{ pie_chart_dendrogram_file_prefix }}{{ rank }}.png" style="max-height: 700px; max-width: 200px; overflow: none;"></div>
+</td>
+{% endfor %}
+</tr>
+</table>
+</center>
+
+
+{% for rank in ranks %}
+<div class="smallhead">Dendrograms » {{ rank|capfirst }} <span style="font-size: 0.4em;"><a name="{{ rank }}" href="#top" title="top">^</a></span></div>
+
+<p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ piechart_dendrograms_dir }}/{{ pie_chart_dendrogram_file_prefix }}{{ rank }}.png">
+{% endfor %}
+
+
+
+
+
+{% endblock %}
