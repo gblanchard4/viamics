@@ -1,0 +1,6 @@
+*.pyc
+.htaccess
+config.py
+framework/tmp/*
+framework/analyses/*
+framework/errors/*
