@@ -16,7 +16,6 @@
 #
 
 import os
-import time
 
 import framework.tools.rdp
 
@@ -39,18 +38,20 @@ def _exec(p, request_dict):
     number_of_sequences = helper_functions.get_number_of_lines(p.files.data_file_path) / 2
     debug("running rdp on %d sequences" % number_of_sequences, p.files.log_file)
     framework.tools.rdp.run_classifier(c.rdp_running_path, p.files.data_file_path, p.files.rdp_output_file_path, p.files.rdp_error_log_file_path)
-    
-    #for some reason samples_dictionary(p) is not finding the data file
-    #it seems to be running before the RDP classifier is done saving the file
-    try:
-    	samples_dictionary(p)
-    except IOError as (errno, strerror):
-    	if(errno==2):
-    	    time.sleep(30)
-    	    samples_dictionary(p)
-    	else:
-    	    raise
-    	    
+
+    #for some reason samples_dictionary(p) was not finding the data file
+    #it seemed to be running before the RDP classifier is done saving the file
+    #this worked for a short fasta file, but the cleaner solution is in 
+    #tools/rdp.py using subprocess.call instead of os.system
+    #try:
+        #samples_dictionary(p)
+    #except IOError as (errno, strerror):
+    #	if(errno==2):
+    #	    time.sleep(30)
+    #	    samples_dictionary(p)
+    #	else:
+    #	    raise
+    samples_dictionary(p)
     rdp_general_confidence_image(p)
     rdp_otu_confidence_analysis(p)
     rdp_samples_confidence_image(p)
