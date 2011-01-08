@@ -12,8 +12,8 @@ import unittest
 
 sys.path.append("../../")
 
-import merensframework.constants as c
-from merensframework import helper_functions
+from framework import constants as c
+from framework import helper_functions
 
 
 class Tests(unittest.TestCase):

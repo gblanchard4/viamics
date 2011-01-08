@@ -11,8 +11,10 @@ import cPickle
 
 import unittest
 
-sys.path.append("../../")
-import merensframework.constants as c
+sys.path.append("../..")
+sys.path.append("../")
+
+from framework import constants as c
 
 class Tests(unittest.TestCase):
     def setUp(self):
@@ -26,10 +28,10 @@ class Tests(unittest.TestCase):
     def testDirectories(self):
         def _test(dir):
             if not c.__dict__.has_key(dir):
-                raise("'%s' has no entry in constants" % dir)
+                raise Exception("'%s' has no entry in constants" % dir)
 
             if not os.path.exists(c.__dict__[dir]):
-                raise("'%s' doesn't exist at '%s'" % (dir, c.__dict__[dir]))
+                raise Exception("'%s' doesn't exist at '%s'" % (dir, c.__dict__[dir]))
 
             return True
 

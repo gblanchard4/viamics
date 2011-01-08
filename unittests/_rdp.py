@@ -13,13 +13,13 @@ import unittest
 
 sys.path.append("../../")
 
-import merensframework.constants as c
-from merensframework import helper_functions
+from framework import constants as c
+from framework import helper_functions
 
 
 class Tests(unittest.TestCase):
     def setUp(self):
-        self.test_fasta_file = os.path.join(c.base_dir, 'unittests/test_files/example_fasta')
+        self.test_fasta_file = os.path.join(c.base_dir, "../", 'unittests/test_files/example_fasta')
         self.analysis_id = helper_functions.get_sha1sum(self.test_fasta_file) + "-test"
         self.rdp_analysis_dir = os.path.join(c.analyses_dir, self.analysis_id)
 
