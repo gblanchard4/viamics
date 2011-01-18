@@ -1,4 +1,10 @@
+# platform dependent python byte code files.
 *.pyc
+
+# temporary vi files.
+*.sw*
+
+# framework related stuff..
 .htaccess
 config.py
 framework/tmp/*
