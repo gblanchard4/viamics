@@ -33,7 +33,6 @@ import threading
 import traceback
 import matplotlib.cm as cm
 
-
 sys.path.append("../")
 try:
     import framework.constants as c
@@ -479,6 +478,21 @@ class ProcessRequest:
             functions_dict = {}
             functions_dict.update(functions_module_dict)
             functions_dict.update(functions_common_dict)
+
+            # this is important. functions_dict contains function names,
+            # descriptions, as well as actual memory references to functions
+            # exported by protocol specific and common module provide.
+            #
+            # memory references are meaningful in the context of the server
+            # and they shouldn't be sent to clients (since clients can not
+            # do anything with them).
+            #
+            # here, I am solving the problem by stripping those references
+            # from the data structure with my dirty loop before writing sending
+            # response data back to the client. a better solution could replace
+            # this anytime.
+            for module_item in functions_dict:
+                functions_dict[module_item]['func'] = None
 
             self.write_socket({'response': 'OK', 'refresh_options': refresh_options, 'functions_dict': functions_dict})
         else:
