@@ -37,7 +37,6 @@ def log_10_fix(x, pos):
         return r'$0$'
     return r'$10^%d$' % int(math.log10(x))
 
-
 def get_t_p_values_dict_for_subset(samples_dict, otu_library, sample_map_file_path, ranks = None, real_abundance = False):
     """this function sorts OTUs according to students t-test values with expected mean difference of 10. this way
        we get a well sorted OTUs from the ones that have the biggest differnce in terms of percent abundance mean
@@ -132,14 +131,14 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             for sample in sample_groups[group]:
                 if samples_dict[sample][rank].has_key(otu):
                     if real_abundance:
-                        plot_dict[group].append(samples_dict[sample][rank][otu])
+                        plot_dict[group].append((samples_dict[sample][rank][otu], sample),)
                     else:
                         if samples_dict[sample]['tr'] == 0:
                             otu_vectors[group].append(0.0)
                         else:
-                            plot_dict[group].append(samples_dict[sample][rank][otu] * 100.0 / samples_dict[sample]['tr'])
+                            plot_dict[group].append((samples_dict[sample][rank][otu] * 100.0 / samples_dict[sample]['tr'], sample),)
                 else:
-                    plot_dict[group].append(0.0)
+                    plot_dict[group].append((0.0, sample),)
 
         fig = figure(figsize=(3, 6))
         if real_abundance:
@@ -158,8 +157,8 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             if real_abundance:
                 """if abundance is 0.0, make it 1 so it would look better on log scale"""
                 for j in range(0, len(plot_dict[key])):
-                    if plot_dict[key][j] < 1:
-                        plot_dict[key][j] = 1.0
+                    if plot_dict[key][j][0] < 1:
+                        plot_dict[key][j][0] = 1.0
 
             title(otu)
 
@@ -167,9 +166,9 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             # at the same spot. instead of this, [i] * len(plot_dict[key]) could be used to plot them.
             y_positions =  [((1 - (r.gauss(100, 3) /100)) + i) for x in range(0, len(plot_dict[key]))]
 
-            plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
+            plot(y_positions, [t[0] for t in plot_dict[key]], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
 
-            b = boxplot(plot_dict[key], positions=[i + 0.35], sym=',', widths=0.2)
+            b = boxplot([t[0] for t in plot_dict[key]], positions=[i + 0.35], sym=',', widths=0.2)
             setp(b['medians'], color=group_colors[key])
             setp(b['whiskers'], color='black', alpha=0.3)
             setp(b['boxes'], color='black', alpha=0.3)
