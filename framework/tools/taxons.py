@@ -131,14 +131,14 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             for sample in sample_groups[group]:
                 if samples_dict[sample][rank].has_key(otu):
                     if real_abundance:
-                        plot_dict[group].append((samples_dict[sample][rank][otu], sample),)
+                        plot_dict[group].append([samples_dict[sample][rank][otu], sample],)
                     else:
                         if samples_dict[sample]['tr'] == 0:
                             otu_vectors[group].append(0.0)
                         else:
-                            plot_dict[group].append((samples_dict[sample][rank][otu] * 100.0 / samples_dict[sample]['tr'], sample),)
+                            plot_dict[group].append([samples_dict[sample][rank][otu] * 100.0 / samples_dict[sample]['tr'], sample],)
                 else:
-                    plot_dict[group].append((0.0, sample),)
+                    plot_dict[group].append([0.0, sample],)
 
         fig = figure(figsize=(3, 6))
         if real_abundance:
