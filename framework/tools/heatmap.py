@@ -19,12 +19,16 @@
 #  python generate_rpy_heatmap.py -a ABUNDANCE_FILE -p 10 -m 1 --row-text-size=1.5 --column-text-size=1 --margin-right=20 --margin-bottom=10 --width=1000 --height=1200 -l
 #
 
+import os
 import sys
 import math
 import numpy
 import Numeric
 
-from rpy import *
+from rpy2 import robjects
+import rpy2.robjects.numpy2ri
+from rpy2.robjects.packages import importr
+
 from optparse import OptionParser
 
 def main(options, analyses_dir = ''):
@@ -78,36 +82,40 @@ def main(options, analyses_dir = ''):
 
     if len(col_names) < 2 or len(row_names) < 2:
         raise Exception, "Number of columns or rows can't be smaller than 2 in a heatmap (you might have enetered some criteria that eliminates all OTU's or samples)."
+
     generate_heatmap(options, col_names, row_names, data_matrix, sample_colours = map(sample_colour, col_names))
 
     return
 
 
 def generate_heatmap(options, col_names, row_names, data_matrix, sample_colours):
-    #R stuff
-    r.library('gplots')
+    robjects.r.library('gplots')
+    grdevices = importr('grDevices')
+
     h = options.height or len(row_names) * 25
     if h < 400:
         h = 400
     w = options.width or len(col_names) * 20
     if w < 500:
         w = 500
-    r.png(options.output_file, width=w, height=h)
-    r.heatmap_2(data_matrix,
-                labRow=row_names,
-                scale=options.scale,
-                labCol=col_names,
-                ColSideColors=sample_colours,
-                col=r.redgreen(50),
-                #col=r.topo_colors(50),
-                key=True,
-                symkey=False,
-                density_info="none",
-                trace="none",
-                margins=r.c(options.margin_bottom, options.margin_right), # margin right and bottom
-                cexRow=options.cexRow,       # Y axis text size
-                cexCol=options.cexCol)       # X axis text size
-    r.dev_off()
+
+    grdevices.png(options.output_file, width=w, height=h)
+
+    robjects.r.heatmap(data_matrix,
+                       labRow=row_names,
+                       scale=options.scale,
+                       labCol=col_names,
+                       ColSideColors=robjects.StrVector(sample_colours),
+                       col=robjects.r.redgreen(100),
+                       key=True,
+                       symkey=False,
+                       density_info="none",
+                       trace="none",
+                       margins=robjects.r.c(options.margin_bottom, options.margin_right), # margin right and bottom
+                       cexRow=options.cexRow,       # Y axis text size
+                       cexCol=options.cexCol)       # X axis text size
+
+    grdevices.dev_off()
 
     return
 
