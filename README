@@ -101,8 +101,8 @@ sudo R
 # quit R.
 
 
-#RPy
-wget http://downloads.sourceforge.net/project/rpy/rpy/1.0.3/rpy-1.0.3.tar.gz?use_mirror=voxel
+#RPy2
+wget http://downloads.sourceforge.net/project/rpy/rpy2/2.1.x/rpy2-2.1.8.tar.gz
 echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib64/R/bin:/usr/local/lib64/R/lib' >> ~/.bashrc
 su
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib64/R/bin:/usr/local/lib64/R/lib
@@ -110,7 +110,7 @@ export PATH=$PATH:/usr/local/bin/
 python setup.py install
 
 # download RDP and put it somewhere on the disk, then edit your config file.
-wget http://downloads.sourceforge.net/project/rdp-classifier/rdp-classifier/rdp_classifier_2.2.zip?use_mirror=cdnetworks-us-2
+wget http://downloads.sourceforge.net/project/rdp-classifier/rdp-classifier/rdp_classifier_2.2.zip
 
 # PyCogent
 wget http://downloads.sourceforge.net/project/pycogent/PyCogent/1.4.1/PyCogent-1.4.1.tgz?use_mirror=cdnetworks-us-1
