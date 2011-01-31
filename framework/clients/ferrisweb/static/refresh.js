@@ -13,8 +13,8 @@ function refresh_analyses(timer)
                 //alert("shut: " + data[0]);
                 analyses = data;
                 len = analyses.length;
-                if(len == 0) return;
-                finished = (analyses[0].state == "done");
+                if(len == 0) {timer.stop(); return; }
+                finished = (analyses[0].state == "done" );
                 for (i = 0; i< len; i++)
                 {
                     currentLog = analyses[i].log;
