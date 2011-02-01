@@ -24,8 +24,10 @@
 
 import os
 import sys
+import shlex
 import shutil
 import cPickle
+import subprocess
 import random as r
 
 from pylab import *
@@ -42,7 +44,14 @@ def run_classifier(rdp_running_path, fasta_file, rdp_output_file, error_log = '/
     """changes directory, runs RDP, returns back to the original directory"""
     cur_dir = os.getcwd()
     os.chdir(rdp_running_path)
-    ret_val = os.system(cmd % {'fasta_file': fasta_file, 'rdp_output_file': rdp_output_file, 'error_log': error_log})
+    #uses subprocess.call instead of older os.system.
+    #subprocess was added in python 2.4, if backwards compat is an issue
+    #we can add a condition to check the version. may need to do other stuff 
+    #too as os.system was seeming to not block in some cases.
+    command = (cmd % {'fasta_file': fasta_file, 'rdp_output_file': rdp_output_file, 'error_log': error_log})
+    args = shlex.split(command)
+    ret_val = subprocess.call(args)
+    #ret_val = os.system(cmd % {'fasta_file': fasta_file, 'rdp_output_file': rdp_output_file, 'error_log': error_log})
     os.chdir(cur_dir)
     return (ret_val, error_log)
 

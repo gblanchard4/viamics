@@ -22,6 +22,7 @@ from framework import constants
 from django.conf.urls.defaults import *
 
 from clients.ferrisweb.views import index
+from clients.ferrisweb.views import web_api
 from clients.ferrisweb.views import about
 from clients.ferrisweb.views import status_request
 from clients.ferrisweb.views import analysis_info
@@ -42,6 +43,7 @@ from clients.ferrisweb.views import update_analysis_remove_samples
 
 urlpatterns = patterns('',
     (r'^$', index),
+    (r'^api/*', web_api),
     (r'^about/$', about),
     (r'^status/$', status_request),
     (r'^info/(?P<analysis_id>[a-zA-Z0-9_.-]+)/$', analysis_info),

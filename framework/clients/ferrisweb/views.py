@@ -18,6 +18,7 @@
 
 import os
 import sys
+import json
 import base64
 import socket
 import cPickle
@@ -321,6 +322,16 @@ def refresh_analysis_files(request, analysis_id):
                                                                          'functions_dict': functions_dict,
                                                                          'analysis_id': analysis_id})))
 
+def web_api(request):
+    server_request = {'request': 'get_analyses'}
+    server_response = server(server_request)
+    
+    if server_err(server_response):
+        return err_response(server_response)
+        
+    analyses = server_response['analyses']
+    return HttpResponse(json.dumps(analyses))
+    
 
 def index(request):
     server_request = {'request': 'get_analyses'}
