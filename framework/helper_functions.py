@@ -56,6 +56,45 @@ class HeatmapOptions:
         self.cexCol                = 1
 
 def server(request):
+    """
+    #takes a python dict "request", and passes it to the Viamics server through
+    #(currently) a UNIX domain socket. 
+    #request has at minimum a key "request", whose values can be:
+    #                'exec_analysis'                
+                     'remove_analysis'              
+                     'status'                       
+                     'get_analyses'                 
+                     'get_analysis_name'            
+                     'get_type_of_analysis'         
+                     'get_analysis_ranks'           
+                     'get_sample_map_name'          
+                     'get_sample_maps'              
+                     'get_sample_map_instances'     
+                     'get_samples_dict_path'        
+                     'get_relative_taxon_charts_dir'
+                     'get_relative_type_specific_data_dir'
+                     'get_otu_confidence_tuples'   
+                     'get_otu_t_p_tuples'          
+                     'get_samples_in_an_analysis'  
+                     'append_samples_to_analysis'  
+                     'info'                        
+                     'refresh_analysis_files'      
+                     'heatmap_options'             
+                     'refresh_heatmap'             
+                     'refresh_sample_map'          
+                     'new_sample_map' 
+    #for example:
+    #show all analyses:
+    server({"request":"get_analyses"}) #returns a listing of all analyses
+    #
+    #remove given analysis
+    server({ 'request': 'remove_analysis', 'analysis_id':             'b7782ab61207929a9e8a2f12eb52b977800d8979-test'})
+    #
+    #perform analysis:
+    server({'request': 'exec_analysis', 'analysis_type': u'rdp',     'job_description': u'fasta', 'seperator': u'_',  'data_file_sha1sum': 'dad183c64f8d0d3516b5cf2c153ab9e97cdf97b4', 'data_file_path': '/home/johnny/Desktop/viamics/framework/tmp/1293740788.36/data_file'})
+    #
+    #see [the wiki](https://github.com/meren/viamics/wiki/Client-API) for more details
+    """
     serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
         serversocket.connect(c.socket_name)
