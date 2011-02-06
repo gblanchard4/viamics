@@ -49,11 +49,12 @@ except AttributeError:
 # for unittests to run properly):
 #################################################################
 
-socket_name = "\0merenssocket"
 
 analyses_dir = join(base_dir, "analyses")
 error_logs_dir = join(base_dir, "errors")
 temp_files_dir = join(base_dir, "tmp")
+
+socket_name = join(temp_files_dir, "sock")
 
 web_dir = join(base_dir, "clients/ferrisweb")
 web_statics_dir = join(web_dir, "static")
