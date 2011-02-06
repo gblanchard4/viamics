@@ -105,6 +105,7 @@ class Server:
             except KeyboardInterrupt:
                 print "interrupted.. closing socket"
                 serversocket.close()
+                os.remove(c.socket_name)
                 sys.exit(0)
 
             threadid = str(time.time())
@@ -792,4 +793,5 @@ class Meta:
             return None
 
 if __name__ == '__main__':
+    """Initializes the Server with the socket specified in config.py"""
     Server(c.socket_name)
