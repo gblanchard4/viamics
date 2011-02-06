@@ -43,7 +43,9 @@ from clients.ferrisweb.views import update_analysis_remove_samples
 
 urlpatterns = patterns('',
     (r'^$', index),
-    (r'^api/*', web_api),
+    (r'^api/*', web_api),#this should be specified in greater detail if we want
+    #to decouple clients. right now it just gives the json for get_analyses.
+    #maybe a betterway would be to allow say, GET viamics.com/index.json
     (r'^about/$', about),
     (r'^status/$', status_request),
     (r'^info/(?P<analysis_id>[a-zA-Z0-9_.-]+)/$', analysis_info),
