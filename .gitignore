@@ -10,3 +10,7 @@ config.py
 framework/tmp/*
 framework/analyses/*
 framework/errors/*
+
+#nonsense
+.DS_STORE
+*~
