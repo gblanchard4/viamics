@@ -12,6 +12,11 @@ framework/analyses/*
 framework/errors/*
 
 #nonsense
-.DS_STORE
+*.DS_Store
 *~
-#*#
+
+#emacs temp files
+\#*
+
+#R command history
+.Rhistory
