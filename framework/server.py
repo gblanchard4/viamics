@@ -90,6 +90,10 @@ class ServerState:
 class Server:
     def __init__(self, socket_name):
         serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+            os.remove(c.socket_name)
+        except:
+            pass
         serversocket.bind(socket_name)
         serversocket.listen(5)
 
@@ -116,12 +120,12 @@ class Server:
 
 
 class ProcessRequest:
-    """"
+    """"""
     #takes a request through a UNIX domain socket `clientsocket`, and writes the 
 #server response to the socket. The socket should provide a python dict, 
 #for example the one passed into helper_functions.server. one of the functions 
 #in `executors` will be called based on `dict["request"]`
-    """"
+    
     def __init__(self, clientsocket, serverstate, threadid):
         self.threadid = threadid
         self.clientsocket = clientsocket
@@ -776,11 +780,11 @@ class Files:
 class Meta:
     """
     Meta-info for a particular analysis. contains - 
-dirs - Dirs object
-files - Files object
-images - Images object
-type - str
-desc - str
+    dirs - Dirs object
+    files - Files object
+    images - Images object
+    type - str
+    desc - str
     """
     def __init__(self, analysis_id):
         self.dirs = Dirs(analysis_id)
