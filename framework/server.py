@@ -90,6 +90,10 @@ class ServerState:
 class Server:
     def __init__(self, socket_name):
         serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+            os.remove(c.socket_name)
+        except:
+            pass
         serversocket.bind(socket_name)
         serversocket.listen(5)
 
