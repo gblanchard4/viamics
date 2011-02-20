@@ -1,7 +1,7 @@
 import rpy2.robjects as R
 import cPickle
     
-def union_of_otu_sets(samples_dict, samples_to_compare, desired_level):
+def all_otus_from(samples_dict, samples_to_compare, desired_level):
     """Given a list of samples to compare, and at the level you wish to compare:
         
         Return an ordered list of otu's that appear in any of the samples."""
@@ -14,11 +14,11 @@ def union_of_otu_sets(samples_dict, samples_to_compare, desired_level):
     l.sort()
     return l
 
-def correlation_between(sample_a, sample_b, level="genus"):
+def correlation_between(samples_dict, sample_a, sample_b, level="genus"):
     """Returns a float representing the pearson correlation between two samples. This number is a measure of how similar the two samples are.  """
-    otus = union_otu_sets([sample_a,sample_b], level)
-    vector_a = R.r.IntVector(map(number_for_otu_at(sample_a,level), otus))
-    vector_b = R.r.IntVector(map(number_for_otu_at(sample_b,level), otus))
+    otus = all_otus_from(samples_dict, [sample_a,sample_b], level)
+    vector_a = R.IntVector(map(number_for_otu_at(samples_dict[sample_a],level), otus))
+    vector_b = R.IntVector(map(number_for_otu_at(samples_dict[sample_b],level), otus))
     return R.r.cor(vector_a, vector_b, method="pearson")[0]
 
 def number_for_otu_at(sample,level):
@@ -31,5 +31,4 @@ def number_for_otu_at(sample,level):
 if __name__ == "__main__":
     """for testing purposes"""
     samples_dict = cPickle.load(open('../../unittests/test_files/bv_study_samples_dict'))
-    for otu in union_of_otu_sets(samples_dict,['41','47'], 'class'):
-        print otu,
+    print(correlation_between(samples_dict,'95','131',level='class'))
