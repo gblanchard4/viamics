@@ -15,8 +15,11 @@ def union_of_otu_sets(samples_dict, samples_to_compare, desired_level):
     return l
 
 def correlation_between(sample_a, sample_b, level="genus"):
+    """Returns a float representing the pearson correlation between two samples. This number is a measure of how similar the two samples are.  """
     otus = union_otu_sets([sample_a,sample_b], level)
     vector_a = R.r.IntVector(map(number_for_otu_at(sample_a,level), otus))
+    vector_b = R.r.IntVector(map(number_for_otu_at(sample_b,level), otus))
+    return R.r.cor(vector_a, vector_b, method="pearson")[0]
 
 def number_for_otu_at(sample,level):
     def number_of(otu):
