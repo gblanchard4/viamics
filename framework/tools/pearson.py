@@ -1,4 +1,6 @@
 import rpy2.robjects as R
+import numpy as NP
+from numpy import *
 import cPickle
     
 def all_otus_from(samples_dict, samples_to_compare, desired_level):
@@ -27,6 +29,16 @@ def number_for_otu_at(sample,level):
             return sample[level][otu]
         else: return 0
     return number_of
+
+def generate_correlation_matrix(samples_dict):
+    keys = samples_dict.keys()
+    size = len(keys)
+    matrix = NP.arange(size**2).reshape(size,size).astype(float64)
+    for i in range(size):
+        for j in range(size)[i:]:
+            corr = correlation_between(samples_dict,keys[i],keys[j])
+            matrix[i][j], matrix[j][i] = corr, corr
+    return matrix
 
 if __name__ == "__main__":
     """for testing purposes"""
