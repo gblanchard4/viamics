@@ -156,6 +156,18 @@ def get_random_taxa_color_dict(p, samples_dict, cm):
 
     return taxa_color_dict
 
+def phylo_tree(otu_library):
+    """Return a nested dict (tree) representing the relationships in the taxonomic tree specified by otu_library """
+    phylo_tree = {}
+    for row in otu_library:
+        parent = phylo_tree
+        for otu in row:
+            if not parent.has_key(otu):
+                parent[otu] = {}
+            parent = parent[otu]
+    return phylo_tree
+
+
 
 def get_largest_abundance_number_in_all_samples(samples_dict):
     abundance_values = []
