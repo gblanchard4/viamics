@@ -28,7 +28,7 @@ function refresh_analyses(timer)
                         state = document.getElementById('analysis_state_'+(i+1));
                         state.src = "/static/done.gif";
                         var link = document.createElement('a');
-                        link.setAttribute('href', './info/'+analyses[0].id);
+                        link.setAttribute('href', './info/'+analyses[i].id);
                         link.innerHTML = "»";
                         var td = debuglist.parentNode.parentNode;
                         var title = td.getElementsByClassName('smallheadindex')[0];
