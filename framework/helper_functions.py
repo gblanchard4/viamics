@@ -28,7 +28,8 @@ import socket
 import string
 import hashlib
 import cPickle
-
+ 
+from colorsys import hsv_to_rgb
 from scipy import log2
 
 sys.path.append("../..")
@@ -132,14 +133,23 @@ def get_groups_colors_from_sample_map_file(sample_map_file_path):
     return (sample_groups, group_colors)
 
 
+def taxon_colors_dict(p,samples_dict,cm):
+    if(p.type == "rdp"):
+        return structured_taxa_color_dict(phylo_tree(
+                cPickle.load(open(p.files.otu_library_file_path))))
+    else:
+        return get_random_taxa_color_dict(p,samples_dict,cm)
+
+
 def get_random_taxa_color_dict(p, samples_dict, cm):
+    "only used for one-level analyses"
     def getColor(name, n):
         return cm.get_cmap(name, lut=n+2)
 
     taxa_color_dict = {}
 
     for rank in c.ranks[p.type]:
-        level_color_dict = {}
+        #level_color_dict = {}
         taxons = []
         for sample in samples_dict:
             for taxon in samples_dict[sample][rank]:
@@ -150,9 +160,9 @@ def get_random_taxa_color_dict(p, samples_dict, cm):
         random.shuffle(taxons)
         colors = getColor('Accent', len(taxons))
         for i in range(0, len(taxons)):
-            level_color_dict[taxons[i]] = colors(i)
+            taxa_color_dict[taxons[i]] = colors(i)
 
-        taxa_color_dict[rank] = level_color_dict
+        #taxa_color_dict[rank] = level_color_dict
 
     return taxa_color_dict
 
@@ -167,6 +177,38 @@ def phylo_tree(otu_library):
             parent = parent[otu]
     return phylo_tree
 
+
+def structured_taxa_color_dict(phylo_tree, 
+              interval=(0,1),
+              saturation=0.2,
+              value=0.8,
+              alpha=1.0,
+              level = None):
+    "returns a structured color map for all otus in the phylogenetic tree. Colors are organized so related otus have color hues near each other."
+    l = phylo_tree.keys()
+    if not l: return {}
+    color_spacing = float(interval[1]-interval[0])/len(l)
+    def color_dict(current_dict, item):
+        rgb = hsv_to_rgb((interval[0]+color_spacing*len(current_dict)),
+                                        saturation,
+                                        value,
+                                        )
+        current_dict[item] = (rgb[0], rgb[1], rgb[2], alpha)
+        return current_dict
+    colors = reduce(color_dict, l, {})
+    for i, key in enumerate(l):
+        colors.update(structured_taxa_color_dict(phylo_tree[key],
+                                                 interval=(interval[0]+i*color_spacing,
+                                                           interval[0]+(i+1)*color_spacing),
+                                                 saturation=saturation+0.2,
+                                                 value=value,
+                                                 alpha=alpha
+                                                 ))
+    return colors
+    
+    
+        
+        
 
 
 def get_largest_abundance_number_in_all_samples(samples_dict):
