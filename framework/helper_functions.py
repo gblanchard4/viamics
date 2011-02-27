@@ -134,15 +134,21 @@ def get_groups_colors_from_sample_map_file(sample_map_file_path):
 
 
 def taxon_colors_dict(p,samples_dict,cm):
-    if(p.type == "rdp"):
-        return structured_taxa_color_dict(phylo_tree(
-                cPickle.load(open(p.files.otu_library_file_path))))
+    """Return a dict mapping from otu to RGBA color quadruple for each otu in samples_dict """
+    if(len(c.ranks[p.type]) > 1):
+        return get_structured_taxa_color_dict(p, samples_dict, cm)
     else:
         return get_random_taxa_color_dict(p,samples_dict,cm)
 
 
+def get_structured_taxa_color_dict(p, samples_dict, cm):
+    """Return a dict mapping from otu to RGBA color quadruple for each otu in samples_dict. maintains consistent interface with get_random_taxa_color_dict  """
+    return structured_taxa_color_dict(phylo_tree(
+                cPickle.load(open(p.files.otu_library_file_path))))
+
+
 def get_random_taxa_color_dict(p, samples_dict, cm):
-    "only used for one-level analyses"
+    "Return a dict mapping from otu to RGBA color quadruple for each otu in samples_dict. Colors are mapped randomly to taxons. Only used for one-level analyses"
     def getColor(name, n):
         return cm.get_cmap(name, lut=n+2)
 
@@ -176,6 +182,10 @@ def phylo_tree(otu_library):
                 parent[otu] = {}
             parent = parent[otu]
     return phylo_tree
+
+def phylo_tree_red(otu_library):
+    def tree_from(row):
+        
 
 
 def structured_taxa_color_dict(phylo_tree, 
