@@ -37,7 +37,8 @@ def _exec(p, request_dict):
     sequences_bar_image(p)
     simpsons_diversity_bar_image(p)
     shannon_diversity_bar_image(p)
-    random_taxon_colors_dict(p)
+    #random_taxon_colors_dict(p)
+    taxon_colors_dict(p)
     pie_charts(p)
     pie_chart_dendrograms(p)
 
@@ -144,11 +145,18 @@ def shannon_diversity_bar_image(p):
     debug("Generating shannons diversity index image", p.files.log_file)
     framework.tools.diversityindex.generate(samples_dict, p.images.shannon_diversity_index_img_path, p.files.shannon_diversity_index_data_path,  p.type, method = "shannons")
 
-def random_taxon_colors_dict(p):
+#def random_taxon_colors_dict(p):
+#    samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
+#    debug("Generating random taxon color dicts", p.files.log_file)
+#    taxa_color_dict = framework.helper_functions.get_random_taxa_color_dict(p, samples_dict, cm)
+#    SerializeToFile(taxa_color_dict, p.files.taxa_color_dict_file_path)
+
+def taxon_colors_dict(p):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
-    debug("Generating random taxon color dicts", p.files.log_file)
-    taxa_color_dict = framework.helper_functions.get_random_taxa_color_dict(p, samples_dict, cm)
+    debug("Generating taxon color dicts", p.files.log_file)
+    taxa_color_dict = framework.helper_functions.taxon_colors_dict(p, samples_dict, cm)
     SerializeToFile(taxa_color_dict, p.files.taxa_color_dict_file_path)
+
 
 def pie_charts(p):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
