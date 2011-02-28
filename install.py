@@ -1,11 +1,18 @@
 #!/usr/bin/python
 
+# requires su permissions, so should be executed like so:
+# $ sudo ./install.py
+
+# Confirmed working on Ubuntu 10.10 32bit
+
 # TODO: 
+#   
 #   - This is a very crude start to a script to install viamics.
 #   - Right now it only supports Debian-Based Linux Distrobutrions that use apt-get to install software packages. We should add support for other OSes (Not you, Windows!)
 #   - This needs commenting and organization...BAD >_<
 #   - rdp_classifier should download if it is already there...likewise it shouldn't unzip if already unzipped.
 #   - FINAL STAGE - copy config.py and update with PATH to rdp_classifier and framework
+#   - Should check if we have proper permissions FIRST
 
 import os
 import sys
