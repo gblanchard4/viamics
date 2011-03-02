@@ -18,3 +18,6 @@ from framework.tools.logger import debug
 from framework.clients.ferrisweb import webforms
 
 server = helper_functions.server
+
+def remove(id):
+    server({ 'request': 'remove_analysis', 'analysis_id': id })

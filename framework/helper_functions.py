@@ -172,8 +172,8 @@ def get_random_taxa_color_dict(p, samples_dict, cm):
 
     return taxa_color_dict
 
-def phylo_tree(otu_library):
-    """Return a nested dict (tree) representing the relationships in the taxonomic tree specified by otu_library """
+def phylo_tree_iter(otu_library):
+    """Return a nested dict (tree) representing the relationships in the taxonomic tree specified by otu_library. should get exactly the same result as phylo_tree, (pointless rewrite of perfectly good function to satisfy my curiosity) """
     phylo_tree = {}
     for row in otu_library:
         parent = phylo_tree
@@ -183,17 +183,22 @@ def phylo_tree(otu_library):
             parent = parent[otu]
     return phylo_tree
 
-def phylo_tree_red(otu_library):
-    def tree_from(row):
-        
+def phylo_tree(otu_library):
+    """Return a nested dict (tree) representing the relationships in the taxonomic tree specified by otu_library """
+    def tree_from(current_dict, row):
+        if(len(row) == 0): return {}
+        else:
+            current_dict[row[0]] = tree_from(current_dict.get(row[0], {}), row[1:])
+            return current_dict
+
+    return reduce(tree_from, otu_library, {})
 
 
 def structured_taxa_color_dict(phylo_tree, 
               interval=(0,1),
               saturation=0.2,
               value=0.8,
-              alpha=1.0,
-              level = None):
+              alpha=1.0):
     "returns a structured color map for all otus in the phylogenetic tree. Colors are organized so related otus have color hues near each other."
     l = phylo_tree.keys()
     if not l: return {}
@@ -207,7 +212,7 @@ def structured_taxa_color_dict(phylo_tree,
         return current_dict
     colors = reduce(color_dict, l, {})
     for i, key in enumerate(l):
-        colors.update(structured_taxa_color_dict(phylo_tree[key],
+        colors = dict(colors, **structured_taxa_color_dict(phylo_tree[key],
                                                  interval=(interval[0]+i*color_spacing,
                                                            interval[0]+(i+1)*color_spacing),
                                                  saturation=saturation+0.2,
