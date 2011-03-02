@@ -232,10 +232,12 @@ returns self.decode_request of the data recieved.
         job_description         = self.request_dict['job_description']
         analysis_type           = self.request_dict['analysis_type']
 
-        late_response_request = self.request_dict.has_key('return_when_done') and self.request_dict['return_when_done'] == True
+        late_response_request = self.request_dict.has_key('return_when_done') \
+            and self.request_dict['return_when_done'] == True
 
         if analysis_type not in server_modules_dict:
-             self.write_socket({'response': 'error', 'content': 'Wrong type of analysis.'})
+             self.write_socket({'response': 'error', \
+                                 'content': 'Wrong type of analysis.'})
 
         p = Meta(analysis_id)
 
@@ -674,6 +676,9 @@ returns self.decode_request of the data recieved.
 
 
 class Dirs:
+    """
+    figures out filesystem locations for several resources of a given analysis. 
+    """
     def __init__(self, analysis_id):
         self.analysis_dir = os.path.join(c.analyses_dir, analysis_id)
         self.sample_map_instance = None
@@ -734,6 +739,11 @@ class Dirs:
 
 
 class Images:
+    """ From a server.Dirs object, figures out paths to image files. e.g.:
+    imgs = Images(dirs)
+    imgs.samples_sequences_bar_path  #bar graph of number of sequences per sample
+    imgs.simpsons_diversity_index_img_path #Simpson's diversity index for each sample
+    imgs.shannon_diversity_index_img_path #Shannon'sdiversity index for each sample."""
     def __init__(self, dirs):
         self.samples_sequences_bar_path         = os.path.join(dirs.analysis_dir, c.samples_sequences_bar_name)
         self.simpsons_diversity_index_img_path  = os.path.join(dirs.analysis_dir, c.simpsons_diversity_index_img_name)

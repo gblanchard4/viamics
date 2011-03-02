@@ -49,7 +49,8 @@ def generate(samples_dict, taxa_color_dict, rank = "genus", pie_chart_file_prefi
                 else:
                     percentage = 100.0
                 percentages.append(percentage)
-                c.append(taxa_color_dict[rank][taxon])
+                #c.append(taxa_color_dict[rank][taxon])
+                c.append(taxa_color_dict[taxon])
                 if percentage > 5:
                     labels.append(taxon)
                 else:

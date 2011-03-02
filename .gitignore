@@ -20,3 +20,7 @@ framework/errors/*
 
 #R command history
 .Rhistory
+framework/TEMP_MATRIX
+framework/dependancy_check.py
+framework/helper_functions.py.orig
+testinstall.py
