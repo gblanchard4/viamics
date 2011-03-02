@@ -31,14 +31,15 @@ if sys.platform != "linux2":
 #
 
 try:
-    test = open("/etc/test.permissions.file","wr")
+    temp = "/etc/test.permissions.file"
+    test = open(temp,"wr")
     test.close()
-    os.remove(test.name)
-    print "Please do not execute this script with super user privelleges.\nGoodbye ...\n"
-    sys.exit(0)
+    if os.path.exists(temp):
+        os.remove(test.name)
+        print "Please do not execute this script with super user privelleges.\nGoodbye ...\n"
+        sys.exit(0)
 
-except Exception,e:
-    print e
+except IOError:
     pass
 
 #
