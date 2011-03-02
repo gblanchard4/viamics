@@ -1,38 +1,53 @@
 #!/usr/bin/python
 
-# requires su permissions, so should be executed like so:
-# $ sudo ./install.py
-
-# Confirmed working on Ubuntu 10.10 32bit
-
 # TODO: 
 #   
-#   - This is a very crude start to a script to install viamics.
 #   - Right now it only supports Debian-Based Linux Distrobutrions that use apt-get to install software packages. We should add support for other OSes (Not you, Windows!)
-#   - This needs commenting and organization...BAD >_<
-#   - rdp_classifier should download if it is already there...likewise it shouldn't unzip if already unzipped.
-#   - FINAL STAGE - copy config.py and update with PATH to rdp_classifier and framework
-#   - Should check if we have proper permissions FIRST
+#   - rdp_classifier should not download if it is already there...likewise it shouldn't unzip if already unzipped.
+#   - Change all occurances of path creations to use os.join()
+#   - .htaccess install
+#   - I feel dirty for how I solved the permissions issues I've had. I could definitely use advice on that.
 
 import os
 import sys
 import urllib
 import zipfile
 
+print "Thank you for your interest in installing Viamics!\n"
+
 #
 # Only works on linux :)
 #
 
 if sys.platform != "linux2":
-    print "Sorry, but right this script only works in Debian-Based Linux Distros using apt-get!\nShutting down...Goodbye!\n"
+    print "Sorry, but right now this script only works in Debian-Based Linux Distros using apt-get!\nShutting down...Goodbye!\n"
     sys.exit(0)
 
 #
-# install the entire repository that apt-get has...everything!
+# Check if we have super user permissions by checking if we can write to apache2 folder.
+# We eventually need super user permissions, but having it all the way through the script 
+# will cause ownership conflicts for things we'd like to have without super user permissions.
+# Because of this, we prevent the script from running with super user permissions.
+#
+
+try:
+    test = open("/etc/test.permissions.file","wr")
+    test.close()
+    os.remove(test.name)
+    print "Please do not execute this script with super user privelleges.\nGoodbye ...\n"
+    sys.exit(0)
+
+except Exception,e:
+    print e
+    pass
+
+#
+# install the entire apt-get repository...or at least make sure that everything we need is there!
 #    
     
 try:
     os.system("sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python")
+
 except:
     print "apt-get was unable to run install.\n"
     sys.exit(0)
@@ -43,11 +58,13 @@ except:
 
 try:
     import rpy2.robjects as R
+
 except:
     print "Python Module - 'rpy2' - was not properly installed.\nRe-Attempting apt-get install..."
     os.system("sudo apt-get install python-rpy2")
     try:
         import rpy2.robjects as R
+        
     except:
         print " FAILED!\nPython Module - 'rpy2' was unable to be installed. Please install this module manually.\n"
         sys.exit(0)
@@ -57,21 +74,21 @@ except:
 #
         
 print 'Installing R packages...'
-f = open("rpackages.script", "w")
 
 # Set the CRAN to default repository (this may need to be changed to ensure that if this repo goes down, we have another option)
-# And second command in script updates all current packages in R...as of 2/28/11 a fresh install of R does in fact have packages requiring updates.
+# And second command in script updates all current packages in R...Interesting note: as of 2/28/11 a fresh install of R does in fact have packages requiring updates.
 
 script_commands = ["options(repos=c(CRAN=\"http://streaming.stat.iastate.edu/CRAN/\"))\n","update.packages(ask=FALSE)\n"]
-from rpy2.robjects.packages import importr
 
 # Check for each required R package. If they are not found, add them to a temporary R script file to be installed later.
+from rpy2.robjects.packages import importr
+
 try: 
-    importr('gtools')
+    importr('gtools')   
 except:
-    script_commands.append("install.packages('gtools')\n")
+    script_commands.append("install.packages('gtools')\n")   
 try:
-    importr('gdata')
+    importr('gdata')  
 except:
     script_commands.append("install.packages('gdata')\n")
 try:
@@ -88,6 +105,8 @@ except:
     script_commands.append("install.packages('gplots')\n")
     
 script_commands.append("quit()\n")
+
+f = open("rpackages.script", "w")
 f.writelines(script_commands)
 f.close()
 
@@ -110,13 +129,15 @@ try:
     importr('caTools')
     importr('bitops')
     importr('gplots')
-except:
+except: # In order to do this 'right', I should re-test each package individually and build a string of the packages that were not installed, instead of leaving it up to the user to guess which ones failed...Possible TODO
     print "FAILED!\n Please try to manual install the following R packages:\n\n\tgtools\n\tgdata\n\tcaTools\n\tbitops\n\tgplots\n\nGoodbye...\n"
 
 #
 # Download and unzip rdp_classifier
 #
 # Note: Uses system call to unzip to unzip. I was unable to get zipfile library to work without OSError. This may be a bug in library.
+
+print "Downloading RDP Classifier...\n"
 
 rdp_name = "rdp_classifier_2.2"
 rdp_zip_name = rdp_name + ".zip"
@@ -167,24 +188,73 @@ except:
     pass
 
 #
+# Clone Viamics
+#
+
+os.system("git clone git://github.com/meren/viamics.git")
+
+#
+# Create proper config.py
+#
+
+# get the working directory
+current_dir = os.getcwd()
+
+#### =====>change to os.join()<=====
+# these are the proper paths to be used in the new config.py file
+rdp_path = current_dir + "/" + rdp_name # /current/working/directory/rdp_classifier_2.2
+framework_path = current_dir +"/viamics/framework"
+
+# these are the placeholders in the default config file to be replaced
+rdp_placeholder = "/path/to/rdp/classifier"
+framework_placeholder = "/path/to/framework"
+
+# copy the default config file
+template_config = open(framework_path + "/config-default.py", "r")
+text = template_config.read()
+template_config.close()
+
+# write the proper config file
+config = open(framework_path + "/config.py", "w")
+config.write(text.replace(rdp_placeholder, rdp_path).replace(framework_placeholder, framework_path))
+config.close()
+
+#
+# Make temp/errors/analyses folders 
+#
+
+tmp = framework_path + "/tmp"
+errors = framework_path + "/errors"
+analyses = framework_path + "/analyses"
+
+os.mkdir(tmp)
+os.mkdir(errors)
+os.mkdir(analyses)
+
+#
 # Change apache config file so that all instances of 'AllowOverride None' -> 'AllowOverride All'
 #
 
+elevated_script = open("elevated.py", "w")
+elevated_text = """#!/usr/bin/python
+import os
 original_text = "AllowOverride None"
 new_text = "AllowOverride All"
 
 apache_file_path = "/etc/apache2/sites-enabled/000-default"
 apache_file = open(apache_file_path, "r")
+
 text = apache_file.read()
 apache_file.close()
 apache_file = open(apache_file_path, "w")
 apache_file.write(text.replace(original_text, new_text))
 apache_file.close()
-
-#
-# Clone Viamics
-#
-os.system("git clone git://github.com/meren/viamics.git")
+"""
+elevated_script.write(elevated_text)
+elevated_script.close()
+os.chmod('elevated.py', 777)
+os.system('sudo ./elevated.py')
+os.remove('elevated.py')
 
 print "SUCCESS!\n"
     
