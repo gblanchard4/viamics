@@ -84,27 +84,19 @@ script_commands = ["options(repos=c(CRAN=\"http://streaming.stat.iastate.edu/CRA
 # Check for each required R package. If they are not found, add them to a temporary R script file to be installed later.
 from rpy2.robjects.packages import importr
 
-try: 
-    importr('gtools')   
-except:
-    script_commands.append("install.packages('gtools')\n")   
-try:
-    importr('gdata')  
-except:
-    script_commands.append("install.packages('gdata')\n")
-try:
-    importr('caTools')
-except:
-    script_commands.append("install.packages('caTools')\n")
-try:
-    importr('bitops')
-except:
-    script_commands.append("install.packages('bitops')\n")
-try:
-    importr('gplots')
-except:
-    script_commands.append("install.packages('gplots')\n")
-    
+def installed(r_pkg):
+    try:
+        importr(r_pkg)
+        return True
+    except:
+        return False
+
+r_pkgs =  ['gtools','gdata','caTools','bitops','gplots']
+
+for pkg in r_pkgs:
+    if not installed(pkg):
+        script_commands.append("install.packages('"+pkg+"')\n")
+
 script_commands.append("quit()\n")
 
 f = open("rpackages.script", "w")
@@ -124,14 +116,17 @@ os.remove(f.name)
 
 # Ensure that R libraries can be found
 
-try:
-    importr('gtools')
-    importr('gdata')
-    importr('caTools')
-    importr('bitops')
-    importr('gplots')
-except: # In order to do this 'right', I should re-test each package individually and build a string of the packages that were not installed, instead of leaving it up to the user to guess which ones failed...Possible TODO
-    print "FAILED!\n Please try to manual install the following R packages:\n\n\tgtools\n\tgdata\n\tcaTools\n\tbitops\n\tgplots\n\nGoodbye...\n"
+fail_string = "FAILED!\n Please try to manual install the following R packages:\n\n"
+failed = False
+
+for pkg in r_pkgs:
+    if not installed(pkg):
+        fail_string = fail_string + "\t"+pkg+"\n"
+        failed = True
+if failed:
+    print fail_string+"GOODBYE"
+    sys.exit(0)
+
 
 #
 # Download and unzip rdp_classifier
