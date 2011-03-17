@@ -158,7 +158,10 @@ def drawdendrogram(clust, image_list, sample_list, dendrogram_out = 'clusters.pn
     depth = getdepth(clust)
 
     # width is fixed, so scale distances accordingly
-    scaling = float(w - 150)/depth
+    if(depth == 0):
+        scaling = 1
+    else:
+        scaling = float(w - 150)/depth
 
     # Create a new image with a white background
     if map:
@@ -251,12 +254,12 @@ def generate(samples_dict, otu_library, pie_charts_dir = "", dendrogram_prefix =
             img_list.append(piecharts % (rank, sample))
             sample_list.append(sample)
 
-        tree = hcluster(features)
+        clust = hcluster(features)
 
         if save_dir:
-            drawdendrogram(tree, img_list, sample_list, dendrogram_out = os.path.join(save_dir, dendrogram_prefix + rank + ".png"), map = map)
+            drawdendrogram(clust, img_list, sample_list, dendrogram_out = os.path.join(save_dir, dendrogram_prefix + rank + ".png"), map = map)
         else:
-            drawdendrogram(tree, img_list, sample_list, dendrogram_out = os.path.join(pie_charts_dir, dendrogram_prefix + rank + ".png"), map = map)
+            drawdendrogram(clust, img_list, sample_list, dendrogram_out = os.path.join(pie_charts_dir, dendrogram_prefix + rank + ".png"), map = map)
 
 
 if __name__  ==  "__main__":
