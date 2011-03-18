@@ -236,7 +236,7 @@ def m(tree):
 
 def generate(samples_dict, otu_library, pie_charts_dir = "", dendrogram_prefix = "", ranks = None, save_dir = None, map = None):
     """
-    if save_dir is None, this function will save files in pie_charts_dir
+    Generates piechart dendrograms for the given dict of samples. if save_dir is None, this function will save files in pie_charts_dir
     """
     piecharts = os.path.join(pie_charts_dir, "mini_piechart_%s_%s.png")
 

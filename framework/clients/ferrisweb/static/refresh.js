@@ -4,21 +4,30 @@ function refresh_analyses(timer)
     //finished = call the server, get status:
     resp = $.getJSON(   "api/get_analyses",
                 {},
-            function(data, status, xhr) 
+            function(analyses, status, xhr) 
             {
                 mesa = document.getElementsByTagName('table')[0];
-                debuglists = mesa.getElementsByTagName('ul');
-                spans = mesa.getElementsByClassName('analysis_id');
+                //debuglists = mesa.getElementsByTagName('ul');
+                //spans = mesa.getElementsByClassName('analysis_id');
+
+		rows = mesa.getElementsByTagName('tr');
+		rowMap = {};
+		for(i = 0; i<rows.length; i++)//create a map from analysis_id -> tr,
+		{//so the script can update analyses in the browser regardless of the
+		 //order the server sends them
+		    rowMap[rows[i].getElementsByClassName('analysis_id')[0].innerHTML] =
+			rows[i];
+		}
     
                 //alert("shut: " + data[0]);
-                analyses = data;
-                len = analyses.length;
+                //analyses = data;//the result of the HTTP request
+                len = analyses.length;//the number of analyses on the server
                 if(len == 0) {timer.stop(); return; }
                 finished = (analyses[0].state == "done" );
                 for (i = 0; i< len; i++)
                 {
                     currentLog = analyses[i].log;
-                    debuglist = debuglists[i];
+                    debuglist = rowMap[analyses[i].id].getElementsByTagName('ul')[0];
                     for (j = 0; j< currentLog.length; j++)
                     {
                         debuglist.children[j].innerHTML = currentLog[j];
@@ -28,26 +37,17 @@ function refresh_analyses(timer)
                         state = document.getElementById('analysis_state_'+(i+1));
                         state.src = "/static/done.gif";
                         var link = document.createElement('a');
-                        link.setAttribute('href', './info/'+analyses[i].id);
+			link.setAttribute('href', './info/'+analyses[i].id);
                         link.innerHTML = "»";
                         var td = debuglist.parentNode.parentNode;
                         var title = td.getElementsByClassName('smallheadindex')[0];
                         if(title.getElementsByTagName('a')[0])
                         {  
-                            //try
-                            //{ 
                                 c = title.getElementsByTagName('a')[0];
                             	title.removeChild(c);
-                            //}
-                            //catch (err)
-                            //{
-                            //	alert(td.innerHTML + err);
-                            //	throw err;
-                            //}
                         }
                         title.appendChild(link);
-                        finished = (finished && true);
-                    } else finished = (finished && false);
+                    } else finished = false;
                     
         
         
