@@ -28,7 +28,8 @@ import socket
 import string
 import hashlib
 import cPickle
- 
+import numpy as np
+
 from colorsys import hsv_to_rgb
 from scipy import log2
 
@@ -199,29 +200,40 @@ def structured_taxa_color_dict(phylo_tree,
               saturation=0.2,
               value=0.8,
               alpha=1.0):
-    "returns a structured color map for all otus in the phylogenetic tree. Colors are organized so related otus have color hues near each other."
-    l = phylo_tree.keys()
-    if not l: return {}
-    color_spacing = float(interval[1]-interval[0])/len(l)
-    def color_dict(current_dict, item):
-        rgb = hsv_to_rgb((interval[0]+color_spacing*len(current_dict)),
-                                        saturation,
-                                        value,
-                                        )
-        current_dict[item] = (rgb[0], rgb[1], rgb[2], alpha)
-        return current_dict
-    colors = reduce(color_dict, l, {})
-    for i, key in enumerate(l):
-        colors = dict(colors, **structured_taxa_color_dict(phylo_tree[key],
-                                                 interval=(interval[0]+i*color_spacing,
-                                                           interval[0]+(i+1)*color_spacing),
-                                                 saturation=saturation+0.2,
-                                                 value=value,
-                                                 alpha=alpha
-                                                 ))
-    return colors
+    """returns structured_taxa_hsv_dict, with hsv triples converted to rgba 4tuples"""
+    hsv = structured_taxa_hsv_dict(phylo_tree,
+                                   interval=interval,
+                                   saturation=saturation,
+                                   value=value,
+                                   alpha=alpha)
+    return dict(zip(hsv.keys(),
+                    map(lambda v: hsv_to_rgb(v[0],v[1],v[2])+(alpha,),hsv.values()
+                         )
+                    )
+                )
+
+def structured_taxa_hsv_dict(phylo_tree, 
+              interval=(0,1),
+              saturation=0.2,
+              value=0.8,
+              alpha=1.0):
+    "returns a structured color map from taxon -> hsv color triple for all otus in the phylogenetic tree. Colors are organized so related otus have color hues near each other."
+    if not phylo_tree.keys(): return {}
     
-    
+    siblings = phylo_tree.keys()
+    color_spacing = float(interval[1]-interval[0])/len(siblings)
+    hues = np.arange(interval[0],interval[1],color_spacing)#hues distributed evenly though the color-space given
+    colors = map(lambda h: (h,saturation,value),hues)
+    level_dict = dict(zip(siblings,colors))
+    child_dicts = map(
+                lambda i: structured_taxa_hsv_dict(
+                    phylo_tree[i],
+                    interval=(level_dict[i][0],level_dict[i][0]+color_spacing),
+                    saturation=saturation+0.2,
+                    value=value,
+                    alpha=alpha),siblings)#create a color dict for each subtree
+    return dict(level_dict, **(reduce(lambda x,y: dict(x, **y), child_dicts)))#combine all dicts
+
         
         
 
