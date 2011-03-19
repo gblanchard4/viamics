@@ -158,7 +158,10 @@ def drawdendrogram(clust, image_list, sample_list, dendrogram_out = 'clusters.pn
     depth = getdepth(clust)
 
     # width is fixed, so scale distances accordingly
-    scaling = float(w - 150)/depth
+    if(depth == 0):
+        scaling = 1
+    else:
+        scaling = float(w - 150)/depth
 
     # Create a new image with a white background
     if map:
@@ -233,7 +236,7 @@ def m(tree):
 
 def generate(samples_dict, otu_library, pie_charts_dir = "", dendrogram_prefix = "", ranks = None, save_dir = None, map = None):
     """
-    if save_dir is None, this function will save files in pie_charts_dir
+    Generates piechart dendrograms for the given dict of samples. if save_dir is None, this function will save files in pie_charts_dir
     """
     piecharts = os.path.join(pie_charts_dir, "mini_piechart_%s_%s.png")
 
@@ -251,12 +254,12 @@ def generate(samples_dict, otu_library, pie_charts_dir = "", dendrogram_prefix =
             img_list.append(piecharts % (rank, sample))
             sample_list.append(sample)
 
-        tree = hcluster(features)
+        clust = hcluster(features)
 
         if save_dir:
-            drawdendrogram(tree, img_list, sample_list, dendrogram_out = os.path.join(save_dir, dendrogram_prefix + rank + ".png"), map = map)
+            drawdendrogram(clust, img_list, sample_list, dendrogram_out = os.path.join(save_dir, dendrogram_prefix + rank + ".png"), map = map)
         else:
-            drawdendrogram(tree, img_list, sample_list, dendrogram_out = os.path.join(pie_charts_dir, dendrogram_prefix + rank + ".png"), map = map)
+            drawdendrogram(clust, img_list, sample_list, dendrogram_out = os.path.join(pie_charts_dir, dendrogram_prefix + rank + ".png"), map = map)
 
 
 if __name__  ==  "__main__":
