@@ -17,6 +17,7 @@ framework/errors/*
 
 #emacs temp files
 \#*
+.#*
 
 #R command history
 .Rhistory

@@ -113,7 +113,9 @@ class Server:
                 sys.exit(0)
 
             threadid = str(time.time())
-            thread = threading.Thread(target=ProcessRequest, args=(clientsocket, serverstate, threadid))
+            thread = threading.Thread(target=ProcessRequest, args=(clientsocket,
+                                                                   serverstate,
+                                                                   threadid))
             thread.setName(threadid)
             thread.start()
 
