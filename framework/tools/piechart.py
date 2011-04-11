@@ -27,6 +27,18 @@ from framework import helper_functions
 
 
 def generate(samples_dict, taxa_color_dict, rank = "genus", pie_chart_file_prefix = "piechart_", save_dir = None, is_transparent = False):
+    """Creates and saves piecharts showing the relative frequency of the different otus in each sample in samples_dict, using the colors in taxa_color_dict to color the piecharts
+    
+    REQUIRED ARGUMENTS:
+    --samples_dict - the dictionary of sample name -> dictionary, created by
+                     modules.<analysis type>.samples_dictionary(p)
+    --taxa_colors_dict - a dict of OTU name -> rgb or rgba color tuple, used to color the piechart
+
+    OPTIONAL ARGUMENTS:
+    --rank="genus" - the level at which to draw the piechart, e.g. rank="phylum" will
+    generate piecharts showing the phyla in each sample
+    --pie_chart_file_prefix = "piechart_" - Piecharts will be named:  pie_chart_file_prefix + rank + "_" + sample + '.png' and saved in save_dir if save_dir is not None
+    --save_dir - location to save piecharts. If not given, attempts to display them"""
     def _generate(mini = False):
         for sample in samples_dict:
             if mini:

@@ -43,7 +43,19 @@ def _exec(p, request_dict):
 
 
 def _append(p, request_dict):
+    """Add the given request_dict to the analysis in p, and generate images that are changed """
+    #import pdb; pdb.set_trace()
     #FIXME: This is the worst possible way to handle this request (instead, images for unchanged samples shouldn't be re-created):
+    #
+    #Here's what I plan to do: each type of analysis has a tool for extracting sample
+    #names from a data file.
+    #get that list from request_dict.additional_data_file_path, then (maybe) make a
+    #modified samples_dict from it containing only the new/modified samples, point
+    #point p.samples_serialized_file_path at this new file, and call _exec on p.
+    #
+    #Thinking about all this makes me wonder what the point of all this disk IO is. Are
+    #are the typical data sets large enough that memory use is an issue? Is the program
+    #CPU bound enough that the time to read and write is irrelevant?
     _exec(p, request_dict)
 
 
