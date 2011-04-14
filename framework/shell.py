@@ -13,7 +13,7 @@ sys.path.append("/clients")
 sys.path.append("../")
 from framework import constants as c
 
-from framework import helper_functions
+from framework.tools import helper_functions
 from framework.tools.logger import debug
 from framework.clients.ferrisweb import webforms
 from framework.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath

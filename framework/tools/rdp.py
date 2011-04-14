@@ -34,7 +34,7 @@ from pylab import *
 from optparse import OptionParser
 
 sys.path.append("../../")
-from framework import helper_functions
+from framework.tools import helper_functions
 
 
 # command to run RDP classifier

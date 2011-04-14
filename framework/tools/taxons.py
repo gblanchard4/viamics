@@ -25,7 +25,7 @@ from pylab import *
 from cogent.maths.stats.test import t_two_sample as t_test
 
 sys.path.append("../../")
-from framework import helper_functions
+from framework.tools import helper_functions
 from framework.tools.rdp import read_samples_dictionary
 
 def log_10_fix(x, pos):

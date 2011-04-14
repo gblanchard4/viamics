@@ -24,7 +24,7 @@ import random
 import rdp
 
 sys.path.append("../../")
-from framework import helper_functions
+from framework.tools import helper_functions
 
 
 def get_rarefaction_values(all_species):

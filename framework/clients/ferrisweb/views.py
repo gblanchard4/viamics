@@ -32,7 +32,7 @@ sys.path.append("../..")
 sys.path.append("../../..")
 from framework import constants
 
-from framework import helper_functions
+from framework.tools import helper_functions
 from framework.tools.logger import debug
 from framework.clients.ferrisweb import webforms
 

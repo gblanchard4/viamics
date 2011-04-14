@@ -18,7 +18,7 @@
 import copy
 
 from framework import constants as c
-from framework import helper_functions
+from framework.tools import helper_functions
 
 from framework.tools.logger import debug
 from framework.helper_functions import HeatmapOptions, DeserializeFromFile, SerializeToFile, GetCopy, RelativePath

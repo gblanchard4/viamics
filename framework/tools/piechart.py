@@ -23,7 +23,7 @@ import os
 import rdp
 
 sys.path.append("../../")
-from framework import helper_functions
+from framework.tools import helper_functions
 
 
 def generate(samples_dict, taxa_color_dict, rank = "genus", pie_chart_file_prefix = "piechart_", save_dir = None, is_transparent = False):

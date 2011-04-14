@@ -25,7 +25,7 @@ import zlib
 sys.path.append("../")
 from framework import constants
 
-from framework import helper_functions
+from framework.tools import helper_functions
 
 def server(request):
     serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

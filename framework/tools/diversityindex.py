@@ -24,7 +24,7 @@ import random as r
 from pylab import *
 
 sys.path.append("../../")
-from framework import helper_functions
+from framework.tools import helper_functions
 
 def get_shannons_diversity_index(species):
     S = len(species.values())

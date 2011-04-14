@@ -45,7 +45,7 @@ framework.sanity_check.all()
 
 
 from framework.modules.modules import server_modules_dict
-from framework import helper_functions
+from framework.tools import helper_functions
 from framework.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
 from framework.tools.logger import debug
 
