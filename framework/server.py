@@ -81,6 +81,9 @@ class ServerState:
     def __init__(self):
         self.running_analyses = []
         self.done_analyses = []
+        self.refresh_analyses()
+
+    def refresh_analyses(self):
         for dir in os.listdir(c.analyses_dir):
             if dir.startswith('.'):
                 continue
@@ -238,6 +241,7 @@ returns self.decode_request of the data recieved.
 
         if analysis_type not in server_modules_dict:
              self.write_socket({'response': 'error', 'content': 'Wrong type of analysis.'})
+             return#fixes _framework.testServerError
 
         p = Meta(analysis_id)
 

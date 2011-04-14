@@ -53,3 +53,7 @@ class Tests(unittest.TestCase):
         server_request = {'request': 'remove_analysis',
                           'analysis_id': self.analysis_id}
         server_response = self.server(server_request)
+        for d in dirs:
+            self.assertFalse(os.path.exists(os.path.join(self.rdp_analysis_dir, d)))
+        self.assertFalse(os.path.exists(self.rdp_analysis_dir))
+        
