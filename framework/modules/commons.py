@@ -21,7 +21,7 @@ from framework import constants as c
 from framework.tools import helper_functions
 
 from framework.tools.logger import debug
-from framework.helper_functions import HeatmapOptions, DeserializeFromFile, SerializeToFile, GetCopy, RelativePath
+from framework.tools.helper_functions import HeatmapOptions, DeserializeFromFile, SerializeToFile, GetCopy, RelativePath
 
 import framework.tools.bar
 import framework.tools.diversityindex
@@ -104,7 +104,7 @@ def heatmaps(p):
     for rank in c.ranks[p.type]:
         debug("Creating percent abundance for '%s' level" % rank, p.files.log_file)
         percent_abundance_file_path = vars(p.files)[c.percent_abundance_file_prefix + rank + '_file_path']
-        framework.helper_functions.create_percent_abundance_file(samples_dict, percent_abundance_file_path, rank = rank)
+        framework.tools.helper_functions.create_percent_abundance_file(samples_dict, percent_abundance_file_path, rank = rank)
 
         # heatmaps
         heatmap_options = copy.deepcopy(HeatmapOptions())
@@ -143,7 +143,7 @@ def simpsons_diversity_dot_plot(p):
 def sequences_bar_image(p):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
     debug("Generating number of sequences bar image", p.files.log_file)
-    samples = framework.helper_functions.sorted_copy(samples_dict.keys())
+    samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
     framework.tools.bar.generate([(sample, samples_dict[sample]['tr']) for sample in samples], p.images.samples_sequences_bar_path)
 
 def simpsons_diversity_bar_image(p):
@@ -159,7 +159,7 @@ def shannon_diversity_bar_image(p):
 def random_taxon_colors_dict(p):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
     debug("Generating random taxon color dicts", p.files.log_file)
-    taxa_color_dict = framework.helper_functions.get_random_taxa_color_dict(p, samples_dict, cm)
+    taxa_color_dict = framework.tools.helper_functions.get_random_taxa_color_dict(p, samples_dict, cm)
     SerializeToFile(taxa_color_dict, p.files.taxa_color_dict_file_path)
 
 def pie_charts(p):

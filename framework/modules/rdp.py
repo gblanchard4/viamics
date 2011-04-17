@@ -23,7 +23,7 @@ from framework import constants as c
 from framework.tools import helper_functions
 
 from framework.tools.logger import debug
-from framework.helper_functions import DeserializeFromFile, SerializeToFile, GetCopy
+from framework.tools.helper_functions import DeserializeFromFile, SerializeToFile, GetCopy
 
 def _exec(p, request_dict):
     """execute a pristine analysis with"""
@@ -70,8 +70,8 @@ def _append(p, request_dict):
     additional_data_file_path = request_dict['additional_data_file_path']
     seperator = open(p.files.seperator_file_path).read()
 
-    additional_samples = framework.helper_functions.sorted_copy(framework.tools.rdp.extract_sample_names(additional_data_file_path, seperator))
-    original_samples = framework.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()])
+    additional_samples = framework.tools.helper_functions.sorted_copy(framework.tools.rdp.extract_sample_names(additional_data_file_path, seperator))
+    original_samples = framework.tools.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()])
 
     #running rdp on additional data
     # FIXME: and this is just wrong (it is not compatible with the FASTA standard, sequences that follow headers
@@ -89,7 +89,7 @@ def _append(p, request_dict):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
 
     debug("Unique samples in samples dict being stored in samples file", p.files.log_file)
-    samples = framework.helper_functions.sorted_copy(samples_dict.keys())
+    samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
     open(p.files.all_unique_samples_file_path, 'w').write('\n'.join(samples) + '\n')
 
     rdp_general_confidence_image(p)
@@ -135,7 +135,7 @@ def rdp_general_confidence_image(p):
 def rdp_otu_confidence_analysis(p):
     debug("Generating RDP confidence per otu figures", p.files.log_file)
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
-    samples = framework.helper_functions.sorted_copy(samples_dict.keys())
+    samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
     seperator = open(p.files.seperator_file_path).read()
     framework.tools.rdp.otu_confidence_analysis(p.files.rdp_output_file_path, p.dirs.type_specific_data_dir, seperator, samples)
 
@@ -144,7 +144,7 @@ def rdp_samples_confidence_image(p):
     debug("Refreshing RDP Confidence per sample figure", p.files.log_file)
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
     seperator = open(p.files.seperator_file_path).read()
-    samples = framework.helper_functions.sorted_copy(samples_dict.keys())
+    samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
     framework.tools.rdp.sample_confidence_analysis(p.files.rdp_output_file_path, p.dirs.analysis_dir, seperator, samples)
 
 

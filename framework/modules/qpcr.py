@@ -23,13 +23,13 @@ from framework import constants as c
 from framework.tools import helper_functions
 
 from framework.tools.logger import debug
-from framework.helper_functions import DeserializeFromFile, SerializeToFile, GetCopy
+from framework.tools.helper_functions import DeserializeFromFile, SerializeToFile, GetCopy
 
 def _exec(p, request_dict):
     p.set_analysis_type("qpcr")
 
     #extracting sample names from qpcr file
-    samples = framework.helper_functions.sorted_copy(framework.tools.qpcr.extract_sample_names(p.files.data_file_path))
+    samples = framework.tools.helper_functions.sorted_copy(framework.tools.qpcr.extract_sample_names(p.files.data_file_path))
     open(p.files.all_unique_samples_file_path, 'w').write('\n'.join(samples) + '\n')
     debug("%d unique samples from QPCR stored in samples file" % len(samples), p.files.log_file)
 

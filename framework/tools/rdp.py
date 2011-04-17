@@ -491,7 +491,7 @@ def main(options, samples):
     else:
         print samples_dict
 
-    framework.helper_functions.create_percent_abundance_file(samples_dict, output_file_path)
+    framework.tools.helper_functions.create_percent_abundance_file(samples_dict, output_file_path)
 
 if __name__ == "__main__":
     parser = OptionParser()

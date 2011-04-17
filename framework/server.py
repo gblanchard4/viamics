@@ -46,7 +46,7 @@ framework.sanity_check.all()
 
 from framework.modules.modules import server_modules_dict
 from framework.tools import helper_functions
-from framework.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
+from framework.tools.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
 from framework.tools.logger import debug
 
 import framework.tools.rdp
@@ -376,7 +376,7 @@ returns self.decode_request of the data recieved.
 
             # get filtered samples dict and store it for sample map
             debug("Filtered samples dict are being generated and stored", p.files.log_file)
-            filtered_samples_dict = framework.helper_functions.filter_dict(samples_dict, keep_only = [s['sample'] for s in sample_map_list])
+            filtered_samples_dict = framework.tools.helper_functions.filter_dict(samples_dict, keep_only = [s['sample'] for s in sample_map_list])
             SerializeToFile(filtered_samples_dict, p.files.sample_map_filtered_samples_dict_file_path)
 
 
@@ -556,7 +556,7 @@ returns self.decode_request of the data recieved.
 
         p = Meta(analysis_id)
 
-        instances = framework.helper_functions.sorted_copy(p.dirs.get_sample_map_instances())
+        instances = framework.tools.helper_functions.sorted_copy(p.dirs.get_sample_map_instances())
 
         meta = {}
 
@@ -656,7 +656,7 @@ returns self.decode_request of the data recieved.
                      'ranks': c.ranks[p.type],
                      'rdp_output_file_exists': os.path.exists(p.files.rdp_output_file_path),
                      'rdp_output_file_path'  : os.path.join(analysis_id, c.rdp_output_file_name),
-                     'all_unique_samples_list': framework.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()]),
+                     'all_unique_samples_list': framework.tools.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()]),
                      'samples_sequences_bar': os.path.join(analysis_id, c.samples_sequences_bar_name),
                      'pie_charts_dir' : os.path.join(analysis_id, c.pie_charts_dir_name),
                      'rarefaction_all_samples_exists': os.path.exists(p.files.rarefaction_curves_all_samples_file_path),
@@ -677,7 +677,7 @@ returns self.decode_request of the data recieved.
 
         p = Meta(analysis_id)
 
-        samples = framework.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()])
+        samples = framework.tools.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()])
 
         self.write_socket({'response': 'OK', 'samples': samples})
 

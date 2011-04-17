@@ -16,7 +16,7 @@ from framework import constants as c
 from framework.tools import helper_functions
 from framework.tools.logger import debug
 from framework.clients.ferrisweb import webforms
-from framework.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
+from framework.tools.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
 
 
 server = helper_functions.server

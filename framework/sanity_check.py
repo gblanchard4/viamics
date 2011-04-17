@@ -22,7 +22,7 @@ import stat
 
 sys.path.append("../")
 from framework import constants as c
-from framework.helper_functions import confirm
+from framework.tools.helper_functions import confirm
 
 def dirs():
     # base directory check:

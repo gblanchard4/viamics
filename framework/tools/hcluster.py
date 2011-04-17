@@ -20,7 +20,7 @@ sys.path.append("../..")
 from numpy import *
 from PIL import Image, ImageDraw
 
-from framework.helper_functions import generate_feature_vectors_from_samples_dict
+from framework.tools.helper_functions import generate_feature_vectors_from_samples_dict
 import framework.constants
 
 class cluster_node:
