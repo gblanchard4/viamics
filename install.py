@@ -16,7 +16,7 @@ import commands
 
 print "Thank you for your interest in installing Viamics!\n"
 
-supported_platforms = {"linux2": {"install": "sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python"},
+supported_platforms = {"linux2": {"install": "sudo apt-get gcj-4.5-jre-headless install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python"},
                         "darwin": {"install":"sudo port install wget py26-numpy py26-scipy py26-matplotlib py26-ipython py26-rpy2 apache2 py26-django mod_python26 py26-pil py26-numeric py"}}
 
 #
