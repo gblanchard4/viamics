@@ -12,7 +12,7 @@ def __suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(_sanity.Tests))
     suite.addTest(unittest.makeSuite(_framework.Tests))
-    suite.addTest(unittest.makeSuite(_rdp.Tests))
+    #suite.addTest(unittest.makeSuite(_rdp.Tests))
     return suite
 
 if __name__ == "__main__":

@@ -219,6 +219,7 @@ returns self.decode_request of the data recieved.
     def remove_analysis(self):
         analysis_id             = self.request_dict['analysis_id']
 
+        #import pdb; pdb.set_trace()
         p = Meta(analysis_id)
 
         if analysis_id in self.serverstate.running_analyses:
@@ -238,10 +239,15 @@ returns self.decode_request of the data recieved.
         analysis_type           = self.request_dict['analysis_type']
 
         late_response_request = self.request_dict.has_key('return_when_done') and self.request_dict['return_when_done'] == True
-
-        if analysis_type not in server_modules_dict:
+        #import pdb; pdb.set_trace()
+        if analysis_type not in server_modules_dict:#this is where we could check filetype 
              self.write_socket({'response': 'error', 'content': 'Wrong type of analysis.'})
              return#fixes _framework.testServerError
+
+        if(analysis_id in self.serverstate.running_analyses or
+           analysis_id in self.serverstate.done_analyses):
+            self.write_socket({'response':'error', 'content':'Analysis is already running'})
+            return#fixes _framework.testRepeatAnalysis
 
         p = Meta(analysis_id)
 
@@ -420,6 +426,7 @@ returns self.decode_request of the data recieved.
                              'state': 'done',
                              'log': open(p.files.log_file).readlines()[-5:]})
 
+        #import pdb; pdb.set_trace()
         self.write_socket({'response': 'OK', 'analyses': analyses})
 
 
