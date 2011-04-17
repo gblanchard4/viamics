@@ -12,17 +12,31 @@ import os
 import sys
 import urllib
 import zipfile
+import commands
 
+supported_platforms = {"linux2": {"install": "sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python"}, "darwin": {"install":"sudo port install wget py26-numpy py26-scipy py26-matplotlib py26-ipython py26-rpy2 apache2 py26-django mod_python26 py26-pil py26-numeric py26-rpy2"}}
 print "Thank you for your interest in installing Viamics!\n"
 
 #
-# Only works on linux :)
+# Only works on linux and OS X :)
 #
+platform = sys.platform
 
-if sys.platform != "linux2":
+if not platform in supported_platforms:
     print "Sorry, but right now this script only works in Debian-Based Linux Distros using apt-get!\nShutting down...Goodbye!\n"
     sys.exit(0)
 
+#
+# Check OS X specific requirements, such as MacPorts and Git (unable to install form MacPorts)
+#
+
+if platform == "darwin":
+    if commands.getstatusoutput("which git")[0] != 0: # This changes to subprocess.check_output in Python 2.7 or later
+        # install git
+        pass
+    if commands.getstatusoutput("which port")[0] != 0:
+        # install Mac ports
+        pass
 #
 # Check if we have super user permissions by checking if we can write to apache2 folder.
 # We eventually need super user permissions, but having it all the way through the script 
@@ -47,7 +61,7 @@ except IOError:
 #    
     
 try:
-    os.system("sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python")
+    os.system(supported_platforms[platform]["install"])
 
 except:
     print "apt-get was unable to run install.\n"
