@@ -17,7 +17,7 @@ import commands
 print "Thank you for your interest in installing Viamics!\n"
 
 supported_platforms = {"linux2": {"install": "sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python"},
-                        "darwin": {"install":"sudo port install wget py26-numpy py26-scipy py26-matplotlib py26-ipython py26-rpy2 apache2 py26-django mod_python26 py26-pil py26-numeric py26-rpy2"}}
+                        "darwin": {"install":"sudo port install wget py26-numpy py26-scipy py26-matplotlib py26-ipython py26-rpy2 apache2 py26-django mod_python26 py26-pil py26-numeric py"}}
 
 #
 # Only works on linux and (soon) OS X :)
@@ -39,25 +39,32 @@ if platform == "darwin":
         # install git
         # Download git
         try:
-            os.system("tar xvzf git-1.5.2.4.tar.gz")
+            os.system("curl -O http://www.kernel.org/pub/software/scm/git/git-1.7.4.tar.gz")
+            os.system("tar xvzf git-1.7.4.tar.gz")
         except:
-            print "Can't find git-1.5.2.4.tar.gz"
+            print "Can't find git-1.7.4.tar.gz"
             sys.exit(0)
-        os.chdir("git-1.5.2.4")
+        os.chdir("git-1.7.4")
         os.system("make configure")
-        os.system("./configure --prefix=/usr/local")
-        os.system("make all")
-        os.system("sudo make install")
+        os.system("./configure --prefix=/usr/local && make all && sudo make install")
+        #os.system("make all")
+        #os.system("sudo make install")
         os.chdir("..")
+        os.system("rm -rf git-1.7.4*")
         if commands.getstatusoutput("which git")[0] != 0:
             print "Unable to install git. Please manually do so and re-run this script."
             sys.exit(0)
         
     if commands.getstatusoutput("which port")[0] != 0:
         # install Mac ports
-        pass
+        os.system("curl -O http://distfiles.macports.org/MacPorts/MacPorts-1.9.2.tar.bz2")
+        os.chdir("MacPorts-1.9.2")
+        os.system("./configure && make && sudo make install")
+        os.chdir("..")
+        os.system("rm -rf MacPorts-1.9.2*")
+        
     print "Hey, I'm a 'Mac' too!"
-    sys.exit(0)
+    
 #
 # Check if we have super user permissions by checking if we can write to apache2 folder.
 # We eventually need super user permissions, but having it all the way through the script 
