@@ -14,12 +14,15 @@ import urllib
 import zipfile
 import commands
 
-supported_platforms = {"linux2": {"install": "sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python"}, "darwin": {"install":"sudo port install wget py26-numpy py26-scipy py26-matplotlib py26-ipython py26-rpy2 apache2 py26-django mod_python26 py26-pil py26-numeric py26-rpy2"}}
 print "Thank you for your interest in installing Viamics!\n"
 
+supported_platforms = {"linux2": {"install": "sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python"},
+                        "darwin": {"install":"sudo port install wget py26-numpy py26-scipy py26-matplotlib py26-ipython py26-rpy2 apache2 py26-django mod_python26 py26-pil py26-numeric py26-rpy2"}}
+
 #
-# Only works on linux and OS X :)
+# Only works on linux and (soon) OS X :)
 #
+
 platform = sys.platform
 
 if not platform in supported_platforms:
@@ -31,12 +34,30 @@ if not platform in supported_platforms:
 #
 
 if platform == "darwin":
-    if commands.getstatusoutput("which git")[0] != 0: # This changes to subprocess.check_output in Python 2.7 or later
+    # Mac install requires git and Mac Ports (for simplicity), so check if either are already installed, if not install
+    if commands.getstatusoutput("which git")[0] != 0: # commands.getsatusoutput changes to subprocess.check_output in Python 2.7+
         # install git
-        pass
+        # Download git
+        try:
+            os.system("tar xvzf git-1.5.2.4.tar.gz")
+        except:
+            print "Can't find git-1.5.2.4.tar.gz"
+            sys.exit(0)
+        os.chdir("git-1.5.2.4")
+        os.system("make configure")
+        os.system("./configure --prefix=/usr/local")
+        os.system("make all")
+        os.system("sudo make install")
+        os.chdir("..")
+        if commands.getstatusoutput("which git")[0] != 0:
+            print "Unable to install git. Please manually do so and re-run this script."
+            sys.exit(0)
+        
     if commands.getstatusoutput("which port")[0] != 0:
         # install Mac ports
         pass
+    print "Hey, I'm a 'Mac' too!"
+    sys.exit(0)
 #
 # Check if we have super user permissions by checking if we can write to apache2 folder.
 # We eventually need super user permissions, but having it all the way through the script 
