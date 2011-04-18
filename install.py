@@ -47,7 +47,7 @@ except IOError:
 #    
     
 try:
-    os.system("sudo apt-get install git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python")
+    os.system("sudo apt-get install gcj-4.5-jre-headless git unzip python-matplotlib python-scipy python-numeric r-base r-recommended python-rpy2 python-setuptools python-dev python-django apache2 libapache2-mod-python")
 
 except:
     print "apt-get was unable to run install.\n"
