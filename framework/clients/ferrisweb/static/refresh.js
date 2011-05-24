@@ -2,7 +2,7 @@ function refresh_analyses(timer)
 {
 
     //finished = call the server, get status:
-    resp = $.getJSON(   "api/get_analyses",
+    resp = $.getJSON(   "api/analyses",
                 {},
             function(analyses, status, xhr) 
             {

@@ -22,7 +22,7 @@ from framework import constants
 from django.conf.urls.defaults import *
 
 from clients.ferrisweb.views import index
-from clients.ferrisweb.views import web_api
+from clients.ferrisweb import web_api
 from clients.ferrisweb.views import about
 from clients.ferrisweb.views import status_request
 from clients.ferrisweb.views import analysis_info
@@ -40,10 +40,11 @@ from clients.ferrisweb.views import new_analysis
 from clients.ferrisweb.views import update_analysis_append_samples
 from clients.ferrisweb.views import update_analysis_remove_samples
 
-
+#please read before modifying web api:
+#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
 urlpatterns = patterns('',
     (r'^$', index),
-    (r'^api/*', web_api),#this should be specified in greater detail if we want
+    (r'^api/analyses', web_api.analyses),#this should be specified in greater detail if we want
     #to decouple clients. right now it just gives the json for get_analyses.
     #maybe a betterway would be to allow say, GET viamics.com/index.json
     (r'^about/$', about),

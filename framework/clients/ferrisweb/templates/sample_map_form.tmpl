@@ -1,3 +1,4 @@
+
 {% extends "base.tmpl" %}
 
 {% block title %}New Sample Map{% endblock %}
@@ -21,9 +22,17 @@
 <tr><td width="200"><label for="id_{{ sample }}">{{ sample }}</label></td><td>: <input id="id_{{ sample }}" size="10" type="text" name="{{ sample }}" maxlength="10" width="10" /></td></tr>
 
 {% endfor %}
+<tr>
+    <td width="400">
+        <label for="id_metadata_file">Data file:</label><input type="file" name="metadata_file" id="id_metadata_file" />
+	<input type="submit" value="Upload" />
+    </td>
+</tr>
 </table>
 <br>
 <input type="submit" value="Next" />
 </form>
 </div>
+
+
 {% endblock %}
