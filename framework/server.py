@@ -98,6 +98,7 @@ class Server:
         except:
             pass
         serversocket.bind(socket_name)
+        os.chmod(socket_name,S_IRWXU|S_IRWXG|S_IRWXO)#set to 777 so apache can read/write
         serversocket.listen(5)
 
         serverstate = ServerState()
