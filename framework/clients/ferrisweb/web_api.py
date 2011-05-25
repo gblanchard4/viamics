@@ -74,14 +74,4 @@ def analyses(request):
     else:
         return err_response({'content':'Only the GET method is implemented for this resource'})
 
-"""    
-def echo_file(request):
-    if request.method == 'POST':
-        f = request.FILES[request.FILES.keys()[0]]
-        result = {}
-        for line in f:
-            l = line.split(',')
-            result[l[0].strip()] = {"group":l[1].strip()}
-        
-        return HttpResponse(json.dumps(result))
-"""
+

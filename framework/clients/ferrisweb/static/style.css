@@ -15,6 +15,61 @@ h1 {
     border-bottom: 1px solid #ADADAD;
 }
 
+#map-create {
+    overflow: hidden;
+    }
+#sample-map-create {
+    width: 200px;
+    float: left;
+    padding: 2px;
+    background-color: #D7FFEA;
+    }
+
+#map-name {
+    margin-left: auto;
+    margin-right: auto;
+/*    width: 50%;*/
+    background-color: #FFEAD7;
+    padding: 2px;
+    text-align: center;
+    }
+
+#sample-map-create li {
+    list-style: none;
+    padding: 5px;
+/*    line-height: 1.4em*/
+    position: relative;
+    
+    }
+
+.sample-container {
+    height: 1.2em;
+    }
+
+#sample-map-create li label {
+    position: absolute;
+    bottom: 0;
+    }
+
+#sample-map-create li input {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    }
+
+.map-submit-button {
+    float: left;
+    clear: left;
+    }
+
+#map-file-input {
+    float: left;
+     background-color: #D7FFEA;
+     margin: 5px;
+    
+     padding: 2px;
+    }
+
 .smallsmallhead {
     font-size: 1.0em;
     border-bottom: 1px solid #ADADAD;
@@ -102,6 +157,9 @@ h1 {
 
 .form {
     padding-left: 50px;
+    width: auto;
+    overflow: hidden;
+    display: inline-block;
 }
 
 .links-bar {
