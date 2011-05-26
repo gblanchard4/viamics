@@ -21,6 +21,7 @@
 
 # standard python modules
 import os
+from stat import * #for chmod flags
 import sys
 import time
 import copy
