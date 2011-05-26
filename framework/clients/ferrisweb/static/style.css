@@ -14,21 +14,107 @@ h1 {
     font-size: 3em;
     border-bottom: 1px solid #ADADAD;
 }
+/**for js switch **/
+.switch-box {
+	width:260px;
+	height:66px;
+	position:relative;
+	margin: 10;
+	border:1px solid #07060a;
+	background: -webkit-gradient(linear, 0 bottom, 0 top, from(#2a2833 ), to(#464451));
+    background: -moz-linear-gradient(-90deg, #464451, #2a2833 );
+	-webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+	-webkit-box-shadow:inset 0 1px 0 #62616c, 0 0 6px #292739;
+    -moz-box-shadow: inset 0 1px 0 #62616c, 0 0 6px #292739;
+    box-shadow: inset 0 1px 0 #62616c, 0 0 6px #292739;
+}
+
+.item:hover h2 {
+	color:#C9D0D9;
+}
+
+.switcher {
+	list-style:none;
+	padding:1px;
+	position:absolute;
+	right:8px;
+	top:0px;
+	background:#413F4A;
+	-webkit-border-radius: 13px;
+    -moz-border-radius: 13px;
+    border-radius: 13px;
+}
+
+.switcher li {
+	float:left;
+}
+
+.switcher li a {
+	font:13px/30px "BebasNeueRegular", Helvetica, Arial, sans-serif;
+	text-shadow: 0 -1px 0 #1b1929;
+	color:#aeabc9;
+	background:#5ad0ab;
+	display:block;
+	padding:0 13px;
+	height:27px;
+	border:1px solid #201e27;
+	background: -webkit-gradient(linear, 0 bottom, 0 top, from(#33313e ), to(#514f5d));
+	background: -moz-linear-gradient(-90deg, #514f5d, #33313e ) ;
+	-webkit-box-shadow:inset 0 1px 0 #6B6974 ;
+    -moz-box-shadow: inset 0 1px 0 #6B6974 ;
+    box-shadow: inset 0 1px 0 #6B6974 ;
+	-webkit-transition:all .2s ease-out;
+	-o-transition:all .2s ease-out;
+	-moz-transition:all .2s ease-out;
+}
+
+li:first-child a {
+	border-right:none;
+	padding-left:15px;
+	-webkit-border-radius: 13px 0 0 13px;
+    -moz-border-radius: 13px 0 0 13px;
+    border-radius:13px 0 0 13px;
+}
+
+li:last-child a {
+	-webkit-border-radius: 0 13px 13px 0;
+    -moz-border-radius: 0 13px 13px 0;
+    border-radius:0 13px 13px 0;
+}
+
+ li a:hover {
+	background: -webkit-gradient(linear, 0 bottom, 0 top, from(#383643 ), to(#6c6a78));
+	background: -moz-linear-gradient(-90deg, #6c6a78, #383643 ) ;
+}
+
+.switcher li.active a{
+	color:#fff;
+	text-shadow:0 1px 1px #000;
+	background: -webkit-gradient(linear, 0 bottom, 0 top, from(#3d3b47 ), to(#24222b));
+	background: -moz-linear-gradient(-90deg, #24222b, #3d3b47 ) ;
+	-webkit-box-shadow:inset 0 1px 1px #17161c ;
+    -moz-box-shadow: inset 0 1px 1px #17161c ;
+    box-shadow: inset 0 1px 1px #17161c ;
+}
+
+/** /switcher styles **/
 
 #map-create {
     overflow: hidden;
     }
 #sample-map-create {
-    width: 200px;
+    width: 300px;
     float: left;
     padding: 2px;
     background-color: #D7FFEA;
     }
 
 #map-name {
-    margin-left: auto;
+    margin-left: 0;
     margin-right: auto;
-/*    width: 50%;*/
+    width: 283px;
     background-color: #FFEAD7;
     padding: 2px;
     text-align: center;
@@ -66,7 +152,6 @@ h1 {
     float: left;
      background-color: #D7FFEA;
      margin: 5px;
-    
      padding: 2px;
     }
 
