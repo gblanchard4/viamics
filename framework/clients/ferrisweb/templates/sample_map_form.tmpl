@@ -1,6 +1,3 @@
-<script type="text/javascript">
-  window.onload=function(){hide('map-file-input');show('switch-box');};
-</script>
 {% extends "base.tmpl" %}
 
 {% block title %}New Sample Map{% endblock %}
@@ -13,39 +10,20 @@
 <p class="info">You are about to create a new sample map. If you leave any of those sample boxes blank, that sample will not be included in the sample map. In the next step you will be asked to define groups you chose here. Group names are case-sensitive ("bv" and "BV" are not the same).
 
 <div class="form">
-  <form enctype="multipart/form-data" method="post" action="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis_id }}/{{ next_step }}" id="map-create">
-    <div id="map-name">
-      
-      <label for="id_sample_map_name">Sample map name</label>: <input id="id_sample_map_name" size="10" type="text" name="sample_map_name" maxlength="30" length="30" />
-      <div id="switch-box" class="switch-box" style="display: none;"> 
-	
-		
-		<ul class="switcher"> 
-			<li class="active"><a href="#" title="On" onclick="swap('map-file-input','sample-map-create');">Input Map Data</a></li> 
-			<li><a href="#" title="OFF" onclick="swap('sample-map-create','map-file-input');">Upload Map Data</a></li> 
-		</ul>
-	
-	</div> 
-      </div>
-    &nbsp;
-    <ul id="sample-map-create">
-      <p class="info">Create a sample map by entering a group for each sample</p>
-      
-      {% for sample in samples %}
-	
-	<li><div class="sample-container" ><label for="id_{{ sample }}">{{ sample }}:</label> <input id="id_{{ sample }}" size="10" type="text" name="{{ sample }}" maxlength="10" width="10" /></div></li>
-	
-      {% endfor %}
-     <li> <div class="sample-container"> <input type="submit" value="next" /></div></li>
-    </ul>
-    <div id="map-file-input">
-      <p class="info">Upload a .csv file containing the group information. For example, create a spreadsheet like this:<br /><img src="/static/spreadsheet.png" />  <br />and save as .csv</p>
-      <label for="id_metadata_file">Data file:</label><input type="file" name="metadata_file" id="id_metadata_file" />
-      <input type="submit" value="Upload" />
-       
-    </div>
-  </form>
+<form enctype="multipart/form-data" method="post" action="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis_id }}/{{ next_step }}">
+<table style="text-align: left;">
+<tr><td width="200"><label for="id_sample_map_name">Sample map name</label></td><td>: <input id="id_sample_map_name" size="10" type="text" name="sample_map_name" maxlength="30" length="30" /></td></tr>
+</table>
+&nbsp;
+<table style="text-align: left;">
+{% for sample in samples %}
+
+<tr><td width="200"><label for="id_{{ sample }}">{{ sample }}</label></td><td>: <input id="id_{{ sample }}" size="10" type="text" name="{{ sample }}" maxlength="10" width="10" /></td></tr>
+
+{% endfor %}
+</table>
+<br>
+<input type="submit" value="Next" />
+</form>
 </div>
-
-
 {% endblock %}
