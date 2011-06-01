@@ -246,13 +246,16 @@ def create_sample_map(request, analysis_id, step):
         sample_map_dict['sample_map_name'] = request.POST['sample_map_name']
         sample_map_dict['sample_map_list'] = []
 
-        if len(request.FILES)>0:
+        if len(request.FILES)>0:#uploaded file
             f = request.FILES[request.FILES.keys()[0]].readlines()
             if(is_valid(f)):
                 for line in f:
                     l = [ el.strip() for el in line.split(',')]
                     sample_map_dict["sample_map_list"].append({'sample': l[0], 'group': l[1]})
-        else:    
+            else:
+                return err_response({"content":"The uploaded file is not valid"})
+                    
+        else:#manually input
             for sample in get_sample_names():
                 if request.POST[sample]:
                     sample_map_dict['sample_map_list'].append({'sample': sample, 'group': request.POST[sample].strip()})
