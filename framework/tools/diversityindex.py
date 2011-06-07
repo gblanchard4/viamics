@@ -104,10 +104,8 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
         setp(b['fliers'], color='black', alpha=0.3)
         setp(b['caps'], color='black', alpha=0.3)
 
-        plot([0], [max_val], visible = False)
-        plot([-0.9], [-max_val * 10 / 100], visible = False)
-        plot([i + 0.9], [max_val], visible = False)
         ylim(ymin=-max_val * 10 / 100, ymax=max_val)
+        xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
         xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
 
     if not save_dir:
@@ -133,7 +131,6 @@ def generate(samples_dict, img_save_path = None, data_save_path = None, type = N
 
     samples = helper_functions.sorted_copy(samples_dict.keys())
     samples_diversity_index_list = []
-
     if method == 'simpsons':
         samples_diversity_index_list = [get_simpsons_diversity_index(samples_dict[sample][taxonomic_level]) for sample in samples]
         lbl = "Simpson's Sample Diversity Index"
@@ -144,7 +141,6 @@ def generate(samples_dict, img_save_path = None, data_save_path = None, type = N
         c = color='#66AA66'
     else:
         return None
-
 
     # store diveristy indices in a text file as well
     if data_save_path:
@@ -174,14 +170,17 @@ def generate(samples_dict, img_save_path = None, data_save_path = None, type = N
     yticks(size='xx-small')
 
     ylabel(lbl, fontsize = 12)
-
+    
     if img_save_path:
         savefig(img_save_path)
     else:
         show()
 
 if __name__ == '__main__':
-    samples_dict_path = "/home/amanda/repo/ferris/framework/analyses/5b10a9e7cbaf1e975dffe394520cf9015d1e23aa/samples_dict_serialized"
+    # for testing purposes:
+    samples_dict_path = "/path/to/analysis/samples_dict_serialized"
     samples_dict = rdp.read_samples_dictionary(samples_dict_path)
+    sample_map_file_path = "/path/to/analysis/maps/1/sample_map"
 
-    generate(samples_dict, type = "rdp", method='shannos')
+    generate(samples_dict, method='shannons')
+    generate_for_sample_map(samples_dict, sample_map_file_path)

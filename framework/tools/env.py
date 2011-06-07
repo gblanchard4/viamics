@@ -117,10 +117,4 @@ def get_otu_library(env_file):
     return otu_library
 
 if __name__ == "__main__":
-    s = create_samples_dictionary("files/sample_env_output")
-    n = extract_sample_names("files/sample_env_output")
-    o = get_otu_library("files/sample_env_output")
-
-    for i in s:
-        print i, s[i]["species"]
-
+    pass

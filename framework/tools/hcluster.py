@@ -263,13 +263,4 @@ def generate(samples_dict, otu_library, pie_charts_dir = "", dendrogram_prefix =
 
 
 if __name__  ==  "__main__":
-    import rdp
-    samples_dict = rdp.read_samples_dictionary("/home/amanda/repo/ferris/framework/analyses/f62c0136a808f674c037df10c436da5543b62851/samples_dict_serialized")
-    otu_library = rdp.read_samples_dictionary("/home/amanda/repo/ferris/framework/analyses/f62c0136a808f674c037df10c436da5543b62851/otu_library")
-    pie_charts_dir = "/home/amanda/repo/ferris/framework/analyses/f62c0136a808f674c037df10c436da5543b62851/piecharts/"
-    map = {'name': 'squirrel', 'heatmaps': {'phylum': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/heatmaps/abundance_heatmap_phylum.png', 'genus': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/heatmaps/abundance_heatmap_genus.png', 'order': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/heatmaps/abundance_heatmap_order.png', 'family': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/heatmaps/abundance_heatmap_family.png', 'class': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/heatmaps/abundance_heatmap_class.png'}, 'ranks': ['genus', 'family', 'order', 'class', 'phylum'], 'sample_groups': {'b': ['S6', 'S7', 'S8', 'S9'], 't': ['S1', 'S2', 'S3', 'S4', 'S5']}, 'instance': u'4', 'group_colors': {'b': '#9ACD32', 't': '#4169E1'}, 'excluded': [], 'included': ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9'], 'percent_abundance_files': {'phylum': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/percent_abundance_phylum', 'genus': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/percent_abundance_genus', 'order': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/percent_abundance_order', 'family': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/percent_abundance_family', 'class': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/percent_abundance_class'}, 'taxon_charts_dir': u'f62c0136a808f674c037df10c436da5543b62851/maps/4/taxon_charts'}
-    generate(samples_dict, otu_library, pie_charts_dir, ranks = ["genus"], save_dir = "./", map = map)
-
-
-
-
+    pass
