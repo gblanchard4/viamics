@@ -228,6 +228,15 @@ def create_sample_map(request, analysis_id, step):
         server_response = server(server_request)
         return server_response['name']
 
+    def is_valid(uploaded):
+        names = set(get_sample_names())
+        for line in uploaded:
+            if line.split(',')[0].strip() not in names:
+                return False
+        return True
+        
+
+
     analysis_name = get_analysis_name()
 
     step = int(step)
@@ -237,9 +246,19 @@ def create_sample_map(request, analysis_id, step):
         sample_map_dict['sample_map_name'] = request.POST['sample_map_name']
         sample_map_dict['sample_map_list'] = []
 
-        for sample in get_sample_names():
-            if request.POST[sample]:
-                sample_map_dict['sample_map_list'].append({'sample': sample, 'group': request.POST[sample].strip()})
+        if len(request.FILES)>0:#uploaded file
+            f = request.FILES[request.FILES.keys()[0]].readlines()
+            if(is_valid(f)):
+                for line in f:
+                    l = [ el.strip() for el in line.split(',')]
+                    sample_map_dict["sample_map_list"].append({'sample': l[0], 'group': l[1]})
+            else:
+                return err_response({"content":"The uploaded file is not valid"})
+                    
+        else:#manually input
+            for sample in get_sample_names():
+                if request.POST[sample]:
+                    sample_map_dict['sample_map_list'].append({'sample': sample, 'group': request.POST[sample].strip()})
 
         groups = list(set([x['group'] for x in sample_map_dict['sample_map_list']]))
 
@@ -321,17 +340,20 @@ def refresh_analysis_files(request, analysis_id):
         return HttpResponse(get_template("refresh.tmpl").render(Context({'refresh_options': refresh_options,
                                                                          'functions_dict': functions_dict,
                                                                          'analysis_id': analysis_id})))
-
-def web_api(request):
-    server_request = {'request': 'get_analyses'}
-    server_response = server(server_request)
-    
-    if server_err(server_response):
-        return err_response(server_response)
+#please read before modifying web api:
+#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
+def analyses(request):
+    if request.method == 'GET':
+        server_request = {'request': 'get_analyses'}
+        server_response = server(server_request)
         
-    analyses = server_response['analyses']
-    return HttpResponse(json.dumps(analyses))
-    
+        if server_err(server_response):
+            return err_response(server_response)
+        
+        analyses = server_response['analyses']
+        return HttpResponse(json.dumps(analyses))
+    else:
+        return err_response({'content':'Only the GET method is implemented for this resource'})
 
 def index(request):
     server_request = {'request': 'get_analyses'}

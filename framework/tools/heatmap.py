@@ -23,7 +23,7 @@ import os
 import sys
 import math
 import numpy
-import numpy.core.numeric
+import Numeric
 
 from rpy2 import robjects
 import rpy2.robjects.numpy2ri

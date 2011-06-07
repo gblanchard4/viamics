@@ -21,6 +21,7 @@
 
 # standard python modules
 import os
+from stat import * #for chmod flags
 import sys
 import time
 import copy
@@ -98,6 +99,7 @@ class Server:
         except:
             pass
         serversocket.bind(socket_name)
+        os.chmod(socket_name,S_IRWXU|S_IRWXG|S_IRWXO)#set to 777 so apache can read/write
         serversocket.listen(5)
 
         serverstate = ServerState()
@@ -467,6 +469,8 @@ returns self.decode_request of the data recieved.
     def append_samples_to_analysis(self):
         analysis_id         = self.request_dict['analysis_id']
         data_file_temp_path = self.request_dict['data_file_path']
+        self.serverstate.done_analyses.remove(analysis_id)
+        self.serverstate.running_analyses.append(analysis_id)
 
         p = Meta(analysis_id)
 
@@ -489,6 +493,8 @@ returns self.decode_request of the data recieved.
         ################################################################
 
         os.remove(additional_data_file_path)
+        self.serverstate.done_analyses.remove(analysis_id)
+        self.serverstate.running_analyses.append(analysis_id)
         debug("Done.", p.files.log_file)
 
     def refresh_analysis_files(self):
