@@ -57,7 +57,9 @@ def get_simpsons_diversity_index(species):
 
 def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None, type = None, method='simpsons'):
     taxonomic_level = "genus"
-    if type == "qpcr" or type == "env":
+    # FIXME: this is embarrassing, we gotta fix this.
+    # this is not the place to handle this:
+    if type == "qpcr" or type == "env" or type == "vamps":
         taxonomic_level = "species"
 
     sample_groups, group_colors = helper_functions.get_groups_colors_from_sample_map_file(sample_map_file_path)
@@ -126,7 +128,7 @@ def generate(samples_dict, img_save_path = None, data_save_path = None, type = N
     #we assume we're working with RDP
     taxonomic_level = "genus"
     #but what if it's not?
-    if type == "qpcr" or type == "env":
+    if type == "qpcr" or type == "env" or type == "vamps":
         taxonomic_level = "species"
 
     samples = helper_functions.sorted_copy(samples_dict.keys())

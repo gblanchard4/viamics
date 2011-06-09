@@ -53,6 +53,7 @@ from framework.tools.logger import debug
 import framework.tools.rdp
 import framework.tools.env
 import framework.tools.qpcr
+import framework.tools.vamps
 import framework.tools.heatmap
 import framework.tools.bar
 import framework.tools.piechart

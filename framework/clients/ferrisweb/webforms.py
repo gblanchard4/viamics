@@ -16,6 +16,10 @@ class EnvUploadForm(forms.Form):
     job_description = forms.CharField(max_length = 256)
     data_file = forms.Field(widget=forms.FileInput())
 
+class VampsUploadForm(forms.Form):
+    job_description = forms.CharField(max_length = 256)
+    data_file = forms.Field(widget=forms.FileInput())
+
 class DataUploadForm(forms.Form):
     data_file = forms.Field(widget=forms.FileInput())
 

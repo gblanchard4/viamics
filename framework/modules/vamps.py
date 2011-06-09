@@ -62,6 +62,6 @@ def samples_dictionary(p):
 
 
 def otu_library(p):
-    debug("Regeneration OTU Library", p.files.log_file)
+    debug("Generating OTU Library", p.files.log_file)
     otu_library = framework.tools.vamps.get_otu_library(p.files.data_file_path)
     SerializeToFile(otu_library, p.files.otu_library_file_path)
