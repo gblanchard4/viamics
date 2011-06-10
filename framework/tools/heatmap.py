@@ -83,12 +83,15 @@ def main(options, analyses_dir = ''):
     if len(col_names) < 2 or len(row_names) < 2:
         raise Exception, "Number of columns or rows can't be smaller than 2 in a heatmap (you might have enetered some criteria that eliminates all OTU's or samples)."
 
-    generate_heatmap(options, col_names, row_names, data_matrix, sample_colours = map(sample_colour, col_names))
+    #bioDist = importr('bioDist')
+    
+
+    generate_heatmap(options, col_names, row_names, data_matrix, sample_colours = map(sample_colour, col_names))#,dist_func=bioDist.spearman_dist
 
     return
 
 
-def generate_heatmap(options, col_names, row_names, data_matrix, sample_colours):
+def generate_heatmap(options, col_names, row_names, data_matrix, sample_colours, dist_func=robjects.r.dist):
     robjects.r.library('gplots')
     grdevices = importr('grDevices')
 
@@ -107,6 +110,7 @@ def generate_heatmap(options, col_names, row_names, data_matrix, sample_colours)
                        labCol=col_names,
                        ColSideColors=robjects.StrVector(sample_colours),
                        col=robjects.r.redgreen(100),
+                       distfun=dist_func,
                        key=True,
                        symkey=False,
                        density_info="none",

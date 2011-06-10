@@ -53,6 +53,7 @@ except AttributeError:
 analyses_dir = join(base_dir, "analyses")
 error_logs_dir = join(base_dir, "errors")
 temp_files_dir = join(base_dir, "tmp")
+blastdb_dir = join(base_dir, 'blastdb')
 
 socket_name = join(temp_files_dir, "sock")
 
@@ -117,3 +118,9 @@ sample_map_otu_t_p_tuples_dict_real_file_name = "otu_t_p_tuples_real_dict" #for 
 percent_abundance_file_prefix = "percent_abundance_"
 abundance_heatmap_file_prefix = "abundance_heatmap_"
 heatmap_options_file_prefix = "heatmap_options_"
+
+#blast
+blast_error_name = "blast_error"
+blast_output_name = 'blast_output'
+blast_legend_file_extension = '.blg'
+blast_db_name_path = 'db_name'

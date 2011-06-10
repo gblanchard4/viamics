@@ -11,8 +11,6 @@ important stuff that should not be forgotten.
  - Installation shouldn't be a big hassle.
  - User manual with some toy runs, hypothesis testing examples, et cetera.
  - Exception handling should be improved.
- - TAB delimited batch meta-data submission and meta-data management
- interface.
  - UNIFRAC analysis and introspection (fairly easy, QIIME could provide
  enough inspiration).
  - Interface for exporting analysis results (as PDF or, stand-alone static

@@ -778,6 +778,8 @@ class Files:
         self.rarefaction_curves_all_samples_file_path = J(c.rarefaction_curves_all_samples_file_name)
         self.simpsons_diversity_index_data_path  = os.path.join(dirs.analysis_dir, c.simpsons_diversity_index_data_name)
         self.shannon_diversity_index_data_path   = os.path.join(dirs.analysis_dir, c.shannon_diversity_index_data_name)
+        self.blast_output_file_path                = J(c.blast_output_name)
+        self.blast_db_name_path                    = J(c.blast_db_name_path)
 
         self.sample_map_name_file_path                     = None
         self.sample_map_file_path                          = None
