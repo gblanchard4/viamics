@@ -180,12 +180,12 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             ax.yaxis.set_major_formatter(formatter)
 
             xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-            xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+            xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
             ylim(ymin=1e-1, ymax=max_y)
         else:
             ylim(ymin=-5, ymax=105)
             xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-            xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+            xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
             yticks(arange(0, 101, 10))
 
         if not save_dir:

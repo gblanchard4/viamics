@@ -108,7 +108,7 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
 
         ylim(ymin=-max_val * 10 / 100, ymax=max_val)
         xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-        xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+        xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
 
     if not save_dir:
         show()
