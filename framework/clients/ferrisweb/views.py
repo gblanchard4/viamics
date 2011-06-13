@@ -531,12 +531,15 @@ def new_analysis(request, analysis_type):
 
     if request.method == 'POST':
 
+#        import pdb; pdb.set_trace()
         if analysis_type == "rdp":
             form = webforms.FastaUploadForm(request.POST, request.FILES)
         if analysis_type == "qpcr":
             form = webforms.QpcrUploadForm(request.POST, request.FILES)
         if analysis_type == "env":
             form = webforms.EnvUploadForm(request.POST, request.FILES)
+        if analysis_type == 'blast':
+            form = webforms.BlastUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
             job_description = form.cleaned_data['job_description']
@@ -562,9 +565,12 @@ def new_analysis(request, analysis_type):
                               'data_file_path': data_file_path,
                               'data_file_sha1sum': data_file_sha1sum}
 
-            #update server request if we're here for rdp analysis
-            if analysis_type == "rdp":
-                    server_request['seperator'] = form.cleaned_data['seperator']
+            #update server request for type-specific data
+            special_fields = ['seperator','db_name']
+            for f in special_fields:
+                if form.cleaned_data.has_key(f):
+                    server_request[f] = form.cleaned_data[f]
+                    
 
             server_response = server(server_request)
 
@@ -584,6 +590,9 @@ def new_analysis(request, analysis_type):
         if analysis_type == "env":
             form = webforms.EnvUploadForm()
             tmpl = "env_upload_form.tmpl"
+        if analysis_type == 'blast':
+            form = webforms.BlastUploadForm()
+            tmpl = "blast_upload_form.tmpl"
 
         return HttpResponse(get_template(tmpl).render(Context({'form': form})))
 

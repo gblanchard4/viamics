@@ -10,6 +10,7 @@ config.py
 framework/tmp/*
 framework/analyses/*
 framework/errors/*
+framework/blastdb/*
 
 #nonsense
 *.DS_Store

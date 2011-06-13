@@ -4,6 +4,7 @@ import os
 import shlex
 import subprocess
 from framework import constants as c
+import framework.tools.helper_functions as helper_functions
 from framework.tools.helper_functions import SerializeToFile, DeserializeFromFile
 
 sys.path.append('../..')
@@ -14,13 +15,16 @@ makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s -title %(nam
 def run_blastn(sequences_path,blast_output_path,blast_db_path,fmt=7,num=5,error_log='/tmp/error_log'):
     """Runs blastn on the fasta file at sequences_path against the db at blast_db_path. Blocks until blast is finished. The blastn executable is assumed to be on the path"""
 
+    #import pdb; pdb.set_trace()
     command = (blastn_cmd % {'fasta':sequences_path, 'blast_out':blast_output_path, 'blast_db':blast_db_path,'fmt':fmt, 'num':num})
     #print command
-    args = shlex.split(command)
+    args = shlex.split(str(command))
     try:
         ret_val = subprocess.call(args, stderr=open(error_log,'w'))
     except OSError:
         raise OSError('Error occurred trying to run BLAST. Is blastn on the path?')
+    except TypeError as e:
+        raise e
     return (ret_val, error_log)
 
 def make_blastdb(fasta_path, name,output_dir="",error_log=None):
@@ -81,12 +85,12 @@ def blast_results(f, fmt=7):
             
 def create_samples_dictionary(blast_output_path, legend_path, separator):
     samples = {}
+    #import pdb; pdb.set_trace()
     legend = DeserializeFromFile(legend_path)
     ranks = legend['ranks']
     blast = blast_results(open(blast_output_path))
     
     for result in blast:#iterate over blast results for each query seq
-        #import pdb; pdb.set_trace()
         a = best_alignment(result)
         sample, sequence = a.qseqid.split(separator)
         if sample not in samples:

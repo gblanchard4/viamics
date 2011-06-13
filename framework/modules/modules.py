@@ -17,4 +17,4 @@ server_modules_dict = {'rdp'    : rdp,
                        'qpcr'   : qpcr,
                        'env'    : env,
                        'commons': commons,
-                       'blast'  : blastx}
+                       'blast'  : blast}

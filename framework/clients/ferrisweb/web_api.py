@@ -35,32 +35,11 @@ from framework import constants
 from framework.tools import helper_functions
 from framework.tools.logger import debug
 from framework.clients.ferrisweb import webforms
+from framework.clients.ferrisweb.views import server_err, err_response
 
 server = helper_functions.server
 
-def server_err(server_dict):
-    if server_dict.has_key('response'):
-        return server_dict['response'] == 'error'
-    else:
-        return True
 
-def err_response(server_dict):
-    context_dict = {}
-
-    if server_dict.has_key('content'):
-        context_dict['content'] =  server_dict['content']
-    if server_dict.has_key('exception'):
-        context_dict['exception'] =  server_dict['exception']
-    if server_dict.has_key('time_stamp'):
-        context_dict['time_stamp'] = server_dict['time_stamp']
-    if not len(server_dict):
-        context_dict['content'] =  "Either server is not running or socket name is wrong"
-
-    return HttpResponse(get_template("error.tmpl").render(Context(context_dict)))
-
-
-#please read before modifying web api:
-#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
 def analyses(request):
     if request.method == 'GET':
         server_request = {'request': 'get_analyses'}

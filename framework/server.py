@@ -173,7 +173,10 @@ in `executors` will be called based on `dict["request"]`
                      'heatmap_options'              : self.heatmap_options,
                      'refresh_heatmap'              : self.refresh_heatmap,
                      'refresh_sample_map'           : self.generate_or_refresh_sample_map,
-                     'new_sample_map'               : self.generate_or_refresh_sample_map}
+                     'new_sample_map'               : self.generate_or_refresh_sample_map,
+                     'new_blast_db'                 : self.create_blast_db,
+                     'list'	   		    : self.list_resource
+                     }
 
 
         if not executers.has_key(self.request_dict['request']):
@@ -407,6 +410,21 @@ returns self.decode_request of the data recieved.
             self.write_socket({'response': 'OK'})
 
 
+    def list_resource(self):
+        res = self.request_dict['resource']
+        if res == 'analyses' or res == 'analysis':
+            self.get_analyses()
+        else:
+            resources = []
+            attrs = set(dir(c))
+            if (res + '_dir') in attrs:
+                resources = set([i.split('.')[0] for i in os.listdir(getattr(c,res+'_dir'))])
+                resp = {'response':'OK','resources':[{'id':l } for l in resources]}
+                self.write_socket(resp)
+            else:
+                self.write_socket({'response':'error', 'content':'the requested resource: %s was not found' % res})
+            
+
     def get_analyses(self):
         analyses = []
         """returns analyses that are running on the server or were finished"""
@@ -431,6 +449,22 @@ returns self.decode_request of the data recieved.
         #import pdb; pdb.set_trace()
         self.write_socket({'response': 'OK', 'analyses': analyses})
 
+
+
+    def create_blast_db(self):
+        #maybe need a parallel DB_Meta object for dbs
+        fasta_path = self.request_dict['data_file_path']
+        name = self.request_dict['db_name']
+        for escape_char in ['/','..']:
+            name = name.replace(escape_char, '_')
+        out = c.blastdb_dir
+        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out,error_log=None)
+
+        legend = {'ranks':['species']}
+        cPickle.dump(legend,open(os.path.join(c.blastdb_dir,name+c.blast_legend_file_extension),'w'))
+
+        self.write_socket({'response': 'OK'})
+        
 
     def get_sample_map_name(self):
         analysis_id = self.request_dict['analysis_id']
@@ -690,6 +724,9 @@ returns self.decode_request of the data recieved.
 
     def status_request(self):
         self.write_socket({'response': 'OK', 'running_analyses': self.serverstate.running_analyses, 'done_analyses': self.serverstate.done_analyses})
+
+
+
 
 
 class Dirs:

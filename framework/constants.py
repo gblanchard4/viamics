@@ -66,6 +66,7 @@ ranks = {}
 ranks['rdp'] = ['genus', 'family', 'order', 'class', 'phylum']
 ranks['qpcr'] = ['species']
 ranks['env'] = ['species']
+ranks['blast'] = ['species'] #for now
 
 #rdp
 rdp_output_file_name = "rdp_output"
