@@ -179,17 +179,13 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             formatter = FuncFormatter(log_10_fix)
             ax.yaxis.set_major_formatter(formatter)
 
-            plot([0], [max_abundance], visible = False)
-            plot([-0.9], [-1], visible = False)
-            plot([i + 0.9], [max_abundance], visible = False)
-            xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+            xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
+            xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
             ylim(ymin=1e-1, ymax=max_y)
         else:
-            plot([0], [100], visible = False)
-            plot([-0.9], [-1], visible = False)
-            plot([i + 0.9], [100], visible = False)
             ylim(ymin=-5, ymax=105)
-            xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+            xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
+            xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
             yticks(arange(0, 101, 10))
 
         if not save_dir:
@@ -209,9 +205,11 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
 
 
 if __name__ == "__main__":
-    samples_dict_path = "/home/amanda/repo/ferris/framework/analyses/aa401d5f62a5d595ccdea3452dbba354e4fb195d/samples_dict_serialized"
-    sample_map_file_path = "/home/amanda/repo/ferris/framework/analyses/aa401d5f62a5d595ccdea3452dbba354e4fb195d/maps/3/sample_map"
-    otu_library_file_path = "/home/amanda/repo/ferris/framework/analyses/aa401d5f62a5d595ccdea3452dbba354e4fb195d/otu_library"
+    # FIXME: unittests should be able to cover these.. it
+    # is really unnecessary to do this here.
+    samples_dict_path = "/path/to/analysis/samples_dict_serialized"
+    sample_map_file_path = "/path/to/analysis/maps/3/sample_map"
+    otu_library_file_path = "/path/to/analysis/otu_library"
 
     samples_dict = read_samples_dictionary(samples_dict_path)
     otu_library = read_samples_dictionary(otu_library_file_path)

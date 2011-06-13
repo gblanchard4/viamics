@@ -27,7 +27,8 @@
 <p class="smallsmallheadtitle">» Samples in the original library: {{ analysis_info.all_unique_samples_list|length }}
 <p class="smallsmallheadtitle">» Included Samples ({{ map.included|length }}):
 {% for group, samples in map.sample_groups.items %}
-<p class="smallsmallheadtitle" style="padding-left: 20px;"><span style="border: 1px solid #666; padding-left: 10px; background-color: {{map.group_colors|dict_get:group}}">&nbsp;</span> <b>{{ group }}</b>:
+<p class="smallsmallheadtitle" style="padding-left: 20px;"><span style="border: 1px solid #666; padding-left: 10px; background-color: {{map.group_colors|dict_get:group}}">&nbsp;</span> <b>{{ group }}</b>:</p>
+    <div class="sampleslist">
     {% for sample in samples %}
     <a class="boxpopup3" href="#">{{ sample }}<span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
     <div class="spiffyfg">
@@ -40,20 +41,28 @@
     {% endfor %}
     </div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
     {% endfor %}
+    </div>
 {% endfor %}
 
-<p class="smallsmallheadtitle">» Excluded Samples ({{ map.excluded|length }}): {% ifnotequal map.excluded|length 0 %} {% for sample in map.excluded %}
-<a class="boxpopup3" href="#">{{ sample }}<span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
-<div class="spiffyfg">
-{% for key, value in samples_genus_OTUs.items %}
-    {% ifequal key sample %}
-        {% for otu, count in value %}
-            <i>{{ otu }}:</i> <b>{{ count }}</b><br />
+<p class="smallsmallheadtitle">» Excluded Samples ({{ map.excluded|length }}):</p>
+{% ifnotequal map.excluded|length 0 %}
+    <div class="sampleslist">
+    {% for sample in map.excluded %} 
+        <a class="boxpopup3" href="#">{{ sample }}<span><div><b class="spiffy"><b class="spiffy1"><b></b></b><b class="spiffy2"><b></b></b><b class="spiffy3"></b><b class="spiffy4"></b><b class="spiffy5"></b></b>
+        <div class="spiffyfg">
+        {% for key, value in samples_genus_OTUs.items %}
+            {% ifequal key sample %}
+                {% for otu, count in value %}
+                    <i>{{ otu }}:</i> <b>{{ count }}</b><br />
+                {% endfor %}
+            {% endifequal %}
         {% endfor %}
-    {% endifequal %}
-{% endfor %}
-</div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
-{% endfor %} {% else %} None {% endifnotequal %}
+        </div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>
+    {% endfor %}
+    </div>
+{% else %} 
+    None 
+{% endifnotequal %}
 
 
 <div class="smallhead">Heat Maps</div>

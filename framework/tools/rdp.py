@@ -303,9 +303,8 @@ def otu_confidence_analysis(rdp_output_file, save_path, seperator, samples, rank
             setp(b['boxes'], color='black', alpha=0.9)
             setp(b['fliers'], color='black', alpha=0.9)
             setp(b['caps'], color='black', alpha=0.9)
-            plot([0], [max_val], visible = False)
-            plot([-0.9], [-max_val * 10 / 100], visible = False)
-            plot([i + 0.9], [max_val], visible = False)
+            
+            xlim(xmin=-0.75, xmax=len(samples) - 0.15)
             ylim(ymin=-max_val * 10 / 100, ymax=max_val)
             xticks(arange(len(samples)), samples, rotation=90)
 
@@ -377,21 +376,20 @@ def general_confidence_analysis(rdp_output_file, save_path):
     rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
     rc('grid', color='0.50', linestyle='-', linewidth=0.1)
     grid(True)
-
+    
     for key in m:
-         y_positions =  [((1 - (r.gauss(100, 3) /100)) + m.index(key)) for x in range(0, len(plot_dict[key]))]
-         plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 8, mew = 0.4, alpha = .4)
-         b = boxplot(plot_dict[key], positions=[m.index(key) + 0.35], sym=',', widths=0.2)
-         setp(b['medians'], color=group_colors[key])
-         setp(b['whiskers'], color='black', alpha=0.3)
-         setp(b['boxes'], color='black', alpha=0.3)
-         setp(b['fliers'], color='black', alpha=0.3)
-         setp(b['caps'], color='black', alpha=0.3)
-         plot([0], [max_val], visible = False)
-         plot([-0.9], [-max_val * 10 / 100], visible = False)
-         plot([m.index(key) + 0.9], [max_val], visible = False)
-         ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-         xticks(arange(len(plot_dict)), m, rotation=90)
+        y_positions =  [((1 - (r.gauss(100, 3) /100)) + m.index(key)) for x in range(0, len(plot_dict[key]))]
+        plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 8, mew = 0.4, alpha = .4)
+        b = boxplot(plot_dict[key], positions=[m.index(key) + 0.35], sym=',', widths=0.2)
+        setp(b['medians'], color=group_colors[key])
+        setp(b['whiskers'], color='black', alpha=0.3)
+        setp(b['boxes'], color='black', alpha=0.3)
+        setp(b['fliers'], color='black', alpha=0.3)
+        setp(b['caps'], color='black', alpha=0.3)
+                
+        xlim(xmin=-0.75, xmax=len(m) - 0.15)
+        ylim(ymin=-max_val * 10 / 100, ymax=max_val)
+        xticks(arange(len(plot_dict)), m, rotation=90)
 
     if not save_path:
         show()
@@ -456,9 +454,8 @@ def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_li
         setp(b['boxes'], color='black', alpha=0.9)
         setp(b['fliers'], color='black', alpha=0.9)
         setp(b['caps'], color='black', alpha=0.9)
-        plot([0], [max_val], visible = False)
-        plot([-0.9], [-max_val * 10 / 100], visible = False)
-        plot([i + 0.9], [max_val], visible = False)
+
+        xlim(xmin=-0.75, xmax=len(samples_list) - 0.15)
         ylim(ymin=-max_val * 10 / 100, ymax=max_val)
         xticks(arange(len(samples_list)), samples_list, rotation=90)
 

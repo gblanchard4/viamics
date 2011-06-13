@@ -25,7 +25,6 @@ from pylab import *
 
 sys.path.append("../../")
 from framework.tools import helper_functions
-from framework import constants as c
 
 def get_shannons_diversity_index(species):
     S = len(species.values())
@@ -131,7 +130,8 @@ def generate(samples_dict, img_save_path = None, data_save_path = None, type = N
     samples = helper_functions.sorted_copy(samples_dict.keys())
     samples_diversity_index_list = []
 
-    #import pdb; pdb.set_trace()
+
+
     if method == 'simpsons':
         samples_diversity_index_list = [get_simpsons_diversity_index(samples_dict[sample][taxonomic_level]) for sample in samples]
         lbl = "Simpson's Sample Diversity Index"
