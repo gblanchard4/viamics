@@ -66,6 +66,7 @@ ranks = {}
 ranks['rdp'] = ['genus', 'family', 'order', 'class', 'phylum']
 ranks['qpcr'] = ['species']
 ranks['env'] = ['species']
+ranks['vamps'] = ['species']
 ranks['blast'] = ['species'] #for now
 
 #rdp

@@ -528,7 +528,6 @@ def update_analysis_append_samples(request, analysis_id):
 
 
 def new_analysis(request, analysis_type):
-
     if request.method == 'POST':
 
 #        import pdb; pdb.set_trace()
@@ -540,6 +539,8 @@ def new_analysis(request, analysis_type):
             form = webforms.EnvUploadForm(request.POST, request.FILES)
         if analysis_type == 'blast':
             form = webforms.BlastUploadForm(request.POST, request.FILES)
+        if analysis_type == "vamps":
+            form = webforms.VampsUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
             job_description = form.cleaned_data['job_description']
@@ -584,15 +585,18 @@ def new_analysis(request, analysis_type):
         if analysis_type == "rdp":
             form = webforms.FastaUploadForm()
             tmpl = "fasta_upload_form.tmpl"
-        if analysis_type == "qpcr":
+        elif analysis_type == "qpcr":
             form = webforms.QpcrUploadForm()
             tmpl = "qpcr_upload_form.tmpl"
-        if analysis_type == "env":
+        elif analysis_type == "env":
             form = webforms.EnvUploadForm()
             tmpl = "env_upload_form.tmpl"
-        if analysis_type == 'blast':
+        elif analysis_type == 'blast':
             form = webforms.BlastUploadForm()
             tmpl = "blast_upload_form.tmpl"
+        elif analysis_type == "vamps":
+            form = webforms.EnvUploadForm()
+            tmpl = "vamps_upload_form.tmpl"
 
         return HttpResponse(get_template(tmpl).render(Context({'form': form})))
 

@@ -75,9 +75,6 @@ Pardus Corporate 2 Alpha
 
 # at this point I assume you have the codebase and you are in the root
 # directory of the Framework
-chmod 777 analyses/
-chmod 777 errors/
-chmod 777 tmp/
 sudo pisi it matplotlib
 sudo pisi it numeric
 sudo pisi it scipy

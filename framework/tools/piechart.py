@@ -99,9 +99,4 @@ def main(samples_dict, taxa_color_dict, ranks, pie_chart_file_prefix = "piechart
 
 
 if __name__ == "__main__":
-    samples_dict = rdp.read_samples_dictionary("../analyses/660ec9c89d34f3133e0c1c1ac2bbb39fcb47386f/samples_dict_serialized")
-    otu_library = rdp.read_samples_dictionary("../analyses/660ec9c89d34f3133e0c1c1ac2bbb39fcb47386f/otu_library")
-    taxa_color_dict = rdp.read_samples_dictionary("../analyses/660ec9c89d34f3133e0c1c1ac2bbb39fcb47386f/taxa_color_dict")
-    main(samples_dict, taxa_color_dict, otu_library = otu_library)
-    #main(samples_dict, "./files", "tmp_piechart_", "./files/tmp", is_transparent = True)
-    #main(samples_dict, "./files")
+    pass
