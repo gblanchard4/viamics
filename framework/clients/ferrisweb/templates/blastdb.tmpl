@@ -1,0 +1,82 @@
+{% extends "base.tmpl" %}
+{%block script%}
+<script type="text/javascript"> 
+$(document).ready(function() {
+	$("file_upload_form").onsubmit=function() {
+		$("file_upload_form").target = "upload_target";
+	}
+})
+        function uploadDone() { //Function will be called when iframe is loaded
+	var ret = frames['upload_target'].document.getElementsByTagName("body")[0].innerHTML;
+        if( ret != ""){
+	    var data = JSON.parse(ret);
+            if(data.response == "OK") { //This part happens when the image gets uploaded.			
+                        alert('uploaded');
+	    }
+	    else { //Upload failed - show user the reason.
+		alert("upload failed");
+	    }
+        }
+
+		
+}
+function delete_success(db_id){
+return function(data,textStatus,jqXHR)
+{
+    alert(data);
+    data = JSON.parse(data);
+    if(data.response == "OK"){
+        row = document.getElementById(db_id+'_row');
+        row.parentNode.removeChild(row);
+    }
+}
+}
+</script>
+{%endblock%}
+{% block title %}Viamics - BLAST databases{% endblock %}
+
+{% block content %}
+
+<div class="head">Viamics</div>
+<div class="title">Visual and statistical analysis framework for microbial communities, and probably more...</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+
+<p class="info">There {{ databases|length|pluralize:"is,are" }} {{databases|length}} BLAST database{{ databases|length|pluralize:" ,s" }} on the server:</p>
+
+
+<div class="form"> 
+<table class="resource_list">
+{% for db in databases %}
+    <tr id="{{ db.id }}_row">
+        <td class="listed_resource_icon" ><img src="{{ request.META.HTTP_HOST }}/static/db.png" ></td>
+        <td>
+            <div class="smallheadindex" >{{  db.id }} <a href="/blastdb/{{ db.id }}">»</a></div>
+            <div class="smalltitle"><span class="analysis_id">{{ db.length }} sequences / <a href="#" onclick="alert('coming soon')">Append</a></span>
+	    <span class="secondary_control">
+	      <a href="#" onclick="$.ajax({url:'/api/blastdb/{{ db.id }}/',type:'DELETE',success:delete_success('{{ db.id }}'),data:{_method:'DELETE'}})">Delete
+	    </span></div>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+</div>
+<div class="add_resource_box">
+<form id="file_upload_form" method="post" enctype="multipart/form-data" action="/api/blastdb/" class="input form" target="upload_target" >
+  
+  <h3>  <img src="{{ request.META.HTTP_HOST }}/static/db.png" >Add new BLAST DB</h3>
+  <p class="info">Upload a FASTA file which will be converted into a BLAST database. You can then BLAST other sequences against the DB</p>
+  <label for="file">FASTA file:</label>
+  <input name="file" id="file" type="file" /><br />
+  <label for="db_name">DB Name:</label>
+  <input name="db_name" id="db_name" type="text" /><br />
+  <input type="submit" name="action" value="Upload" /><br />
+  <input type="hidden" name="file_type" id="db_name" value="fasta" />
+ </form>
+
+ <iframe id="upload_target" name="upload_target" src="" style="display:none"  onload="uploadDone()"></iframe> 
+
+</div>
+
+{% endblock %}
+

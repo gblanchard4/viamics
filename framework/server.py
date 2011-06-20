@@ -153,9 +153,9 @@ in `executors` will be called based on `dict["request"]`
         print "\n\n* Incoming Data: ", self.request_dict
 
         executers = {'exec_analysis'                : self.exec_analysis,
-                     'remove_analysis'              : self.remove_analysis,
+                     'remove_analysis'              : self.remove_analysis,#use delete_resource
                      'status'                       : self.status_request,
-                     'get_analyses'                 : self.get_analyses,
+                     'get_analyses'                 : self.get_analyses,#use list_resource
                      'get_analysis_name'            : self.get_analysis_name,
                      'get_type_of_analysis'         : self.get_type_of_analysis,
                      'get_analysis_ranks'           : self.get_analysis_ranks,
@@ -169,14 +169,15 @@ in `executors` will be called based on `dict["request"]`
                      'get_otu_t_p_tuples'           : self.get_otu_t_p_tuples,
                      'get_samples_in_an_analysis'   : self.get_samples_in_an_analysis,
                      'append_samples_to_analysis'   : self.append_samples_to_analysis,
-                     'info'                         : self.get_analysis_info,
+                     'info'                         : self.get_info,
                      'refresh_analysis_files'       : self.refresh_analysis_files,
                      'heatmap_options'              : self.heatmap_options,
                      'refresh_heatmap'              : self.refresh_heatmap,
                      'refresh_sample_map'           : self.generate_or_refresh_sample_map,
                      'new_sample_map'               : self.generate_or_refresh_sample_map,
                      'new_blast_db'                 : self.create_blast_db,
-                     'list'	   		    : self.list_resource
+                     'list'	   		    : self.list_resource,
+                     'delete'                       :self.delete_resource
                      }
 
 
@@ -411,6 +412,22 @@ returns self.decode_request of the data recieved.
             self.write_socket({'response': 'OK'})
 
 
+
+    def delete_resource(self):
+        res = self.request_dict['resource']
+        if res == 'analyses' or res == 'analysis':
+            self.remove_analysis()
+        else:
+            if(hasattr(c,res+'_dir')):
+                shutil.rmtree(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']))
+                self.write_socket({'response':'OK'})
+            else:
+                error_log = os.path.join(c.error_logs_dir, time_stamp.__str__())
+                traceback.print_exc(file=open(error_log, "w"))
+                exception_info = open(error_log).read()
+                self.write_socket({'response': 'error', 'exception': 'the requested resource does not exist'})
+        return
+        
     def list_resource(self):
         res = self.request_dict['resource']
         if res == 'analyses' or res == 'analysis':
@@ -419,7 +436,7 @@ returns self.decode_request of the data recieved.
             resources = []
             attrs = set(dir(c))
             if (res + '_dir') in attrs:
-                resources = set([i.split('.')[0] for i in os.listdir(getattr(c,res+'_dir'))])
+                resources = os.listdir(getattr(c,res+'_dir'))
                 resp = {'response':'OK','resources':[{'id':l } for l in resources]}
                 self.write_socket(resp)
             else:
@@ -451,18 +468,21 @@ returns self.decode_request of the data recieved.
         self.write_socket({'response': 'OK', 'analyses': analyses})
 
 
-
+#server({'request':'new_blast_db','data_file_path':<datafile>,'db_name':<name>})
     def create_blast_db(self):
         #maybe need a parallel DB_Meta object for dbs
         fasta_path = self.request_dict['data_file_path']
         name = self.request_dict['db_name']
         for escape_char in ['/','..']:
             name = name.replace(escape_char, '_')
-        out = c.blastdb_dir
-        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out,error_log=None)
+        out = os.path.join(c.blastdb_dir,name)#and here, to put all blastdbs in their own folder
+        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
 
-        legend = {'ranks':['species']}
-        cPickle.dump(legend,open(os.path.join(c.blastdb_dir,name+c.blast_legend_file_extension),'w'))
+        num_seqs = len([l for l in open(fasta_path) if l.startswith('>')])
+        legend = {'ranks':['species'], 'length':num_seqs}#this is where we can store any taxonomic information we have about the db
+        cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
+
+
 
         self.write_socket({'response': 'OK'})
         
@@ -684,6 +704,25 @@ returns self.decode_request of the data recieved.
             maps.append(helper_functions.get_sample_map_dict(p))
 
         self.write_socket({'response': 'OK', 'sample_maps': maps})
+
+    def get_info(self):
+        
+        if 'resource' not in self.request_dict:
+            self.get_analysis_info()
+        elif self.request_dict['resource'] == 'analysis':
+            self.get_analysis_info()
+        elif self.request_dict['resource'] == 'blastdb':
+            resource_dir = getattr(c,self.request_dict['resource']+'_dir')
+            if self.request_dict['id'] in os.listdir(resource_dir):
+                id = self.request_dict['id']
+                legend = cPickle.load(open(os.path.join(resource_dir,id,id+'.blg')))
+                
+                response = {'response':'OK','id':self.request_dict['id'],'length':legend['length']}
+                self.write_socket(response)
+            else:#return error if there is no blastdb with this name
+                self.write_socket({'response':'error','exception':'the requested resource does not exist'})
+        else:#return error if there is no resource type with this name
+            self.write_socket({'response':'error','exception':'the requested resource does not exist'})
 
 
     def get_analysis_info(self):

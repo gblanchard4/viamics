@@ -39,6 +39,10 @@ from framework.clients.ferrisweb.views import server_err, err_response
 
 server = helper_functions.server
 
+def server_resp_json(server_request):
+    server_response = server(server_request)
+    return HttpResponse(json.dumps(server_response))
+
 
 def analyses(request):
     if request.method == 'GET':
@@ -54,3 +58,30 @@ def analyses(request):
         return err_response({'content':'Only the GET method is implemented for this resource'})
 
 
+def blastdbs(request):
+    #import pdb; pdb.set_trace()
+    
+    if request.method == 'GET':
+        req = {'request':'list', 'resource':'blastdb'}
+        return server_resp_json(req)
+    
+    elif request._method == 'POST':
+        if len(request.FILES)>0:#uploaded file
+            tmp_data_file = os.path.join(constants.temp_files_dir,request.POST['db_name'])
+            f = open(tmp_data_file,'w')
+            f.write(request.FILES[request.FILES.keys()[0]].read())
+            if request.POST['file_type'] == 'fasta':
+                req = {'request':'new_blast_db','data_file_path':tmp_data_file,'db_name':request.POST['db_name']}
+                return server_resp_json(req)
+            elif request.POST['file_type'] == 'blast_db':
+                pass#TODO basically just give the file to the server and let it save it.
+
+
+def blastdb(request, db_name):
+    if request.method == 'GET':
+        #server({'request':'info','resource':'blastdb','id':<id>})
+        return HttpResponse(json.dumps({'GET request':'recieved'}))
+    if request._method == 'DELETE':
+        req = {'request':'delete', 'id':db_name, 'resource':'blastdb'}
+        return server_resp_json(req)
+            

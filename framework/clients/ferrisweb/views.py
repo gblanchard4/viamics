@@ -340,21 +340,7 @@ def refresh_analysis_files(request, analysis_id):
         return HttpResponse(get_template("refresh.tmpl").render(Context({'refresh_options': refresh_options,
                                                                          'functions_dict': functions_dict,
                                                                          'analysis_id': analysis_id})))
-#please read before modifying web api:
-#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
-def analyses(request):
-    if request.method == 'GET':
-        server_request = {'request': 'get_analyses'}
-        server_response = server(server_request)
-        
-        if server_err(server_response):
-            return err_response(server_response)
-        
-        analyses = server_response['analyses']
-        return HttpResponse(json.dumps(analyses))
-    else:
-        return err_response({'content':'Only the GET method is implemented for this resource'})
-
+ 
 def index(request):
     server_request = {'request': 'get_analyses'}
     server_response = server(server_request)
@@ -364,6 +350,19 @@ def index(request):
 
     analyses = server_response['analyses']
     return HttpResponse(get_template("index.tmpl").render(Context({'analyses': analyses})))
+
+def blastdbs(request):
+    if request.method == 'GET':
+        req = {'request':'list', 'resource':'blastdb'}
+        resp = server(req)
+        dbs = []
+        for r in resp['resources']:
+            dbs.append(server({'request':'info','resource':'blastdb','id':r['id']}))
+        if server_err(resp):
+            return err_response(resp)
+        else:
+            return HttpResponse(get_template("blastdb.tmpl").render(Context({'databases':dbs})))
+        
 
 
 def get_samples_genus_OTUs(analysis_id):

@@ -33,7 +33,7 @@ def make_blastdb(fasta_path, name,output_dir="",error_log=None):
         error_log = open(error_log,'w')
     out = os.path.join(output_dir,name)
     command = makeblastdb_cmd % {"in":fasta_path, "out":out, "name":name}
-    args = shlex.split(command)
+    args = shlex.split(str(command))
     exit_val = subprocess.call(args, stderr=error_log)
     return exit_val
 
@@ -81,7 +81,8 @@ def blast_results(f, fmt=7):
                     result = ""
             
             result += line
-    yield Blast_Result(result)#lazy fix to catch last result
+    if result.strip() != '':
+        yield Blast_Result(result)#lazy fix to catch last result
             
 def create_samples_dictionary(blast_output_path, legend_path, separator):
     samples = {}

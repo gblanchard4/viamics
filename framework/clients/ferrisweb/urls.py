@@ -39,14 +39,13 @@ from clients.ferrisweb.views import sample_map_dot
 from clients.ferrisweb.views import new_analysis
 from clients.ferrisweb.views import update_analysis_append_samples
 from clients.ferrisweb.views import update_analysis_remove_samples
+from clients.ferrisweb.views import blastdbs
 
 #please read before modifying web api:
 #http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
 urlpatterns = patterns('',
     (r'^$', index),
-    (r'^api/analyses', web_api.analyses),#this should be specified in greater detail if we want
-    #to decouple clients. right now it just gives the json for get_analyses.
-    #maybe a betterway would be to allow say, GET viamics.com/index.json
+    (r'^api/analyses', web_api.analyses),
     (r'^about/$', about),
     (r'^status/$', status_request),
     (r'^info/(?P<analysis_id>[a-zA-Z0-9_.-]+)/$', analysis_info),
@@ -66,5 +65,7 @@ urlpatterns = patterns('',
     (r'^update_samples/(?P<analysis_id>[a-zA-Z0-9_.-]+)/remove/$', update_analysis_remove_samples),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.analyses_dir, 'show_indexes': True}),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.web_statics_dir, 'show_indexes': True}),
-
+    (r'^blastdb',blastdbs),
+    (r'^api/blastdb/$',web_api.blastdbs),
+    (r'^api/blastdb/(?P<db_name>[a-zA-Z0-9_.-]+)/$', web_api.blastdb)
 )

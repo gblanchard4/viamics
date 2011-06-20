@@ -74,6 +74,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'framework.clients.ferrisweb.middleware.fake_methods.FakeHttpMiddleware'
 )
 
 ROOT_URLCONF = 'ferrisweb.urls'
