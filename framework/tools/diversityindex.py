@@ -25,6 +25,7 @@ from pylab import *
 
 sys.path.append("../../")
 from framework.tools import helper_functions
+from framework import constants as const#c is used as a local in this file
 
 def get_shannons_diversity_index(species):
     S = len(species.values())
@@ -56,9 +57,8 @@ def get_simpsons_diversity_index(species):
     return D
 
 def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None, type = None, method='simpsons'):
-    taxonomic_level = "genus"
-    if type == "qpcr" or type == "env":
-        taxonomic_level = "species"
+    
+    taxonomic_level = const.ranks[type][-1]
 
     sample_groups, group_colors = helper_functions.get_groups_colors_from_sample_map_file(sample_map_file_path)
 
@@ -125,14 +125,13 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
 
 
 def generate(samples_dict, img_save_path = None, data_save_path = None, type = None, method='simpsons'):
-    #we assume we're working with RDP
-    taxonomic_level = "genus"
-    #but what if it's not?
-    if type == "qpcr" or type == "env":
-        taxonomic_level = "species"
 
+    taxonomic_level = const.ranks[type][-1]
+    
     samples = helper_functions.sorted_copy(samples_dict.keys())
     samples_diversity_index_list = []
+
+
 
     if method == 'simpsons':
         samples_diversity_index_list = [get_simpsons_diversity_index(samples_dict[sample][taxonomic_level]) for sample in samples]

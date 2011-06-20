@@ -1,0 +1,20 @@
+{% extends "base.tmpl" %}
+
+{% block title %}Info..{% endblock %}
+
+{% block content %}
+<div class="head">Viamics » New VAMPS Analysis</div>
+<div class="title">VAMPS is a comprehensive infrastructure developed by Marine Biological Laboratory to analyze microbial population structures. This interface aims to analyze taxonomy tables that can be obtained by 'Taxonomy Table' link under 'Community Visualization' on the main page of VAMPS (http://vamps.mbl.edu).</div>
+<div class="links-bar">{% include "links.tmpl" %}</div>
+
+<p class="info">(more explanation to come)
+
+<div class="form">
+<form enctype="multipart/form-data" method="post" action="/new/vamps/">
+<table>
+{{ form.as_table }}
+</table>
+<input type="submit" value="Submit" />
+</form>
+</div>
+{% endblock %}

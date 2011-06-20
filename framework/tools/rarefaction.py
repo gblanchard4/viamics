@@ -49,8 +49,6 @@ def get_rarefaction_values(all_species):
         # stuff above is equal to this here:
         #r = 1 - (reduce(operator.mul, [(N - x - j + 1.0) / (N - j + 1.0) for x in Ni.values()]))
 
-
-
         rarefaction_values.append(r)
     return rarefaction_values
 
@@ -153,27 +151,4 @@ def generate_all_samples_figure(rarefaction_dict, save_path = None, taxonomic_le
 
 
 if __name__ == '__main__':
-    def smaller():
-        samples_dict = rdp.read_samples_dictionary("./samples_dict")
-        sm = {}
-        sm["1"] = samples_dict["1"]
-        sm["2"] = samples_dict["2"]
-        sm["3"] = samples_dict["3"]
-        rarefaction_dict = generate_dict(sm)
-        save_figures(rarefaction_dict, individual_images = 1)
-    def smaller_single():
-        samples_dict = rdp.read_samples_dictionary("./samples_dict")
-        sm = {}
-        sm["1"] = samples_dict["1"]
-        sm["2"] = samples_dict["2"]
-        sm["3"] = samples_dict["3"]
-        rarefaction_dict = generate_dict(sm)
-        save_figures(rarefaction_dict, individual_images = 0, save_path = "/tmp/")
-    def save_all():
-        samples_dict = rdp.read_samples_dictionary("./samples_dict")
-        rarefaction_dict = generate_dict(samples_dict)
-        rdp.write_samples_dictionary('./rarefaction_dict_50', rarefaction_dict)
-        #rarefaction_dict = rdp.read_samples_dictionary("./rarefaction_dict")
-        save_figures(rarefaction_dict, individual_images = 1, save_path = "/home/amanda/Desktop/rf/")
-
-    smaller_single()
+    pass

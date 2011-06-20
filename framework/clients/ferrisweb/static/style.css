@@ -15,6 +15,33 @@ h1 {
     border-bottom: 1px solid #ADADAD;
 }
 
+.switcher li.active {
+    background-color: #E6CEBB;
+    }
+
+.input {
+    background-color: #E6CEBB;
+    margin-top: 0;
+    padding: 5px;
+    width: 350px;
+    }
+
+.switcher {
+    overflow: hidden;
+    background-color: #B2A8A0;
+    margin-bottom: 0;
+    width: 350px;
+    padding: 5px;
+    padding-bottom: 0;
+    }
+
+.switcher li {
+    float: left;
+    list-style: none;
+    padding: 5px;
+    cursor: pointer;
+    }
+
 .smallsmallhead {
     font-size: 1.0em;
     border-bottom: 1px solid #ADADAD;

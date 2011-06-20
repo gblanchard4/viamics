@@ -51,5 +51,4 @@ def get_otu_library(qpcr_file):
     return otu_library
 
 if __name__ == "__main__":
-    s = create_samples_dictionary("files/sample_qpcr")
-    print get_otu_library("files/sample_qpcr")
+    pass

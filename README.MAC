@@ -1,0 +1,76 @@
+Installing Viamics on a Snow Leopard is quite easy. After installing Xcode
+from Apple, Macports (http://www.macports.org/) takes care the rest. But
+installing R and RPy2 is somehow tricky. I solved the problem by compiling and
+installing these two separately. and didn't want the solution go anywhere in
+case someone would need it. Until a proper installation manual for Viamics on
+Mac computers arrive, this sappy README file shall cover R and RPy2 part of
+the installaiton process (meren, 6/8/2011).
+
+---
+
+# first, we need R. but don't forget to remove all R and and RPy2
+# installations if you have any before you start this. 
+
+$ wget http://cran.r-project.org/src/base/R-2/R-2.12.0.tar.gz
+$ tar -zxvf R-2.12.0.tar.gz
+$ cd R-2.12.0
+$ export arch=x86_64
+$ mkdir R-$arch && cd R-$arch
+
+
+$ ../configure r_arch=$arch  CC="gcc -arch $arch" XX="g++ -arch $arch" F77="gfortran -arch $arch" FC="gfortran -arch $arch" OBJC="gcc -arch $arch" --x-includes=/usr/X11/include --x-libraries=/usr/X11/lib --with-blas='-framework vecLib' --with-lapack --enable-R-shlib
+$ make && sudo make install
+
+$ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/Library/Frameworks/R.framework/Resources/bin:/Library/Frameworks/R.framework/Resources/lib' >> ~/.bas
+hrc
+$ source ~/.bashrc
+
+#
+# R somehow assumes that it is running on an i386 architecture.
+# I didn't have time to look into it, as a silly workaround I
+# changed 46th line of the script with this line:
+#
+# : ${R_ARCH="/x86_64"}
+#
+# after this edit, you should be able to run R and install
+# various packages, such as gtools and gdata via the R command
+# line interface (see main README to get the list of R packages
+# need to be installed).
+#
+# next step is to get RPy2 running:
+#
+
+$ wget http://downloads.sourceforge.net/project/rpy/rpy2/2.1.x/rpy2-2.1.8.tar.gz
+$ tar -zxvf rpy2-2.1.8.tar.gz && rpy2-2.1.8
+
+# it was again a little tricky for me to get RPy2 installed
+# properly in respect to the existing R installation on my Mac.
+# Here is a dirty diff shows what I had to change in setup.py:
+
+#########################################################################
+meren ~/src $ diff -Nuar rpy2-2.1.8-orig/setup.py rpy2-2.1.8/setup.py
+--- rpy2-2.1.8-orig/setup.py    2010-11-09 15:17:56.000000000 -0500
++++ rpy2-2.1.8/setup.py 2011-06-07 13:31:12.000000000 -0400
+@@ -226,7 +226,7 @@
+         span = (0, 0)
+         rc = RConfig()
+         for substring in re.split('(?<!-framework) ', string):
+-            ok = False
++            ok = True
+             for pattern in pp:
+                 rconfig_m = pattern.match(substring)
+                 if rconfig_m is not None:
+@@ -267,7 +267,7 @@ 
+ def getRinterface_ext():
+     #r_libs = [os.path.join(RHOME, 'lib'), os.path.join(RHOME, 'modules')]-    r_libs = []
++    r_libs = ['/Library/Frameworks/R.framework/Resources/lib', '/Library/Frameworks/R.framework/Resources/modules']
+     extra_link_args = []
+ 
+     #FIXME: crude way (will break in many cases)
+#########################################################################
+
+$ python setup.py build
+$ sudo python setup.py install
+
+
+Good luck.

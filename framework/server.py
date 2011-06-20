@@ -53,6 +53,7 @@ from framework.tools.logger import debug
 import framework.tools.rdp
 import framework.tools.env
 import framework.tools.qpcr
+import framework.tools.vamps
 import framework.tools.heatmap
 import framework.tools.bar
 import framework.tools.piechart
@@ -469,6 +470,8 @@ returns self.decode_request of the data recieved.
     def append_samples_to_analysis(self):
         analysis_id         = self.request_dict['analysis_id']
         data_file_temp_path = self.request_dict['data_file_path']
+        self.serverstate.done_analyses.remove(analysis_id)
+        self.serverstate.running_analyses.append(analysis_id)
 
         p = Meta(analysis_id)
 
@@ -491,6 +494,8 @@ returns self.decode_request of the data recieved.
         ################################################################
 
         os.remove(additional_data_file_path)
+        self.serverstate.done_analyses.remove(analysis_id)
+        self.serverstate.running_analyses.append(analysis_id)
         debug("Done.", p.files.log_file)
 
     def refresh_analysis_files(self):
@@ -720,7 +725,14 @@ class Dirs:
         return [dir for dir in os.listdir(self.sample_maps_dir) if not dir.startswith('.')]
 
     def create_new_sample_map_instance(self, files):
-        self.sample_map_instance_dir = os.path.join(self.sample_maps_dir, str(len(self.get_sample_map_instances()) + 1))
+        next_available_sample_map_dir = len(self.get_sample_map_instances()) + 1
+        
+        # make it sure that the assumption of next_available_sample_map_dir
+        # holds true even if some of the sample maps were deleted:
+        while os.path.exists(os.path.join(self.sample_maps_dir, str(next_available_sample_map_dir))):
+            next_available_sample_map_dir += 1
+
+        self.sample_map_instance_dir = os.path.join(self.sample_maps_dir, str(next_available_sample_map_dir))
         os.makedirs(self.sample_map_instance_dir)
         self.sample_map_taxon_charts_dir = os.path.join(self.sample_map_instance_dir, c.sample_map_taxon_charts_dir_name)
         os.makedirs(self.sample_map_taxon_charts_dir)
