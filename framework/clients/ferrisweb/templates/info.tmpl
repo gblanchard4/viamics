@@ -28,14 +28,15 @@
     <ul>
         <li class="fancy"><a href="#samples">Samples in the Original Library</a>
         {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="#confidence">Classification Confidence</a>{% endifequal %}
-        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="#confidence_per_sample">Classification Confidence per Sample</a>{% endifequal %}
-        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/confidence/genus/">Classification Confidence per OTU</a>{% endifequal %}
-        <li class="fancy"><a href="#sequence_distribution">Sequence Distribution</a>
-        <li class="fancy"><a href="#simpsons_diversity_index">Simpson's Diversity Index</a>
-        <li class="fancy"><a href="#shannon_diversity_index">Shannon Diversity Index</a>
-        <li class="fancy"><a href="#rarefaction_curves_sect">Rarefaction Curves</a>
-        <li class="fancy"><a href="#pie_charts">Pie Charts</a>
-        <li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/dendrograms/">Dendrograms (Sample Clusters)</a>
+        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="#confidence_per_sample">Classification Confidence per Sample</a></li>{% endifequal %}
+        {% ifequal analysis.info.type "rdp" %}<li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/confidence/genus/">Classification Confidence per OTU</a></li>{% endifequal %}
+        <li class="fancy"><a href="#sequence_distribution">Sequence Distribution</a></li>
+        <li class="fancy"><a href="#simpsons_diversity_index">Simpson's Diversity Index</a></li>
+        <li class="fancy"><a href="#shannon_diversity_index">Shannon Diversity Index</a></li>
+        <li class="fancy"><a href="#rarefaction_curves_sect">Rarefaction Curves</a></li>
+        <li class="fancy"><a href="#pie_charts">Pie Charts</a></li>
+        <li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/dendrograms/">Dendrograms (Sample Clusters)</a></li>
+	<li class="fancy"><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/data_file">Download original data</a></li>
         <br />
         <br />
         <li class="fancy">{% ifequal sample_map_info.instances|length 0 %}There aren't any sample maps yet (<a href="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis.info.id }}/0">create one?</a>){% else %}User Generated Sample Maps for this Analysis:
