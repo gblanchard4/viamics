@@ -67,6 +67,6 @@ urlpatterns = patterns('',
     (r'^media/(?P<analysis_id>[a-zA-Z0-9_.-]+)/split_fasta/$',split_fasta),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.analyses_dir, 'show_indexes': True}),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.web_statics_dir, 'show_indexes': True}),
-    (r'^stripper/$', strip_split)
+    (r'^stripsplit/$', strip_split)
 
 )
