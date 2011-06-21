@@ -381,6 +381,7 @@ def split_fasta(request,analysis_id):
         f.close()
         ids.append(seq_id)
     ids = set(ids)
+    #zip all files into HTTP response
     zipfile = os.path.join('/tmp','all_samples.zip')
     args = ['zip',zipfile]+[ os.path.join('/tmp',i) for i in ids]
     subprocess.call(args)
@@ -392,7 +393,6 @@ def split_fasta(request,analysis_id):
     return response
 
     
->>>>>>> Stashed changes
 
 def get_samples_genus_OTUs(analysis_id):
     server_request = {'request': 'get_samples_dict_path', 'analysis_id': analysis_id}

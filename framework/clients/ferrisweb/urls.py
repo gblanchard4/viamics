@@ -40,6 +40,7 @@ from clients.ferrisweb.views import new_analysis
 from clients.ferrisweb.views import update_analysis_append_samples
 from clients.ferrisweb.views import update_analysis_remove_samples
 from clients.ferrisweb.views import split_fasta
+from stripper.views import strip_split
 
 urlpatterns = patterns('',
     (r'^$', index),
@@ -66,5 +67,6 @@ urlpatterns = patterns('',
     (r'^media/(?P<analysis_id>[a-zA-Z0-9_.-]+)/split_fasta/$',split_fasta),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.analyses_dir, 'show_indexes': True}),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.web_statics_dir, 'show_indexes': True}),
+    (r'^stripper/$', strip_split)
 
 )
