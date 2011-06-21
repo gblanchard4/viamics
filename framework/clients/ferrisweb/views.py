@@ -23,10 +23,12 @@ import base64
 import socket
 import cPickle
 import zlib
+import subprocess
 
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template import Context
+from django.core.servers.basehttp import FileWrapper
 
 sys.path.append("../..")
 sys.path.append("../../..")
@@ -365,6 +367,32 @@ def index(request):
     analyses = server_response['analyses']
     return HttpResponse(get_template("index.tmpl").render(Context({'analyses': analyses})))
 
+
+        
+def split_fasta(request,analysis_id):
+    original_file = os.path.join(constants.analyses_dir, analysis_id,constants.data_file_name)
+    sep = open(os.path.join(constants.analyses_dir,analysis_id,constants.seperator_file_name)).read()
+    of = helper_functions.seqs(open(original_file))
+    ids = []
+    for seq in of:
+        seq_id = seq.split(sep)[0].strip('>')
+        f = open(os.path.join('/tmp',seq_id),'a')
+        f.write(seq)
+        f.close()
+        ids.append(seq_id)
+    ids = set(ids)
+    zipfile = os.path.join('/tmp','all_samples.zip')
+    args = ['zip',zipfile]+[ os.path.join('/tmp',i) for i in ids]
+    subprocess.call(args)
+    response = HttpResponse(FileWrapper(open(zipfile)), content_type='application/zip')
+    os.remove(zipfile)
+    for i in ids:
+        os.remove(os.path.join('/tmp',i))
+    response['Content-Disposition'] = 'attachment; filename=all_samples.zip'
+    return response
+
+    
+>>>>>>> Stashed changes
 
 def get_samples_genus_OTUs(analysis_id):
     server_request = {'request': 'get_samples_dict_path', 'analysis_id': analysis_id}
