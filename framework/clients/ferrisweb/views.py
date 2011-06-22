@@ -24,6 +24,7 @@ import socket
 import cPickle
 import zlib
 import subprocess
+from time import time
 
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -570,7 +571,11 @@ def new_analysis(request, analysis_type):
         if form.is_valid():
             job_description = form.cleaned_data['job_description']
             time_stamp = helper_functions.get_time_stamp()
-            data_file_path = helper_functions.save_uploaded_file(form.cleaned_data['data_file'], time_stamp, output_file_name = constants.data_file_name)
+            if len(request.FILES) == 1:
+                data_file_path = helper_functions.save_uploaded_file(form.cleaned_data['data_file'],
+                                                                     time_stamp, output_file_name = constants.data_file_name)
+            elif len(request.FILES) > 1:
+                data_file_path = cat(request.FILES.values())
 
             data_file_sha1sum = helper_functions.get_sha1sum(data_file_path)
 
@@ -580,7 +585,7 @@ def new_analysis(request, analysis_type):
             if data_file_sha1sum in server_response['running_analyses']:
                 return HttpResponse(get_template("simple.tmpl").render(Context({'content': "This data file is still being analyzed"})))
             elif data_file_sha1sum in server_response['done_analyses']:
-                return HttpResponse(get_template("simple.tmpl").render(Context({'content': "This data file has already been analyzed"})))
+                return HttpResponse(get_template("simple.tmpl").render(Context({'content': "This data file has already been analyzed. The analysis id is "+str(data_file_sha1sum)})))
 
             # TODO: check validity of the file here..
 
@@ -622,3 +627,12 @@ def new_analysis(request, analysis_type):
 def about(request):
     tmpl = get_template("about.tmpl")
     return HttpResponse(tmpl.render(Context({'content': "something happened"})))
+
+def cat(files):
+    tmpfile = os.path.join('/tmp',str(time()))
+    tmp = open(tmpfile,'a')
+    
+    for f in files:
+        tmp.write(f.read())
+    tmp.close()
+    return tmpfile

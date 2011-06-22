@@ -11,9 +11,10 @@
 
 <div class="form">
 <form enctype="multipart/form-data" method="post" action="/new/rdp/">
-<table>
-{{ form.as_table }}
-</table>
+<div class="fields">
+{{ form.as_p }}
+<a href="#" onclick="prepend_input(this,this.parentElement.childElementCount);"><p>More Files <img src="/static/pulldown.jpg" /></p></a>
+</div>
 <input type="submit" value="Submit" />
 </form>
 </div>
