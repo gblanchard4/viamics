@@ -21,7 +21,7 @@
 
 # standard python modules
 import os
-from stat import * #for chmod flags
+from stat import S_IRWXU,S_IRWXG,S_IRWXO
 import sys
 import time
 import copy
