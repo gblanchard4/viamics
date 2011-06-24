@@ -78,6 +78,7 @@ def formatExceptionInfo(maxTBlevel=5):
         text += line
     return text
 
+J = os.path.join
 
 class ServerState:
     def __init__(self):
@@ -176,11 +177,10 @@ in `executors` will be called based on `dict["request"]`
                      'refresh_sample_map'           : self.generate_or_refresh_sample_map,
                      'new_sample_map'               : self.generate_or_refresh_sample_map,
                      'new_blast_db'                 : self.create_blast_db,
+                     'append_seqs_to_blastdb'       : self.add_seqs_to_blastdb,
                      'list'	   		    : self.list_resource,
                      'delete'                       :self.delete_resource
                      }
-
-
         if not executers.has_key(self.request_dict['request']):
             self.write_socket({'response': 'error', 'content': 'unknown request'})
             return
@@ -469,7 +469,7 @@ returns self.decode_request of the data recieved.
 
 
 #server({'request':'new_blast_db','data_file_path':<datafile>,'db_name':<name>})
-    def create_blast_db(self):
+    def create_blast_db(self):#really needs to write_socket before running the BLAST, this is too slow to make an HTTP request wait
         #maybe need a parallel DB_Meta object for dbs
         fasta_path = self.request_dict['data_file_path']
         name = self.request_dict['db_name']
@@ -478,14 +478,29 @@ returns self.decode_request of the data recieved.
         out = os.path.join(c.blastdb_dir,name)#and here, to put all blastdbs in their own folder
         framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
 
-        num_seqs = len([l for l in open(fasta_path) if l.startswith('>')])
+        num_seqs = sum((1 for l in open(fasta_path) if l.startswith('>')))
         legend = {'ranks':['species'], 'length':num_seqs}#this is where we can store any taxonomic information we have about the db
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
 
+        self.write_socket({'response': 'OK'})
 
+    def add_seqs_to_blastdb(self):
+        fasta_path = self.request_dict['data_file_path']
+        name = self.request_dict['db_name']
+        num_seqs = sum((1 for l in open(fasta_path) if l.startswith('>')))
+        out = os.path.join(c.blastdb_dir,name)
+        framework.tools.blast.make_blastdb(fasta_path, 'additional',output_dir=out)
+        framework.tools.blast.make_blastdb('"%s %s"' % ( J(out,'additional'),J(out,name)),name,output_dir=out,input_type='blastdb')
+
+        #import pdb;pdb.set_trace()
+        legend = cPickle.load(open(os.path.join(out,name+c.blast_legend_file_extension)))
+        legend['length'] += num_seqs
+        cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
+        for f in os.listdir(out): 
+            if f.startswith('additional'):
+                os.remove(os.path.join(out,f))
 
         self.write_socket({'response': 'OK'})
-        
 
     def get_sample_map_name(self):
         analysis_id = self.request_dict['analysis_id']

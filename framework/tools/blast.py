@@ -10,7 +10,8 @@ from framework.tools.helper_functions import SerializeToFile, DeserializeFromFil
 sys.path.append('../..')
 
 blastn_cmd = "blastn -query %(fasta)s -outfmt %(fmt)d -num_alignments %(num)d -db %(blast_db)s -out %(blast_out)s"
-makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s -title %(name)s -input_type fasta"
+#makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s -title %(name)s -input_type %(input_type)s"
+makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s "
 
 def run_blastn(sequences_path,blast_output_path,blast_db_path,fmt=7,num=5,error_log='/tmp/error_log'):
     """Runs blastn on the fasta file at sequences_path against the db at blast_db_path. Blocks until blast is finished. The blastn executable is assumed to be on the path"""
@@ -27,14 +28,15 @@ def run_blastn(sequences_path,blast_output_path,blast_db_path,fmt=7,num=5,error_
         raise e
     return (ret_val, error_log)
 
-def make_blastdb(fasta_path, name,output_dir="",error_log=None):
+def make_blastdb(fasta_path, name,output_dir="",error_log=None,input_type="fasta"):
     #error_log = os.path.join(c.blastdb_dir,name,c.blast_error_name)
     if error_log:
         error_log = open(error_log,'w')
     out = os.path.join(output_dir,name)
-    command = makeblastdb_cmd % {"in":fasta_path, "out":out, "name":name}
+    command = makeblastdb_cmd % {"in":fasta_path, "out":out, "name":name,'input_type':input_type}
+    print "\n\nrunning "+command
     args = shlex.split(str(command))
-    exit_val = subprocess.call(args, stderr=error_log)
+    exit_val = subprocess.call(args)
     return exit_val
 
 class Blast_Result:

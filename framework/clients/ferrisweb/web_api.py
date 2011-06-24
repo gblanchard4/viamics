@@ -66,22 +66,33 @@ def blastdbs(request):
         return server_resp_json(req)
     
     elif request._method == 'POST':
-        if len(request.FILES)>0:#uploaded file
-            tmp_data_file = os.path.join(constants.temp_files_dir,request.POST['db_name'])
-            f = open(tmp_data_file,'w')
-            f.write(request.FILES[request.FILES.keys()[0]].read())
-            if request.POST['file_type'] == 'fasta':
-                req = {'request':'new_blast_db','data_file_path':tmp_data_file,'db_name':request.POST['db_name']}
-                return server_resp_json(req)
-            elif request.POST['file_type'] == 'blast_db':
-                pass#TODO basically just give the file to the server and let it save it.
+        return blast_request(request,'new_blast_db')
+        
 
 
 def blastdb(request, db_name):
+    #import pdb; pdb.set_trace()
     if request.method == 'GET':
         #server({'request':'info','resource':'blastdb','id':<id>})
         return HttpResponse(json.dumps({'GET request':'recieved'}))
-    if request._method == 'DELETE':
+    elif request._method == 'DELETE':
         req = {'request':'delete', 'id':db_name, 'resource':'blastdb'}
         return server_resp_json(req)
+    elif request._method == 'POST':
+        return blast_request(request, 'append_seqs_to_blastdb')
+        
             
+def blast_request(request, req_type):
+    if len(request.FILES)>0:#uploaded file
+        #import pdb;pdb.set_trace()
+        tmp_data_file = os.path.join(constants.temp_files_dir,request.POST['db_name'])
+        f = open(tmp_data_file,'w')
+        f.write(request.FILES[request.FILES.keys()[0]].read())
+        f.close()
+        if request.POST['file_type'] == 'fasta':
+            req = {'request':req_type,'data_file_path':tmp_data_file,'db_name':request.POST['db_name']}
+            return server_resp_json(req)
+        elif request.POST['file_type'] == 'blast_db':
+            pass#TODO basically just give the file to the server and let it save it.
+    else:
+        return HttpResponse(json.dumps({'response':'error','content':'please select a file to upload'}))
