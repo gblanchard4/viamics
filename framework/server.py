@@ -478,11 +478,19 @@ returns self.decode_request of the data recieved.
         out = os.path.join(c.blastdb_dir,name)#and here, to put all blastdbs in their own folder
         framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
 
-        num_seqs = sum((1 for l in open(fasta_path) if l.startswith('>')))
+        num_seqs = 0#sum((1 for l in open(fasta_path) if l.startswith('>')))
         legend = {'ranks':['species'], 'length':num_seqs}#this is where we can store any taxonomic information we have about the db
+        for s in helper_functions.seqs(open(fasta_path)):
+            head = s.split('\n')
+            num_seqs += 1
+            if '|' in head:
+                head = head.split('|')
+                id = head[0].strip('>')
+                legend[id] = head[-1]
+        
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
 
-        self.write_socket({'response': 'OK'})
+        self.write_socket({'response': 'OK','length':num_seqs,"id":name})
 
     def add_seqs_to_blastdb(self):
         fasta_path = self.request_dict['data_file_path']
@@ -500,7 +508,7 @@ returns self.decode_request of the data recieved.
             if f.startswith('additional'):
                 os.remove(os.path.join(out,f))
 
-        self.write_socket({'response': 'OK'})
+        self.write_socket({'response': 'OK','length':legend['length'], 'id':name})
 
     def get_sample_map_name(self):
         analysis_id = self.request_dict['analysis_id']

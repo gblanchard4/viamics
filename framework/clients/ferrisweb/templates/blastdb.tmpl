@@ -58,7 +58,7 @@ return function(data,textStatus,jqXHR)
             <div class="smallheadindex" >{{  db.id }} <a href="/blastdb/{{ db.id }}">»</a></div>
             <div class="smalltitle"><span class="analysis_id">{{ db.length }} sequences   
 	    <span class="secondary_control">
-	      <a href="#" onclick="$.ajax({url:'/api/blastdb/{{ db.id }}/',type:'DELETE',success:delete_success('{{ db.id }}'),data:{_method:'DELETE'}})">Delete
+	      <a href="#" onclick="$.ajax({url:'/api/blastdb/{{ db.id }}/',type:'DELETE',success:delete_success('{{ db.id }}'),data:{_method:'DELETE'}})">Delete</a>
 	    </span></div>
 	    <div class="logs">
 	      <form id="file_upload_form" method="post" enctype="multipart/form-data" action="/api/blastdb/{{ db.id }}/" target="upload_target" class="input" style="width: 75%;" > 
