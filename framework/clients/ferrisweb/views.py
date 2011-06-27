@@ -23,7 +23,8 @@ import base64
 import socket
 import cPickle
 import zlib
-import subprocess
+#import subprocess
+import zipfile
 from time import time
 
 from django.http import HttpResponse
@@ -371,25 +372,34 @@ def index(request):
 
         
 def split_fasta(request,analysis_id):
+    """Really it would be better to just write the zip file directly to the socket somehow (if possible, I'm not sure how the zip format works). But this writing to disk and then reading off and rm-ing seems wasteful"""
     original_file = os.path.join(constants.analyses_dir, analysis_id,constants.data_file_name)
     sep = open(os.path.join(constants.analyses_dir,analysis_id,constants.seperator_file_name)).read()
     of = helper_functions.seqs(open(original_file))
+    time_stamp = str(helper_functions.get_time_stamp())
     ids = []
+    tmp_dir = '/tmp'
     for seq in of:
-        seq_id = seq.split(sep)[0].strip('>')
-        f = open(os.path.join('/tmp',seq_id),'a')
+        seq_id = time_stamp+seq.split(sep)[0].strip('>')
+        f = open(os.path.join(tmp_dir,seq_id),'a')
         f.write(seq)
         f.close()
         ids.append(seq_id)
     ids = set(ids)
     #zip all files into HTTP response
-    zipfile = os.path.join('/tmp','all_samples.zip')
-    args = ['zip',zipfile]+[ os.path.join('/tmp',i) for i in ids]
-    subprocess.call(args)
-    response = HttpResponse(FileWrapper(open(zipfile)), content_type='application/zip')
-    os.remove(zipfile)
+    zip_file = os.path.join(tmp_dir,'all_samples.zip')
+    z = zipfile.ZipFile(zip_file, 'w',zipfile.ZIP_DEFLATED)
     for i in ids:
-        os.remove(os.path.join('/tmp',i))
+        z.write(os.path.join(tmp_dir,i),i.strip(time_stamp)+'.fna')
+    z.close()
+    """
+    args = ['zip',zipfile]+[ os.path.join('/tmp',time_stamp+'*')]
+    subprocess.call(args)
+    """
+    response = HttpResponse(FileWrapper(open(zip_file)), content_type='application/zip')
+    os.remove(zip_file)
+    for i in ids:
+        os.remove(os.path.join(tmp_dir,i))
     response['Content-Disposition'] = 'attachment; filename=all_samples.zip'
     return response
 
