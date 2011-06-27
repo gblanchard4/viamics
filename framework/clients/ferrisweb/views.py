@@ -390,16 +390,18 @@ def split_fasta(request,analysis_id):
     zip_file = os.path.join(tmp_dir,'all_samples.zip')
     z = zipfile.ZipFile(zip_file, 'w',zipfile.ZIP_DEFLATED)
     for i in ids:
-        z.write(os.path.join(tmp_dir,i),i.strip(time_stamp)+'.fna')
+        z.write(os.path.join(tmp_dir,i),i[len(time_stamp):]+'.fna')#timestamp is clipped off for filename sent to user
     z.close()
     """
     args = ['zip',zipfile]+[ os.path.join('/tmp',time_stamp+'*')]
     subprocess.call(args)
     """
     response = HttpResponse(FileWrapper(open(zip_file)), content_type='application/zip')
+    
     os.remove(zip_file)
     for i in ids:
         os.remove(os.path.join(tmp_dir,i))
+    
     response['Content-Disposition'] = 'attachment; filename=all_samples.zip'
     return response
 
