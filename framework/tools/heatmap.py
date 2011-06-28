@@ -101,12 +101,12 @@ def generate_heatmap(options, col_names, row_names, data_matrix, sample_colours)
 
     grdevices.png(options.output_file, width=w, height=h)
 
-    robjects.r.heatmap(data_matrix,
+    robjects.r('heatmap.2')(data_matrix,
                        labRow=row_names,
                        scale=options.scale,
                        labCol=col_names,
                        ColSideColors=robjects.StrVector(sample_colours),
-                       col=robjects.r.redgreen(100),
+                       col=robjects.r('redgreen')(100),
                        key=True,
                        symkey=False,
                        density_info="none",
