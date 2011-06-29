@@ -212,6 +212,17 @@ def generate_feature_vectors_from_samples_dict(samples_dict, otu_library, rank =
     return samples, components, features
 
 
+def seqs(f):
+    """A generator for the sequences in a FASTA file"""
+    seq = ""
+    for line in f:
+        if seq != "" and line.startswith('>'):
+            yield seq
+            seq = ""
+        seq += line
+    if seq != "":
+        yield seq
+
 def get_fs_compatible_name(fname):
     fname = fname.replace(")", "")
     fname = fname.replace("(", "")

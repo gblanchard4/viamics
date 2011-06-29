@@ -355,13 +355,10 @@ def blastdbs(request):
     if request.method == 'GET':
         req = {'request':'list', 'resource':'blastdb'}
         resp = server(req)
-        dbs = []
-        for r in resp['resources']:
-            dbs.append(server({'request':'info','resource':'blastdb','id':r['id']}))
         if server_err(resp):
             return err_response(resp)
         else:
-            return HttpResponse(get_template("blastdb.tmpl").render(Context({'databases':dbs})))
+            return HttpResponse(get_template("blastdb.tmpl").render(Context({'databases':resp['resources']})))
         
 
 

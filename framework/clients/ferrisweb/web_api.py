@@ -63,7 +63,9 @@ def blastdbs(request):
     
     if request.method == 'GET':
         req = {'request':'list', 'resource':'blastdb'}
-        return server_resp_json(req)
+        res = server(req)
+        return(HttpResponse(json.dumps(res['resources'])))
+        #return server_resp_json(req)
     
     elif request._method == 'POST':
         return blast_request(request,'new_blast_db')

@@ -436,8 +436,12 @@ returns self.decode_request of the data recieved.
             resources = []
             attrs = set(dir(c))
             if (res + '_dir') in attrs:
-                resources = os.listdir(getattr(c,res+'_dir'))
-                resp = {'response':'OK','resources':[{'id':l } for l in resources]}
+                resource_dir = getattr(c,res+'_dir')
+                resources = os.listdir(resource_dir)
+                resp = {'response':'OK','resources':[{'id':l.strip() } for l in resources]}
+                for r in resp['resources']:#ugh this is no good we need to model a general resource somewhere
+                    legend = cPickle.load(open(os.path.join(resource_dir,r['id'],r['id']+c.blast_legend_file_extension)))
+                    r['length'] = legend['length']
                 self.write_socket(resp)
             else:
                 self.write_socket({'response':'error', 'content':'the requested resource: %s was not found' % res})
@@ -479,7 +483,7 @@ returns self.decode_request of the data recieved.
         framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
 
         num_seqs = 0#sum((1 for l in open(fasta_path) if l.startswith('>')))
-        legend = {'ranks':['species'], 'length':num_seqs}#this is where we can store any taxonomic information we have about the db
+        legend = {'ranks':['species']}#this is where we can store any taxonomic information we have about the db
         for s in helper_functions.seqs(open(fasta_path)):
             head = s.split('\n')
             num_seqs += 1
@@ -487,7 +491,8 @@ returns self.decode_request of the data recieved.
                 head = head.split('|')
                 id = head[0].strip('>')
                 legend[id] = head[-1]
-        
+
+        legend['length'] = num_seqs
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
 
         self.write_socket({'response': 'OK','length':num_seqs,"id":name})

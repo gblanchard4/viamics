@@ -1,41 +1,32 @@
 {% extends "base.tmpl" %}
 {%block script%}
-<script type="text/javascript"> 
-$(document).ready(function() {
-	$("file_upload_form").onsubmit=function() {
-		$("file_upload_form").target = "upload_target";
-	}
-})
-        function uploadDone() { //Function will be called when iframe is loaded
-	var ret = frames['upload_target'].document.getElementsByTagName("body")[0].innerHTML;
-        try{
-            if( ret != ""){
-	        var data = JSON.parse(ret);
-                if(data.response == "OK") { //This part happens when the image gets uploaded.			
-                            alert('uploaded');
-	        }
-	        else { //Upload failed - show user the reason.
-		    throw ret
-	        }
-            } 
-        } catch(err){
-            alert('upload failed: '+err.toString())
-        }
+<script type="text/javascript" src="/static/_backbone.js"> </script>
+<script type="text/javascript" src="/static/blastdbs.js"></script>
 
-		
-}
-function delete_success(db_id){
-return function(data,textStatus,jqXHR)
-{
-    alert(data);
-    data = JSON.parse(data);
-    if(data.response == "OK"){
-        row = document.getElementById(db_id+'_row');
-        row.parentNode.removeChild(row);
-    }
-}
-}
-</script>
+<!-- DB-template is used by Underscore's template system to insert the resources into the DOM -->
+<script type="text/template" id="DB-template"> 
+     
+
+        <td class="listed_resource_icon" ><img src="{{ request.META.HTTP_HOST }}/static/db.png" ></td>
+        <td>
+            <div class="smallheadindex" ><%= id %> <a href="/blastdb/<%= id %>">»</a></div>
+            <div class="smalltitle"><span class="analysis_id"><%= length %> sequences   
+	    <span class="secondary_control">
+	      <a href="#" onclick="window.DBs.get('<%= id %>').destroy()">Delete</a>
+	    </span></div>
+	    <div class="logs">
+	      <form id="file_upload_form" method="post" enctype="multipart/form-data" action="/api/blastdb/<%= id %>/" target="upload_target" class="input" style="width: 75%;" > 
+	      <label for="file">Add sequences:</label>
+	      <input name="file" id="file" type="file" />
+	      <input type="hidden" name="file_type" id="file_type" value="fasta" />
+	      <input name="db_name" id="db_name" type="hidden" value=<%= id %> />
+	      <input type="submit" name="action" value="Upload" />
+	    </form>
+	    </div>
+        </td>
+
+      
+    </script> 
 {%endblock%}
 {% block title %}Viamics - BLAST databases{% endblock %}
 
@@ -50,28 +41,8 @@ return function(data,textStatus,jqXHR)
 
 
 <div class="form"> 
-<table class="resource_list">
-{% for db in databases %}
-    <tr id="{{ db.id }}_row">
-        <td class="listed_resource_icon" ><img src="{{ request.META.HTTP_HOST }}/static/db.png" ></td>
-        <td>
-            <div class="smallheadindex" >{{  db.id }} <a href="/blastdb/{{ db.id }}">»</a></div>
-            <div class="smalltitle"><span class="analysis_id">{{ db.length }} sequences   
-	    <span class="secondary_control">
-	      <a href="#" onclick="$.ajax({url:'/api/blastdb/{{ db.id }}/',type:'DELETE',success:delete_success('{{ db.id }}'),data:{_method:'DELETE'}})">Delete</a>
-	    </span></div>
-	    <div class="logs">
-	      <form id="file_upload_form" method="post" enctype="multipart/form-data" action="/api/blastdb/{{ db.id }}/" target="upload_target" class="input" style="width: 75%;" > 
-	      <label for="file">Add sequences:</label>
-	      <input name="file" id="file" type="file" />
-	      <input type="hidden" name="file_type" id="file_type" value="fasta" />
-	      <input name="db_name" id="db_name" type="hidden" value={{ db.id }} />
-	      <input type="submit" name="action" value="Upload" />
-	    </form>
-	    </div>
-        </td>
-    </tr>
-{% endfor %}
+<table class="resource_list" id="DB-list">
+  <!--DB-template goes here -->
 </table>
 </div>
 <div class="add_resource_box">
@@ -87,7 +58,7 @@ return function(data,textStatus,jqXHR)
   <input type="hidden" name="file_type" id="file_type" value="fasta" />
  </form>
 
- <iframe id="upload_target" name="upload_target" src="" style="display:none"  onload="uploadDone()"></iframe> 
+ <iframe id="upload_target" name="upload_target" src="" style="display:none"  onload="uploadDone(this)"></iframe> 
 
 </div>
 
