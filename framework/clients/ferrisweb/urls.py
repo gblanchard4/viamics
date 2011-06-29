@@ -40,9 +40,9 @@ from clients.ferrisweb.views import new_analysis
 from clients.ferrisweb.views import update_analysis_append_samples
 from clients.ferrisweb.views import update_analysis_remove_samples
 from clients.ferrisweb.views import blastdbs
+from clients.ferrisweb.views import split_fasta
+from stripper.views import strip_split
 
-#please read before modifying web api:
-#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
 urlpatterns = patterns('',
     (r'^$', index),
     (r'^api/analyses', web_api.analyses),
@@ -63,8 +63,10 @@ urlpatterns = patterns('',
     (r'^new/(?P<analysis_type>[a-zA-Z0-9_.-]+)/$', new_analysis),
     (r'^update_samples/(?P<analysis_id>[a-zA-Z0-9_.-]+)/append/$', update_analysis_append_samples),
     (r'^update_samples/(?P<analysis_id>[a-zA-Z0-9_.-]+)/remove/$', update_analysis_remove_samples),
+    (r'^media/(?P<analysis_id>[a-zA-Z0-9_.-]+)/split_fasta/$',split_fasta),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.analyses_dir, 'show_indexes': True}),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.web_statics_dir, 'show_indexes': True}),
+    (r'^stripsplit/$', strip_split),
     (r'^blastdb',blastdbs),
     (r'^api/blastdb/$',web_api.blastdbs),
     (r'^api/blastdb/(?P<db_name>[a-zA-Z0-9_.-]+)/$', web_api.blastdb)

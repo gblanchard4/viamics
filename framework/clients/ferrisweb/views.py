@@ -23,10 +23,14 @@ import base64
 import socket
 import cPickle
 import zlib
+#import subprocess
+import zipfile
+from time import time
 
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template import Context
+from django.core.servers.basehttp import FileWrapper
 
 sys.path.append("../..")
 sys.path.append("../../..")
@@ -383,6 +387,43 @@ def blastdbs(request):
         
 
 
+        
+def split_fasta(request,analysis_id):
+    """Really it would be better to just write the zip file directly to the socket somehow (if possible, I'm not sure how the zip format works). But this writing to disk and then reading off and rm-ing seems wasteful"""
+    original_file = os.path.join(constants.analyses_dir, analysis_id,constants.data_file_name)
+    sep = open(os.path.join(constants.analyses_dir,analysis_id,constants.seperator_file_name)).read()
+    of = helper_functions.seqs(open(original_file))
+    time_stamp = str(helper_functions.get_time_stamp())
+    ids = []
+    tmp_dir = '/tmp'
+    for seq in of:
+        seq_id = time_stamp+seq.split(sep)[0].strip('>')
+        f = open(os.path.join(tmp_dir,seq_id),'a')
+        f.write(seq)
+        f.close()
+        ids.append(seq_id)
+    ids = set(ids)
+    #zip all files into HTTP response
+    zip_file = os.path.join(tmp_dir,'all_samples.zip')
+    z = zipfile.ZipFile(zip_file, 'w',zipfile.ZIP_DEFLATED)
+    for i in ids:
+        z.write(os.path.join(tmp_dir,i),i[len(time_stamp):]+'.fna')#timestamp is clipped off for filename sent to user
+    z.close()
+    """
+    args = ['zip',zipfile]+[ os.path.join('/tmp',time_stamp+'*')]
+    subprocess.call(args)
+    """
+    response = HttpResponse(FileWrapper(open(zip_file)), content_type='application/zip')
+    
+    os.remove(zip_file)
+    for i in ids:
+        os.remove(os.path.join(tmp_dir,i))
+    
+    response['Content-Disposition'] = 'attachment; filename=all_samples.zip'
+    return response
+
+    
+
 def get_samples_genus_OTUs(analysis_id):
     server_request = {'request': 'get_samples_dict_path', 'analysis_id': analysis_id}
     server_response = server(server_request)
@@ -562,7 +603,11 @@ def new_analysis(request, analysis_type):
         if form.is_valid():
             job_description = form.cleaned_data['job_description']
             time_stamp = helper_functions.get_time_stamp()
-            data_file_path = helper_functions.save_uploaded_file(form.cleaned_data['data_file'], time_stamp, output_file_name = constants.data_file_name)
+            if len(request.FILES) == 1:
+                data_file_path = helper_functions.save_uploaded_file(form.cleaned_data['data_file'],
+                                                                     time_stamp, output_file_name = constants.data_file_name)
+            elif len(request.FILES) > 1:
+                data_file_path = cat(request.FILES.values())
 
             data_file_sha1sum = helper_functions.get_sha1sum(data_file_path)
 
@@ -572,7 +617,7 @@ def new_analysis(request, analysis_type):
             if data_file_sha1sum in server_response['running_analyses']:
                 return HttpResponse(get_template("simple.tmpl").render(Context({'content': "This data file is still being analyzed"})))
             elif data_file_sha1sum in server_response['done_analyses']:
-                return HttpResponse(get_template("simple.tmpl").render(Context({'content': "This data file has already been analyzed"})))
+                return HttpResponse(get_template("simple.tmpl").render(Context({'content': "This data file has already been analyzed. The analysis id is "+str(data_file_sha1sum)})))
 
             # TODO: check validity of the file here..
 
@@ -620,3 +665,12 @@ def new_analysis(request, analysis_type):
 def about(request):
     tmpl = get_template("about.tmpl")
     return HttpResponse(tmpl.render(Context({'content': "something happened"})))
+
+def cat(files):
+    tmpfile = os.path.join('/tmp',str(time()))
+    tmp = open(tmpfile,'a')
+    
+    for f in files:
+        tmp.write(f.read())
+    tmp.close()
+    return tmpfile

@@ -20,8 +20,8 @@ class BlastUploadForm(forms.Form):
 
 class FastaUploadForm(forms.Form):
     job_description = forms.CharField(max_length = 256)
-    data_file = forms.Field(widget=forms.FileInput())
     seperator = forms.CharField(max_length = 1)
+    data_file = forms.Field(widget=forms.FileInput())
 
 class QpcrUploadForm(forms.Form):
     job_description = forms.CharField(max_length = 256)
