@@ -36,6 +36,24 @@ from optparse import OptionParser
 sys.path.append("../../")
 from framework.tools import helper_functions
 
+class RDPResult:
+
+    def __init__(self, outfile_line,separator=None):
+        self.data = outfile_line
+        outfile_line = outfile_line.split('\t')
+        if separator:
+            ids = outfile_line[0].split(separator)
+            self.sample_id = ids[0]
+            self.seq_id = ids[1]
+        else:
+            self.sample_id = self.seq_id = outfile_line[0]#wasn't given a separator, hopefully this means client is not using id
+        taxonomic_ranks = [outfile_line[8], outfile_line[11], outfile_line[14], outfile_line[17], outfile_line[20]]
+        self.classifications = dict(zip(['phylum','class','order','family','genus'],taxonomic_ranks))
+
+def rdp_results(rdp_file,separator):
+    for line in rdp_file:
+        yield RDPResult(line,separator)
+
 
 # command to run RDP classifier
 cmd = "java -Xmx1g -jar rdp_classifier-2.2.jar -q %(fasta_file)s -o %(rdp_output_file)s -f fixrank &> %(error_log)s"
@@ -146,28 +164,22 @@ def read_samples_dictionary(serialized_object_file):
 
 def get_otu_library(rdp_output_file):
     """returns a unique list of OTUs that were found in the library"""
-    #poor mans enum:
-    PHYLUM, CLASS, ORDER, FAMILY, GENUS = range(0, 5)
 
     genuses = []
     otu_library = []
 
-    for line in [l for l in open(rdp_output_file).readlines() if len(l.split("\t")) == 23]:
-        line = line.replace('"', "").strip().split('\t')
-
-        taxonomic_ranks = [line[8], line[11], line[14], line[17], line[20]]
-
+    for result in rdp_results(open(rdp_output_file),separator=None):#don't care about separator b/c id does not matter at this stage
         #sometimes taxonomic names are empty! gotta fix that!
         last_non_empty_rank = ''
-        for i in range(0, len(taxonomic_ranks)):
-            if taxonomic_ranks[i] == "":
-                taxonomic_ranks[i] = "(%s)" % (last_non_empty_rank)
+        for i in result.classifications.values():
+            if i == "":
+                i = "(%s)" % (last_non_empty_rank)
             else:
-                last_non_empty_rank = taxonomic_ranks[i]
+                last_non_empty_rank = i
 
-        if taxonomic_ranks[GENUS] not in genuses:
-            genuses.append(taxonomic_ranks[GENUS])
-            otu_library.append(taxonomic_ranks)
+        if result.classifications['genus'] not in genuses:
+            genuses.append(result.classifications['genus'])
+            otu_library.append(result.classifications.values())
 
     otu_library.sort()
 
@@ -551,3 +563,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     main(options, samples)
+
+
+    

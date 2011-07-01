@@ -39,7 +39,13 @@ class Tests(unittest.TestCase):
 
         images = ['rarefaction_all_samples.png', 'rdp_confidence_per_sample.png', 'rdp_confidence.png', 'samples_sequences_bar.png', 'shannon_diversity_index.png', 'simpsons_diversity_index.png']
         for i in images:
-            self.assertTrue(os.path.exists(os.path.join(self.rdp_analysis_dir, i)))
+            try:
+                img_path = os.path.join(self.rdp_analysis_dir, i)
+                self.assertTrue(os.path.exists(img_path))
+            except AssertionError as e:
+                print img_path
+                raise e
+                
 
         files = ['otu_library', 'rarefaction_dict', 'rdp_output', 'taxa_color_dict', 'samples_dict_serialized', 'type_of_analysis', 'unique_sample_names']
         for f in files:
