@@ -30,12 +30,12 @@ import cPickle
 import subprocess
 import random as r
 
+from framework import constants as c
 from pylab import *
 from optparse import OptionParser
 
 sys.path.append("../../")
 from framework.tools import helper_functions
-
 
 # command to run RDP classifier
 cmd = "java -Xmx1g -jar rdp_classifier-2.2.jar -q %(fasta_file)s -o %(rdp_output_file)s -f fixrank &> %(error_log)s"
@@ -112,7 +112,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
             rdp_output_file_obj.write(line)
         rdp_output_file_obj.close()
 
-        # this could be used for to update FASTA file
+        # this could be used to update FASTA file
         #i = 0
         #while i < len(original_rdp_output_lines):
         #    if original_rdp_output_lines[i].startswith('>'):
@@ -131,7 +131,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
         #        temporary_rdp_output_file_obj.write(original_rdp_output_lines[i])
         #        i += 1
 
-    all_samples = list(set(original_samples + samples_to_replace))
+    all_samples = list(set(original_samples + additional_samples))
     updated_samples_dict = create_samples_dictionary(original_rdp_output_file, seperator, all_samples)
     write_samples_dictionary(samples_serialized_file_path, updated_samples_dict)
 

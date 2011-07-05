@@ -19,7 +19,9 @@ from framework.tools import helper_functions
 
 class Tests(unittest.TestCase):
     def setUp(self):
-        self.test_fasta_file = os.path.join(c.base_dir, "../", 'unittests/test_files/example_fasta')
+        J = lambda s: os.path.join(c.base_dir,'../','unittests/test_files',s)
+        self.test_fasta_file = J('example_fasta')
+        self.split_analysis = [J(s) for s in ['split1.fna','split2.fna']]
         self.analysis_id = helper_functions.get_sha1sum(self.test_fasta_file) + "-test"
         self.rdp_analysis_dir = os.path.join(c.analyses_dir, self.analysis_id)
 
@@ -56,4 +58,24 @@ class Tests(unittest.TestCase):
         for d in dirs:
             self.assertFalse(os.path.exists(os.path.join(self.rdp_analysis_dir, d)))
         self.assertFalse(os.path.exists(self.rdp_analysis_dir))
+
+        def testAppend(self):
+            initial = self.split_analysis[0]
+            append = self.split_analysis[1]
+            id = helper_functions.get_sha1sum(initial)+'-test'
+
+            #create the analysis:
+            server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':initial,'seperator':':','job_description':'cat-test','analysis_type':'rdp','return_when_done': True})
+            i = server({'request':'info','resource':'analysis','analysis_id':id})
+            self.assertTrue(len(i['info']['all_unique_samples_list']) == 1)
+
+            #append samples:
+            server({'request':'append_samples_to_analysis','analysis_id':id,'data_file_path':append,'return_when_done':True})
+            i = server({'request':'info','resource':'analysis','analysis_id':id})
+            self.assertTrue(len(i['info']['all_unique_samples_list']) == 2)
+
+            #clean up:
+            server({'request': 'remove_analysis',
+                    'analysis_id': id})
+
         

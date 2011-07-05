@@ -73,15 +73,13 @@ def _append(p, request_dict):
     additional_samples = framework.tools.helper_functions.sorted_copy(framework.tools.rdp.extract_sample_names(additional_data_file_path, seperator))
     original_samples = framework.tools.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()])
 
-    #running rdp on additional data
-    # FIXME: and this is just wrong (it is not compatible with the FASTA standard, sequences that follow headers
-    # may be multiple lines):
-    number_of_sequences = helper_functions.get_number_of_lines(additional_data_file_path) / 2
+    number_of_sequences = sum(1 for l in open(additional_data_file_path) if l.startswith('>'))
 
     additional_rdp_output_path = os.path.join(p.dirs.analysis_dir, "additional_rdp_output")
     debug("Running rdp on %d additional sequences" % number_of_sequences, p.files.log_file)
     framework.tools.rdp.run_classifier(c.rdp_running_path, additional_data_file_path, additional_rdp_output_path, p.files.rdp_error_log_file_path)
 
+    #import pdb; pdb.set_trace()
     debug("Merging additional data with the original RDP results", p.files.log_file)
     framework.tools.rdp.merge(p.files.samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_path, p.files.rdp_output_file_path, seperator)
 
