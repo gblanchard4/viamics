@@ -576,8 +576,8 @@ returns self.decode_request of the data recieved.
         ################################################################
 
         os.remove(additional_data_file_path)
-        self.serverstate.done_analyses.remove(analysis_id)
-        self.serverstate.running_analyses.append(analysis_id)
+        self.serverstate.running_analyses.remove(analysis_id)
+        self.serverstate.done_analyses.append(analysis_id)
         debug("Done.", p.files.log_file)
 
     def refresh_analysis_files(self):

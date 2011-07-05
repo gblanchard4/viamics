@@ -30,6 +30,7 @@ import cPickle
 import subprocess
 import random as r
 
+from framework import constants as c
 from pylab import *
 from optparse import OptionParser
 
@@ -37,18 +38,28 @@ sys.path.append("../../")
 from framework.tools import helper_functions
 
 class RDPResult:
+    """    The constructor for this class takes a single line from the RDP output in  'fixrank' format, from which it can read the taxonomic information.
+
+    If the constructor is given a kwarg 'separator', the ID of the sequence will be split into sample id and sequence id, assuming the ID looks like 'sample_id<separator>sequence_id. If there is no separator, both sample_id and sequence_id will be the entire id'
+
+Properties:
+    sample_id: The sample (group of sequences) that this sequence comes from.
+
+    sequence_id: a unique ID for this sequence.
+
+    classifications: a dict with keys ['phylum','class','order','family','genus'] and values are the classification of the sequence for that level."""
 
     def __init__(self, outfile_line,separator=None):
         self.data = outfile_line
         outfile_line = outfile_line.split('\t')
-        if separator:
+        if (separator and len(outfile_line) == 2):
             ids = outfile_line[0].split(separator)
             self.sample_id = ids[0]
             self.seq_id = ids[1]
         else:
             self.sample_id = self.seq_id = outfile_line[0]#wasn't given a separator, hopefully this means client is not using id
         taxonomic_ranks = [outfile_line[8], outfile_line[11], outfile_line[14], outfile_line[17], outfile_line[20]]
-        self.classifications = dict(zip(['phylum','class','order','family','genus'],taxonomic_ranks))
+        self.classifications = dict(zip(reversed(c.ranks['rdp']),taxonomic_ranks))
 
 def rdp_results(rdp_file,separator):
     for line in rdp_file:
@@ -149,7 +160,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
         #        temporary_rdp_output_file_obj.write(original_rdp_output_lines[i])
         #        i += 1
 
-    all_samples = list(set(original_samples + samples_to_replace))
+    all_samples = list(set(original_samples + additional_samples))
     updated_samples_dict = create_samples_dictionary(original_rdp_output_file, seperator, all_samples)
     write_samples_dictionary(samples_serialized_file_path, updated_samples_dict)
 
