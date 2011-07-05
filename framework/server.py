@@ -563,7 +563,8 @@ returns self.decode_request of the data recieved.
 
         self.request_dict['additional_data_file_path'] = additional_data_file_path
 
-        self.write_socket({'response': 'OK'})
+        if not self.request_dict.get('return_when_done'):
+            self.write_socket({'response': 'OK'})
 
         ################################################################
         # call server modules for append..
@@ -579,6 +580,9 @@ returns self.decode_request of the data recieved.
         self.serverstate.running_analyses.remove(analysis_id)
         self.serverstate.done_analyses.append(analysis_id)
         debug("Done.", p.files.log_file)
+
+        if self.request_dict.get('return_when_done'):
+            self.write_socket({'response': 'OK'})
 
     def refresh_analysis_files(self):
         analysis_id = self.request_dict['analysis_id']
