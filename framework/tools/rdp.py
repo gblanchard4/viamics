@@ -14,7 +14,10 @@
 #
 # Module functions for RDP.
 #
-
+#An assumption throughout this module (and all of viamics) is that the ids of FASTA sequences are composed of a sample id,
+#which labels a group of sequences, and a unique sequence id. These are located directly after the '>', and are
+#separated by a variable separator character.
+#
 #
 # example run:
 #
@@ -47,23 +50,54 @@ Properties:
 
     sequence_id: a unique ID for this sequence.
 
-    classifications: a dict with keys ['phylum','class','order','family','genus'] and values are the classification of the sequence for that level."""
+    classifications: a dict with keys ['phylum','class','order','family','genus'] and values are the classification of the sequence for that level.
+
+    confidences: a dict with the same keys as classifications, and values are the classification confidences returned by RDP"""
 
     def __init__(self, outfile_line,separator=None):
         self.data = outfile_line
         outfile_line = outfile_line.split('\t')
-        if (separator and len(outfile_line) == 2):
+        if (separator and len(outfile_line[0].split(separator)) == 2):
             ids = outfile_line[0].split(separator)
             self.sample_id = ids[0]
             self.seq_id = ids[1]
         else:
             self.sample_id = self.seq_id = outfile_line[0]#wasn't given a separator, hopefully this means client is not using id
-        taxonomic_ranks = [outfile_line[8], outfile_line[11], outfile_line[14], outfile_line[17], outfile_line[20]]
+        rank_indices = [8,11,14,17,20]
+        taxonomic_ranks = [outfile_line[i] for i in rank_indices]
+        confidences = [outfile_line[i+2] for i in rank_indices]
+        for i,conf in enumerate(confidences):
+            try:
+                confidences[i] = float(conf)
+            except ValueError:
+                confidences[i] = conf.strip()
         self.classifications = dict(zip(reversed(c.ranks['rdp']),taxonomic_ranks))
+        self.confidences = dict(zip(reversed(c.ranks['rdp']), confidences))
+        
 
 def rdp_results(rdp_file,separator):
     for line in rdp_file:
         yield RDPResult(line,separator)
+
+def low_confidence_seqs(fasta_file_path, rdp_outfile_path, threshold, separator):
+    """Sequences which the classifier marked as below the given threshold. The sequence IDs in the fasta file must be a superset of those in the RDP output. The expected case is that RDP was run against the fasta file to generate the output """
+    #first assume the rdp out and fasta line up exactly:
+    results = rdp_results(open(rdp_outfile_path),separator)
+    sequences = helper_functions.seqs(open(fasta_file_path))
+    for res,seq in zip(results,sequences):
+        try:
+            if res.seq_id == seq.split()[0].split(separator)[1]:
+                if float(res.confidences['genus']) < threshold:
+                    yield seq
+            else:
+                print res.data+'\n-------\n'+seq
+                import pdb;pdb.set_trace()
+                break
+        except:
+            print res+'\n-------\n'+seq
+
+    #otherwise we will need to speed this up:
+    
 
 
 # command to run RDP classifier
@@ -88,13 +122,9 @@ def run_classifier(rdp_running_path, fasta_file, rdp_output_file, error_log = '/
 def extract_sample_names(fasta_file, seperator):
     """finds unique sample names within the entire library, e.g., returns MZH-92 for MZH-92_F58614Y04I2TQV,
        MZH-92_F58614Y04I2TQV, MZH-92_F58614Y04IXSC2 and MZH-92_F58614Y04IKEJL"""
-    samples = []
-    for id in [x[1:].split()[0].split(seperator)[0] for x in open(fasta_file).readlines() if x[0] == ">"]:
-        if id in samples:
-            continue
-        else:
-            samples.append(id)
-    return samples
+    return list(set([x[1:].split()[0].split(seperator)[0]
+                     for x in open(fasta_file).readlines() if x[0] == ">"]))
+
 
 def merge(samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_file, original_rdp_output_file, seperator):
     samples_in_original_rdp_output = list(set([s.split(seperator)[0] for s in open(original_rdp_output_file).readlines()]))
@@ -129,8 +159,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
                 temporary_rdp_output_file_obj.write(original_rdp_output_lines[i])
                 i += 1
 
-        for line in open(additional_rdp_output_file).readlines():
-            temporary_rdp_output_file_obj.write(line)
+        temporary_rdp_output_file_obj.write(additional_rdp_output_file.read())
 
         temporary_rdp_output_file_obj.close()
         shutil.move(temporary_rdp_output_file, original_rdp_output_file)
