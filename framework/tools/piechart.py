@@ -16,7 +16,8 @@
 #
 
 from random import shuffle
-from pylab import *
+import pylab
+import sys
 import cPickle
 import os
 
@@ -42,14 +43,14 @@ def generate(samples_dict, taxa_color_dict, rank = "genus", pie_chart_file_prefi
     def _generate(mini = False):
         for sample in samples_dict:
             if mini:
-                fig = figure(figsize=(3,2))
-                ax = axes([0.0, 0.01, 0.66, 0.99])
+                fig = pylab.figure(figsize=(3,2))
+                ax = pylab.axes([0.0, 0.01, 0.66, 0.99])
             else:
-                fig = figure(figsize=(4,4))
-                ax = axes([0.1, 0.1, 0.7, 0.7])
+                fig = pylab.figure(figsize=(4,4))
+                ax = pylab.axes([0.1, 0.1, 0.7, 0.7])
 
-            rcParams['axes.titlesize'] = 12.0
-            rcParams['font.size'] = 6.0
+            pylab.rcParams['axes.titlesize'] = 12.0
+            pylab.rcParams['font.size'] = 6.0
 
             labels = []
             percentages = []
@@ -68,26 +69,26 @@ def generate(samples_dict, taxa_color_dict, rank = "genus", pie_chart_file_prefi
                     labels.append('')
 
             if mini:
-                pie(percentages, shadow=False, colors=c)
+                pylab.pie(percentages, shadow=False, colors=c)
             else:
-                pie(percentages, labels=labels, shadow=False, colors=c)
+                pylab.pie(percentages, labels=labels, shadow=False, colors=c)
 
             if mini:
                 fig.text(0.63, 0.50, sample, verticalalignment='center', fontsize=12)
 
             else:
-                title(sample)
+                pylab.title(sample)
 
             if not save_dir:
-                show()
+                pylab.show()
             else:
                 if mini:
-                    savefig(os.path.join(save_dir, "mini_" + pie_chart_file_prefix + rank + "_" + sample + '.png'), transparent = is_transparent)
+                    pylab.savefig(os.path.join(save_dir, "mini_" + pie_chart_file_prefix + rank + "_" + sample + '.png'), transparent = is_transparent)
                 else:
-                    savefig(os.path.join(save_dir, pie_chart_file_prefix + rank + "_" + sample + '.png'), transparent = is_transparent)
+                    pylab.savefig(os.path.join(save_dir, pie_chart_file_prefix + rank + "_" + sample + '.png'), transparent = is_transparent)
 
             fig.clf()
-            close('all')
+            pylab.close('all')
 
     _generate()
     _generate(mini = True)
@@ -100,3 +101,4 @@ def main(samples_dict, taxa_color_dict, ranks, pie_chart_file_prefix = "piechart
 
 if __name__ == "__main__":
     pass
+
