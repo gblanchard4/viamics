@@ -15,7 +15,7 @@
 # Bar chart generator.
 #
 
-from pylab import *
+import pylab
 
 import rdp
 
@@ -23,7 +23,7 @@ def generate(sample_sequence_tuples, save_path = None):
     samples = [x[0] for x in sample_sequence_tuples]
     number_of_sequences = [x[1] for x in sample_sequence_tuples]
 
-    pos = arange(len(number_of_sequences))+.5
+    pos = pylab.arange(len(number_of_sequences))+.5
 
     width = len(samples) / 5
     if width < 5:
@@ -32,22 +32,23 @@ def generate(sample_sequence_tuples, save_path = None):
     if width > 15:
         width = 15
 
-    fig = figure(figsize=(width, 4))
+    fig = pylab.figure(figsize=(width, 4))
 
-    rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-    rc('grid', color='0.80', linestyle='-', linewidth=0.1)
-    grid(True)
-    bar(pos, number_of_sequences, align='center', color='#EFADAD', linewidth=0.1)
-    xticks(pos, samples, rotation=90, size='xx-small')
-    xlim(xmax=len(samples))
-    yticks(size='xx-small')
-    ylabel('Number of sequences (%d samples)' % len(samples), size="small")
+    pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+    pylab.rc('grid', color='0.80', linestyle='-', linewidth=0.1)
+    pylab.grid(True)
+    pylab.bar(pos, number_of_sequences, align='center', color='#EFADAD', linewidth=0.1)
+    pylab.xticks(pos, samples, rotation=90, size='xx-small')
+    pylab.xlim(xmax=len(samples))
+    pylab.yticks(size='xx-small')
+    pylab.ylabel('Number of sequences (%d samples)' % len(samples), size="small")
 
     if save_path:
-        savefig(save_path)
+        pylab.savefig(save_path)
     else:
-        show()
+        pylab.show()
 
 if __name__ == '__main__':
     sample_sequence_tuples = [('4002', 3448148), ('4003', 898692), ('4004', 9381260), ('4005', 6412960), ('4006', 6495321), ('4007', 6688560), ('4008', 3951180), ('4009', 3274087), ('4010', 6898681), ('4011', 5985175), ('4012', 13243550), ('4013', 2259064), ('4014', 5191440), ('4016', 48220793), ('4017', 1553203), ('4018', 7374300), ('4019', 9274300), ('4020', 7910898), ('4021', 5094387), ('4022', 1816354), ('4023', 794727), ('4024', 3166415), ('4025', 4417170), ('4026', 3610642), ('4027', 4270995), ('4030', 7703843), ('4031', 5646226), ('4032', 1971628), ('4034', 805139), ('4035', 9266441), ('4037', 6567388), ('4038', 1664804), ('4040', 358930), ('4041', 2696350)]
     generate(sample_sequence_tuples)
+
