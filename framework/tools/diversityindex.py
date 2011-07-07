@@ -21,7 +21,7 @@ import math
 import cPickle
 import rdp
 import random as r
-from pylab import *
+import pylab
 
 sys.path.append("../../")
 from framework.tools import helper_functions
@@ -77,16 +77,16 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
     max_val = max([max(l) for l in plot_dict.values()])
     max_val = max_val + max_val * 10 / 100
 
-    fig = figure(figsize=(3.5, 6.5))
+    fig = pylab.figure(figsize=(3.5, 6.5))
 
-    rcParams['axes.titlesize'] = 12.0
-    rcParams['font.size'] = 8.0
+    pylab.rcParams['axes.titlesize'] = 12.0
+    pylab.rcParams['font.size'] = 8.0
 
-    rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-    rc('grid', color='0.50', linestyle='-', linewidth=0.1)
-    grid(True)
+    pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+    pylab.rc('grid', color='0.50', linestyle='-', linewidth=0.1)
+    pylab.grid(True)
 
-    title(__title)
+    pylab.title(__title)
 
     for i in range(0, len(plot_dict)):
         key = plot_dict.keys()[i]
@@ -95,32 +95,32 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
         # at the same spot. instead of this, [i] * len(plot_dict[key]) could be used to plot them.
         y_positions =  [((1 - (r.gauss(100, 3) /100)) + i) for x in range(0, len(plot_dict[key]))]
 
-        plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
+        pylab.plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
 
-        b = boxplot(plot_dict[key], positions=[i + 0.35], sym=',', widths=0.2)
-        setp(b['medians'], color=group_colors[key])
-        setp(b['whiskers'], color='black', alpha=0.3)
-        setp(b['boxes'], color='black', alpha=0.3)
-        setp(b['fliers'], color='black', alpha=0.3)
-        setp(b['caps'], color='black', alpha=0.3)
+        b = pylab.boxplot(plot_dict[key], positions=[i + 0.35], sym=',', widths=0.2)
+        pylab.setp(b['medians'], color=group_colors[key])
+        pylab.setp(b['whiskers'], color='black', alpha=0.3)
+        pylab.setp(b['boxes'], color='black', alpha=0.3)
+        pylab.setp(b['fliers'], color='black', alpha=0.3)
+        pylab.setp(b['caps'], color='black', alpha=0.3)
 
-        plot([0], [max_val], visible = False)
-        plot([-0.9], [-max_val * 10 / 100], visible = False)
-        plot([i + 0.9], [max_val], visible = False)
-        ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-        xticks(arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+        pylab.plot([0], [max_val], visible = False)
+        pylab.plot([-0.9], [-max_val * 10 / 100], visible = False)
+        pylab.plot([i + 0.9], [max_val], visible = False)
+        pylab.ylim(ymin=-max_val * 10 / 100, ymax=max_val)
+        pylab.xticks(pylab.      arange(len(plot_dict)), sample_groups.keys(), rotation=90)
 
     if not save_dir:
-        show()
+        pylab.show()
     else:
-        savefig(os.path.join(save_dir, method + ".png"))
+        pylab.savefig(os.path.join(save_dir, method + ".png"))
 
     # clean memory
     try:
         fig.clf()
     except:
         pass
-    close('all')
+    pylab.close('all')
 
 
 
@@ -159,28 +159,29 @@ def generate(samples_dict, img_save_path = None, data_save_path = None, type = N
     if width > 15:
         width = 15
 
-    fig = figure(figsize=(width, 4))
+    fig = pylab.figure(figsize=(width, 4))
 
-    rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-    rc('grid', color='0.80', linestyle='-', linewidth=0.1)
-    grid(True)
+    pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+    pylab.rc('grid', color='0.80', linestyle='-', linewidth=0.1)
+    pylab.grid(True)
 
-    pos = arange(len(samples))+.5
-    bar(pos, samples_diversity_index_list, align='center', color=c, linewidth=0.1)
-    plot([0], [1], '^', visible = False)
-    xticks(pos, samples, rotation=90, size='xx-small')
-    xlim(xmax=len(samples))
-    yticks(size='xx-small')
+    pos = pylab.arange(len(samples))+.5
+    pylab.bar(pos, samples_diversity_index_list, align='center', color=c, linewidth=0.1)
+    pylab.plot([0], [1], '^', visible = False)
+    pylab.xticks(pos, samples, rotation=90, size='xx-small')
+    pylab.xlim(xmax=len(samples))
+    pylab.yticks(size='xx-small')
 
-    ylabel(lbl, fontsize = 12)
+    pylab.ylabel(lbl, fontsize = 12)
 
     if img_save_path:
-        savefig(img_save_path)
+        pylab.savefig(img_save_path)
     else:
-        show()
+        pylab.show()
 
 if __name__ == '__main__':
     samples_dict_path = "/home/amanda/repo/ferris/framework/analyses/5b10a9e7cbaf1e975dffe394520cf9015d1e23aa/samples_dict_serialized"
     samples_dict = rdp.read_samples_dictionary(samples_dict_path)
 
     generate(samples_dict, type = "rdp", method='shannos')
+

@@ -21,7 +21,7 @@ import math
 import numpy
 import random as r
 import sys
-from pylab import *
+import pylab
 from cogent.maths.stats.test import t_two_sample as t_test
 
 sys.path.append("../../")
@@ -140,16 +140,16 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
                 else:
                     plot_dict[group].append([0.0, sample],)
 
-        fig = figure(figsize=(3, 6))
+        fig = pylab.figure(figsize=(3, 6))
         if real_abundance:
-            ax = axes()
+            ax = pylab.axes()
 
-        rcParams['axes.titlesize'] = 12.0
-        rcParams['font.size'] = 8.0
+        pylab.rcParams['axes.titlesize'] = 12.0
+        pylab.rcParams['font.size'] = 8.0
 
-        rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-        rc('grid', color='0.50', linestyle='-', linewidth=0.1)
-        grid(True)
+        pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+        pylab.rc('grid', color='0.50', linestyle='-', linewidth=0.1)
+        pylab.grid(True)
 
         for i in range(0, len(plot_dict)):
             key = plot_dict.keys()[i]
@@ -160,48 +160,48 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
                     if plot_dict[key][j][0] < 1:
                         plot_dict[key][j][0] = 1.0
 
-            title(otu)
+            pylab.title(otu)
 
             # scattering the samples in X axis, so it would be easier to see them when there are a bunch of them
             # at the same spot. instead of this, [i] * len(plot_dict[key]) could be used to plot them.
             y_positions =  [((1 - (r.gauss(100, 3) /100)) + i) for x in range(0, len(plot_dict[key]))]
 
-            plot(y_positions, [t[0] for t in plot_dict[key]], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
+            pylab.plot(y_positions, [t[0] for t in plot_dict[key]], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
 
-            b = boxplot([t[0] for t in plot_dict[key]], positions=[i + 0.35], sym=',', widths=0.2)
-            setp(b['medians'], color=group_colors[key])
-            setp(b['whiskers'], color='black', alpha=0.3)
-            setp(b['boxes'], color='black', alpha=0.3)
-            setp(b['fliers'], color='black', alpha=0.3)
-            setp(b['caps'], color='black', alpha=0.3)
+            b = pylab.boxplot([t[0] for t in plot_dict[key]], positions=[i + 0.35], sym=',', widths=0.2)
+            pylab.setp(b['medians'], color=group_colors[key])
+            pylab.setp(b['whiskers'], color='black', alpha=0.3)
+            pylab.setp(b['boxes'], color='black', alpha=0.3)
+            pylab.setp(b['fliers'], color='black', alpha=0.3)
+            pylab.setp(b['caps'], color='black', alpha=0.3)
         if real_abundance:
             ax.set_yscale('log')
-            formatter = FuncFormatter(log_10_fix)
+            formatter = pylab.FuncFormatter(log_10_fix)
             ax.yaxis.set_major_formatter(formatter)
 
-            xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-            xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
-            ylim(ymin=1e-1, ymax=max_y)
+            pylab.xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
+            pylab.xticks(pylab.      arange(len(plot_dict)), plot_dict.keys(), rotation=90)
+            pylab.ylim(ymin=1e-1, ymax=max_y)
         else:
-            ylim(ymin=-5, ymax=105)
-            xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-            xticks(arange(len(plot_dict)), plot_dict.keys(), rotation=90)
-            yticks(arange(0, 101, 10))
+            pylab.ylim(ymin=-5, ymax=105)
+            pylab.xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
+            pylab.xticks(pylab.      arange(len(plot_dict)), plot_dict.keys(), rotation=90)
+            pylab.yticks(pylab.      arange(0, 101, 10))
 
         if not save_dir:
-            show()
+            pylab.show()
         else:
             if real_abundance:
-                savefig(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '_real_abundance' + '.png'), transparent = is_transparent)
+                pylab.savefig(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '_real_abundance' + '.png'), transparent = is_transparent)
             else:
-                savefig(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '.png'), transparent = is_transparent)
+                pylab.savefig(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '.png'), transparent = is_transparent)
 
         # clean memory
         try:
             fig.clf()
         except:
             pass
-        close('all')
+        pylab.close('all')
 
 
 if __name__ == "__main__":
@@ -217,3 +217,4 @@ if __name__ == "__main__":
     otu_t_p_tuples_dict = get_t_p_values_dict_for_subset(samples_dict, otu_library, sample_map_file_path, ranks = ["species"], real_abundance = True)
 
     generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "species", save_dir = None, is_transparent = False, real_abundance = True)
+

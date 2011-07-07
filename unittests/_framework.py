@@ -80,7 +80,7 @@ class Tests(unittest.TestCase):
         state = helper_functions.server({'request':'get_analyses'})
         #remove was successful:
         self.assertTrue(len(state['analyses']) == n)
-        print "state " + str(state)
+        #print "state " + str(state)
         
         
 

@@ -218,6 +218,24 @@ def heatmap_detail(request, analysis_id, instance, rank):
                                                                             'sample_map_name': sample_map_name,
                                                                             'instance': instance})))
 
+def csvformat(text):
+    n_rows = 2
+    lines = text.strip().split('\n')
+    rows = [rowfrom(i,n_rows) for i in lines]
+    return [r for r in rows if r != ('',)*n_rows]
+    
+
+def rowfrom(line,rowlen):
+    l = line.split('\t')
+    if len(l) != rowlen:
+        l = [i for i in line.split(',') if i.strip() != '']
+    if len(l) == rowlen:
+        return tuple([i.strip(""" '" """) for i in l])#remove any quotes surrounding the cell
+    elif len(l) == 0:
+        return ('',) * rowlen
+    else:
+        raise ValueError('could not convert '+line+' to a row of '+str(rowlen)+' elements.')
+
 def create_sample_map(request, analysis_id, step):
     Encode = lambda x: base64.encodestring(cPickle.dumps(x))
     Decode = lambda x: cPickle.loads(base64.decodestring(x))
@@ -232,11 +250,13 @@ def create_sample_map(request, analysis_id, step):
         server_response = server(server_request)
         return server_response['name']
 
-    def is_valid(uploaded):
+    def is_valid(sample_map):
+        if len(sample_map) < 2:
+            raise ValueError(str(sample_map))
         names = set(get_sample_names())
-        for line in uploaded:
-            if line.split(',')[0].strip() not in names:
-                return False
+        for line in sample_map:
+            if line[0] not in names:
+                raise ValueError(line[0]+' is not a valid sample name for this analysis')
         return True
         
 
@@ -251,13 +271,14 @@ def create_sample_map(request, analysis_id, step):
         sample_map_dict['sample_map_list'] = []
 
         if len(request.FILES)>0:#uploaded file
-            f = request.FILES[request.FILES.keys()[0]].readlines()
-            if(is_valid(f)):
-                for line in f:
-                    l = [ el.strip() for el in line.split(',')]
+            f = request.FILES[request.FILES.keys()[0]].read()
+            try:
+                f = csvformat(f)
+                is_valid(f)
+                for l in f:
                     sample_map_dict["sample_map_list"].append({'sample': l[0], 'group': l[1]})
-            else:
-                return err_response({"content":"The uploaded file is not valid"})
+            except ValueError as e:
+                return err_response({"content":"The uploaded file is not valid. "+str(e)})
                     
         else:#manually input
             for sample in get_sample_names():

@@ -17,7 +17,7 @@
 
 import os
 import sys
-from pylab import *
+import pylab
 import matplotlib.font_manager
 import scipy
 import random
@@ -84,49 +84,49 @@ def generate_individual_figures(rarefaction_dict, save_path = None, prefix = "",
         taxonomic_level_colors = {'genus': 'red', 'family': 'purple', 'order': 'orange', 'class': 'blue', 'phylum': 'green'}
 
         for sample in rarefaction_dict:
-            fig = figure(figsize=(10, 5))
-            rcParams.update({'axes.linewidth' : 0.1})
-            rc('grid', color='0.80', linestyle='-', linewidth=0.1)
-            grid(True)
+            fig = pylab.figure(figsize=(10, 5))
+            pylab.rcParams.update({'axes.linewidth' : 0.1})
+            pylab.rc('grid', color='0.80', linestyle='-', linewidth=0.1)
+            pylab.grid(True)
 
             for taxonomic_level in taxonomic_levels:
                 if taxonomic_level == taxonomic_levels[0]:
-                    plot([x[0] for x in rarefaction_dict[sample][taxonomic_level]], c = taxonomic_level_colors[taxonomic_level], linewidth = 1.2, label = taxonomic_level)
-                    plot([x[0] - x[1] for x in rarefaction_dict[sample][taxonomic_level]], ':', c = "black", alpha = 0.9)
-                    plot([x[0] + x[1] for x in rarefaction_dict[sample][taxonomic_level]], ':', c = "black", alpha = 0.9)
+                    pylab.plot([x[0] for x in rarefaction_dict[sample][taxonomic_level]], c = taxonomic_level_colors[taxonomic_level], linewidth = 1.2, label = taxonomic_level)
+                    pylab.plot([x[0] - x[1] for x in rarefaction_dict[sample][taxonomic_level]], ':', c = "black", alpha = 0.9)
+                    pylab.plot([x[0] + x[1] for x in rarefaction_dict[sample][taxonomic_level]], ':', c = "black", alpha = 0.9)
                 else:
-                    plot([x[0] for x in rarefaction_dict[sample][taxonomic_level]], c = taxonomic_level_colors[taxonomic_level], alpha = 0.4, label = taxonomic_level)
+                    pylab.plot([x[0] for x in rarefaction_dict[sample][taxonomic_level]], c = taxonomic_level_colors[taxonomic_level], alpha = 0.4, label = taxonomic_level)
 
             seqs = len(rarefaction_dict[sample][taxonomic_level])
             if seqs < 10:
                 seqs = 10
-            xticks(range(seqs / 10, seqs, seqs / 10), rotation=90, size='xx-small')
-            xlim(xmax=seqs)
-            yticks(size='xx-small')
-            ylabel("Expected # of OTUs for Sample \"%s\" (%d seqs)" % (sample, seqs), fontsize = 'small')
+            pylab.xticks(range(seqs / 10, seqs, seqs / 10), rotation=90, size='xx-small')
+            pylab.xlim(xmax=seqs)
+            pylab.yticks(size='xx-small')
+            pylab.ylabel("Expected # of OTUs for Sample \"%s\" (%d seqs)" % (sample, seqs), fontsize = 'small')
 
-            legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=len(taxonomic_levels), mode="expand", borderaxespad=0., prop = matplotlib.font_manager.FontProperties(size=8))
+            pylab.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=len(taxonomic_levels), mode="expand", borderaxespad=0., prop = matplotlib.font_manager.FontProperties(size=8))
 
             if save_path:
-                savefig(os.path.join(save_path, prefix + str(sample) + postfix))
+                pylab.savefig(os.path.join(save_path, prefix + str(sample) + postfix))
             else:
-                show()
+                pylab.show()
 
             fig.clf()
-            close('all')
+            pylab.close('all')
 
 
 def generate_all_samples_figure(rarefaction_dict, save_path = None, taxonomic_level = "genus"):
-        fig = figure(figsize=(10, 5))
-        rcParams.update({'axes.linewidth' : 0.1})
-        rc('grid', color='0.80', linestyle='-', linewidth=0.1)
-        grid(True)
+        fig = pylab.figure(figsize=(10, 5))
+        pylab.rcParams.update({'axes.linewidth' : 0.1})
+        pylab.rc('grid', color='0.80', linestyle='-', linewidth=0.1)
+        pylab.grid(True)
 
-        colors = cm.get_cmap('Dark2', lut=len(rarefaction_dict) + 2)
+        colors = pylab.cm.get_cmap('Dark2', lut=len(rarefaction_dict) + 2)
 
         i = 0
         for sample in rarefaction_dict:
-            plot([x[0] for x in rarefaction_dict[sample][taxonomic_level]], c = colors(i), linewidth = 1, label = sample)
+            pylab.plot([x[0] for x in rarefaction_dict[sample][taxonomic_level]], c = colors(i), linewidth = 1, label = sample)
             i +=1
 
         lens = [len(rarefaction_dict[x]["genus"]) for x in rarefaction_dict]
@@ -134,21 +134,22 @@ def generate_all_samples_figure(rarefaction_dict, save_path = None, taxonomic_le
         l = lens[0]
         if l < 10:
             l = 10
-        xticks(range(l / 10, l, l / 10), rotation=90, size='xx-small')
-        xlim(xmax=l)
-        yticks(size='xx-small')
-        ylabel("Expected # of OTUs for Samples", fontsize = 'small')
+        pylab.xticks(range(l / 10, l, l / 10), rotation=90, size='xx-small')
+        pylab.xlim(xmax=l)
+        pylab.yticks(size='xx-small')
+        pylab.ylabel("Expected # of OTUs for Samples", fontsize = 'small')
 
-        legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0., prop = matplotlib.font_manager.FontProperties(size=6))
+        pylab.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0., prop = matplotlib.font_manager.FontProperties(size=6))
 
         if save_path:
-            savefig(save_path)
+            pylab.savefig(save_path)
         else:
-            show()
+            pylab.show()
 
         fig.clf()
-        close('all')
+        pylab.close('all')
 
 
 if __name__ == '__main__':
     pass
+

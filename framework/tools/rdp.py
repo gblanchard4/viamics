@@ -30,8 +30,7 @@ import cPickle
 import subprocess
 import random as r
 
-from framework import constants as c
-from pylab import *
+import pylab
 from optparse import OptionParser
 
 sys.path.append("../../")
@@ -289,36 +288,36 @@ def otu_confidence_analysis(rdp_output_file, save_path, seperator, samples, rank
         if width > 15:
             width = 15
 
-        fig = figure(figsize=(width, 4))
+        fig = pylab.figure(figsize=(width, 4))
 
-        rcParams['font.size'] = 8.0
-        rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-        rc('grid', color='0.50', linestyle='-', linewidth=0.1)
-        grid(True)
+        pylab.rcParams['font.size'] = 8.0
+        pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+        pylab.rc('grid', color='0.50', linestyle='-', linewidth=0.1)
+        pylab.grid(True)
 
         for i in range(0, len(samples)):
-            b = boxplot(values_for_boxplots[i], positions=[i], sym=',', widths=0.3)
-            setp(b['medians'], color='black')
-            setp(b['whiskers'], color='black', alpha=0.9)
-            setp(b['boxes'], color='black', alpha=0.9)
-            setp(b['fliers'], color='black', alpha=0.9)
-            setp(b['caps'], color='black', alpha=0.9)
+            b = pylab.boxplot(values_for_boxplots[i], positions=[i], sym=',', widths=0.3)
+            pylab.setp(b['medians'], color='black')
+            pylab.setp(b['whiskers'], color='black', alpha=0.9)
+            pylab.setp(b['boxes'], color='black', alpha=0.9)
+            pylab.setp(b['fliers'], color='black', alpha=0.9)
+            pylab.setp(b['caps'], color='black', alpha=0.9)
             
-            xlim(xmin=-0.75, xmax=len(samples) - 0.15)
-            ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-            xticks(arange(len(samples)), samples, rotation=90)
+            pylab.xlim(xmin=-0.75, xmax=len(samples) - 0.15)
+            pylab.ylim(ymin=-max_val * 10 / 100, ymax=max_val)
+            pylab.xticks(pylab.      arange(len(samples)), samples, rotation=90)
 
         if not save_path:
-            show()
+            pylab.show()
         else:
-            savefig(os.path.join(save_path, figure_file_name))
+            pylab.savefig(os.path.join(save_path, figure_file_name))
 
         # clean memory
         try:
             fig.clf()
         except:
             pass
-        close('all')
+        pylab.close('all')
 
     otu_rdp_confidence_tuples_list.sort(reverse = True)
 
@@ -371,37 +370,37 @@ def general_confidence_analysis(rdp_output_file, save_path):
 
     max_val = max_val + max_val * 10 / 100
 
-    fig = figure(figsize=(8, 6))
-    rcParams['font.size'] = 8.0
-    rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-    rc('grid', color='0.50', linestyle='-', linewidth=0.1)
-    grid(True)
+    fig = pylab.figure(figsize=(8, 6))
+    pylab.rcParams['font.size'] = 8.0
+    pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+    pylab.rc('grid', color='0.50', linestyle='-', linewidth=0.1)
+    pylab.grid(True)
     
     for key in m:
         y_positions =  [((1 - (r.gauss(100, 3) /100)) + m.index(key)) for x in range(0, len(plot_dict[key]))]
-        plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 8, mew = 0.4, alpha = .4)
-        b = boxplot(plot_dict[key], positions=[m.index(key) + 0.35], sym=',', widths=0.2)
-        setp(b['medians'], color=group_colors[key])
-        setp(b['whiskers'], color='black', alpha=0.3)
-        setp(b['boxes'], color='black', alpha=0.3)
-        setp(b['fliers'], color='black', alpha=0.3)
-        setp(b['caps'], color='black', alpha=0.3)
+        pylab.plot(y_positions, plot_dict[key], 'o', color = group_colors[key], ms = 8, mew = 0.4, alpha = .4)
+        b = pylab.boxplot(plot_dict[key], positions=[m.index(key) + 0.35], sym=',', widths=0.2)
+        pylab.setp(b['medians'], color=group_colors[key])
+        pylab.setp(b['whiskers'], color='black', alpha=0.3)
+        pylab.setp(b['boxes'], color='black', alpha=0.3)
+        pylab.setp(b['fliers'], color='black', alpha=0.3)
+        pylab.setp(b['caps'], color='black', alpha=0.3)
                 
-        xlim(xmin=-0.75, xmax=len(m) - 0.15)
-        ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-        xticks(arange(len(plot_dict)), m, rotation=90)
+        pylab.xlim(xmin=-0.75, xmax=len(m) - 0.15)
+        pylab.ylim(ymin=-max_val * 10 / 100, ymax=max_val)
+        pylab.xticks(pylab.      arange(len(plot_dict)), m, rotation=90)
 
     if not save_path:
-        show()
+        pylab.show()
     else:
-        savefig(os.path.join(save_path, "rdp_confidence.png"))
+        pylab.savefig(os.path.join(save_path, "rdp_confidence.png"))
 
     # clean memory
     try:
         fig.clf()
     except:
         pass
-    close('all')
+    pylab.close('all')
 
 def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_list = []):
     """parses rdp output and stores classification confidence
@@ -440,36 +439,36 @@ def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_li
     if width > 15:
         width = 15
 
-    fig = figure(figsize=(width, 4))
+    fig = pylab.figure(figsize=(width, 4))
 
-    rcParams['font.size'] = 8.0
-    rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
-    rc('grid', color='0.50', linestyle='-', linewidth=0.1)
-    grid(True)
+    pylab.rcParams['font.size'] = 8.0
+    pylab.rcParams.update({'axes.linewidth' : 0, 'axes.axisbelow': False})
+    pylab.rc('grid', color='0.50', linestyle='-', linewidth=0.1)
+    pylab.grid(True)
 
     for i in range(0, len(samples_list)):
-        b = boxplot(confidence_list[i], positions=[i], sym=',', widths=0.3)
-        setp(b['medians'], color='black')
-        setp(b['whiskers'], color='black', alpha=0.9)
-        setp(b['boxes'], color='black', alpha=0.9)
-        setp(b['fliers'], color='black', alpha=0.9)
-        setp(b['caps'], color='black', alpha=0.9)
+        b = pylab.boxplot(confidence_list[i], positions=[i], sym=',', widths=0.3)
+        pylab.setp(b['medians'], color='black')
+        pylab.setp(b['whiskers'], color='black', alpha=0.9)
+        pylab.setp(b['boxes'], color='black', alpha=0.9)
+        pylab.setp(b['fliers'], color='black', alpha=0.9)
+        pylab.setp(b['caps'], color='black', alpha=0.9)
 
-        xlim(xmin=-0.75, xmax=len(samples_list) - 0.15)
-        ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-        xticks(arange(len(samples_list)), samples_list, rotation=90)
+        pylab.xlim(xmin=-0.75, xmax=len(samples_list) - 0.15)
+        pylab.ylim(ymin=-max_val * 10 / 100, ymax=max_val)
+        pylab.xticks(pylab.      arange(len(samples_list)), samples_list, rotation=90)
 
     if not save_path:
-        show()
+        pylab.show()
     else:
-        savefig(os.path.join(save_path, "rdp_confidence_per_sample.png"))
+        pylab.savefig(os.path.join(save_path, "rdp_confidence_per_sample.png"))
 
     # clean memory
     try:
         fig.clf()
     except:
         pass
-    close('all')
+    pylab.close('all')
 
 
 
@@ -551,3 +550,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     main(options, samples)
+
