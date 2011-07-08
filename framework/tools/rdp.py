@@ -31,8 +31,10 @@ import shlex
 import shutil
 import cPickle
 import subprocess
+from itertools import izip
 import random as r
 
+from framework import constants as c
 import pylab
 from optparse import OptionParser
 
@@ -56,12 +58,13 @@ Properties:
     def __init__(self, outfile_line,separator=None):
         self.data = outfile_line
         outfile_line = outfile_line.split('\t')
-        if (separator and len(outfile_line[0].split(separator)) == 2):
-            ids = outfile_line[0].split(separator)
+        ids = filter(lambda i: i != '',outfile_line[0].split(separator))
+        if separator and len(ids) == 2:
             self.sample_id = ids[0]
             self.seq_id = ids[1]
         else:
-            self.sample_id = self.seq_id = outfile_line[0]#wasn't given a separator, hopefully this means client is not using id
+            #wasn't given a separator or one id is missing, hopefully this means client is not using id
+            self.sample_id = self.seq_id = outfile_line[0]
         rank_indices = [8,11,14,17,20]
         taxonomic_ranks = [outfile_line[i] for i in rank_indices]
         confidences = [outfile_line[i+2] for i in rank_indices]
@@ -78,24 +81,18 @@ def rdp_results(rdp_file,separator):
     for line in rdp_file:
         yield RDPResult(line,separator)
 
-def low_confidence_seqs(fasta_file_path, rdp_outfile_path, threshold, separator):
+def low_confidence_seqs(fasta_file, rdp_outfile, threshold, separator):
     """Sequences which the classifier marked as below the given threshold. The sequence IDs in the fasta file must be a superset of those in the RDP output. The expected case is that RDP was run against the fasta file to generate the output """
     #first assume the rdp out and fasta line up exactly:
-    results = rdp_results(open(rdp_outfile_path),separator)
-    sequences = helper_functions.seqs(open(fasta_file_path))
-    for res,seq in zip(results,sequences):
-        try:
-            if res.seq_id == seq.split()[0].split(separator)[1]:
-                if float(res.confidences['genus']) < threshold:
-                    yield seq
-            else:
-                print res.data+'\n-------\n'+seq
-                import pdb;pdb.set_trace()
-                break
-        except:
-            print res+'\n-------\n'+seq
-
-    #otherwise we will need to speed this up:
+    results = rdp_results(rdp_outfile,separator)
+    sequences = helper_functions.seqs(fasta_file)
+    below_threshold = set(res.seq_id for res in results if float(res.confidences['genus']) < threshold)
+    for seq in sequences:
+        ids = filter(lambda i: i.strip() != '',seq.split()[0].split(separator))
+        s_id = ids[1]
+        if s_id in below_threshold:
+            yield seq
+        
     
 
 
