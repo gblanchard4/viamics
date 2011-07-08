@@ -301,7 +301,7 @@ def _generate_index(str):
         alist.append(fragment)
 
     # initialize loop
-    prev_isdigit = str[0].isdigit()
+    prev_isdigit = False if len(str) == 0 else str[0].isdigit()
     current_fragment = ''
     # group a string into digit and non-digit parts
     for char in str:

@@ -14,7 +14,9 @@
 #
 # Module functions for RDP.
 #
-
+#An assumption throughout this module (and all of viamics) is that the ids of FASTA sequences are composed of a sample id,
+#which labels a group of sequences, and a unique sequence id. These are located directly after the '>', and are
+#separated by a variable separator character.
 #
 # example run:
 #
@@ -28,13 +30,70 @@ import shlex
 import shutil
 import cPickle
 import subprocess
+from itertools import izip
 import random as r
 
+from framework import constants as c
 import pylab
 from optparse import OptionParser
 
 sys.path.append("../../")
 from framework.tools import helper_functions
+
+class RDPResult:
+    """    The constructor for this class takes a single line from the RDP output in  'fixrank' format, from which it can read the taxonomic information.
+
+    If the constructor is given a kwarg 'separator', the ID of the sequence will be split into sample id and sequence id, assuming the ID looks like 'sample_id<separator>sequence_id. If there is no separator, both sample_id and sequence_id will be the entire id'
+
+Properties:
+    sample_id: The sample (group of sequences) that this sequence comes from.
+
+    sequence_id: a unique ID for this sequence.
+
+    classifications: a dict with keys ['phylum','class','order','family','genus'] and values are the classification of the sequence for that level.
+
+    confidences: a dict with the same keys as classifications, and values are the classification confidences returned by RDP"""
+
+    def __init__(self, outfile_line,separator=None):
+        self.data = outfile_line
+        outfile_line = outfile_line.split('\t')
+        ids = filter(lambda i: i != '',outfile_line[0].split(separator))
+        if separator and len(ids) == 2:
+            self.sample_id = ids[0]
+            self.seq_id = ids[1]
+        else:
+            #wasn't given a separator or one id is missing, hopefully this means client is not using id
+            self.sample_id = self.seq_id = outfile_line[0]
+        rank_indices = [8,11,14,17,20]
+        taxonomic_ranks = [outfile_line[i] for i in rank_indices]
+        confidences = [outfile_line[i+2] for i in rank_indices]
+        for i,conf in enumerate(confidences):
+            try:
+                confidences[i] = float(conf)
+            except ValueError:
+                confidences[i] = conf.strip()
+        self.classifications = dict(zip(reversed(c.ranks['rdp']),taxonomic_ranks))
+        self.confidences = dict(zip(reversed(c.ranks['rdp']), confidences))
+        
+
+def rdp_results(rdp_file,separator):
+    for line in rdp_file:
+        yield RDPResult(line,separator)
+
+def low_confidence_seqs(fasta_file, rdp_outfile, threshold, separator):
+    """Sequences which the classifier marked as below the given threshold. The sequence IDs in the fasta file must be a superset of those in the RDP output. The expected case is that RDP was run against the fasta file to generate the output """
+    #first assume the rdp out and fasta line up exactly:
+    results = rdp_results(rdp_outfile,separator)
+    sequences = helper_functions.seqs(fasta_file)
+    below_threshold = set(res.seq_id for res in results if float(res.confidences['genus']) < threshold)
+    for seq in sequences:
+        ids = filter(lambda i: i.strip() != '',seq.split()[0].split(separator))
+        s_id = ids[1]
+        if s_id in below_threshold:
+            yield seq
+        
+    
+
 
 # command to run RDP classifier
 cmd = "java -Xmx1g -jar rdp_classifier-2.2.jar -q %(fasta_file)s -o %(rdp_output_file)s -f fixrank &> %(error_log)s"
@@ -58,13 +117,8 @@ def run_classifier(rdp_running_path, fasta_file, rdp_output_file, error_log = '/
 def extract_sample_names(fasta_file, seperator):
     """finds unique sample names within the entire library, e.g., returns MZH-92 for MZH-92_F58614Y04I2TQV,
        MZH-92_F58614Y04I2TQV, MZH-92_F58614Y04IXSC2 and MZH-92_F58614Y04IKEJL"""
-    samples = []
-    for id in [x[1:].split()[0].split(seperator)[0] for x in open(fasta_file).readlines() if x[0] == ">"]:
-        if id in samples:
-            continue
-        else:
-            samples.append(id)
-    return samples
+    return list(set([x[1:].split()[0].split(seperator)[0]
+                     for x in open(fasta_file).readlines() if x[0] == ">"]))
 
 def merge(samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_file, original_rdp_output_file, seperator):
     samples_in_original_rdp_output = list(set([s.split(seperator)[0] for s in open(original_rdp_output_file).readlines()]))
@@ -99,8 +153,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
                 temporary_rdp_output_file_obj.write(original_rdp_output_lines[i])
                 i += 1
 
-        for line in open(additional_rdp_output_file).readlines():
-            temporary_rdp_output_file_obj.write(line)
+        temporary_rdp_output_file_obj.write(additional_rdp_output_file.read())
 
         temporary_rdp_output_file_obj.close()
         shutil.move(temporary_rdp_output_file, original_rdp_output_file)
@@ -151,22 +204,18 @@ def get_otu_library(rdp_output_file):
     genuses = []
     otu_library = []
 
-    for line in [l for l in open(rdp_output_file).readlines() if len(l.split("\t")) == 23]:
-        line = line.replace('"', "").strip().split('\t')
-
-        taxonomic_ranks = [line[8], line[11], line[14], line[17], line[20]]
-
+    for result in rdp_results(open(rdp_output_file),separator=None):#don't care about separator b/c id does not matter at this stage
         #sometimes taxonomic names are empty! gotta fix that!
         last_non_empty_rank = ''
-        for i in range(0, len(taxonomic_ranks)):
-            if taxonomic_ranks[i] == "":
-                taxonomic_ranks[i] = "(%s)" % (last_non_empty_rank)
+        for i in result.classifications.values():
+            if i == "":
+                i = "(%s)" % (last_non_empty_rank)
             else:
-                last_non_empty_rank = taxonomic_ranks[i]
+                last_non_empty_rank = i
 
-        if taxonomic_ranks[GENUS] not in genuses:
-            genuses.append(taxonomic_ranks[GENUS])
-            otu_library.append(taxonomic_ranks)
+        if result.classifications['genus'] not in genuses:
+            genuses.append(result.classifications['genus'])
+            otu_library.append(result.classifications.values())
 
     otu_library.sort()
 
