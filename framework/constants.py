@@ -68,12 +68,14 @@ ranks['env'] = ['species']
 ranks['vamps'] = ['species']
 
 #rdp
-rdp_output_file_name = "rdp_output"
-rdp_error_log_file_name = "rdp_error_log"
-samples_serialized_file_name = "samples_dict_serialized"
-all_unique_samples_file_name = "unique_sample_names"
-otu_library_file_name = "otu_library"
-taxa_color_dict_file_name = "taxa_color_dict"
+rdp_output_file_name          = "rdp_output"
+rdp_error_log_file_name       = "rdp_error_log"
+samples_serialized_file_name  = "samples_dict_serialized"
+all_unique_samples_file_name  = "unique_sample_names"
+otu_library_file_name         = "otu_library"
+taxa_color_dict_file_name     = "taxa_color_dict"
+low_confidence_seqs_file_name = 'low_confidence_seqs'
+threshold_file_name           = 'confidence_threshold'
 
 data_file_name = "data_file"
 seperator_file_name = "seperator"

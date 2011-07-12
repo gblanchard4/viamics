@@ -64,7 +64,7 @@ Properties:
         else:
             #wasn't given a separator or one id is missing, hopefully this means client is not using id
             self.sample_id = self.seq_id = outfile_line[0]
-        rank_indices = [8,11,14,17,20]
+        rank_indices = [5,8,11,14,17,20]
         taxonomic_ranks = [outfile_line[i] for i in rank_indices]
         confidences = [outfile_line[i+2] for i in rank_indices]
         for i,conf in enumerate(confidences):
@@ -72,8 +72,9 @@ Properties:
                 confidences[i] = float(conf)
             except ValueError:
                 confidences[i] = conf.strip()
-        self.classifications = dict(zip(reversed(c.ranks['rdp']),taxonomic_ranks))
-        self.confidences = dict(zip(reversed(c.ranks['rdp']), confidences))
+        ranks = ['domain'] + list(reversed(c.ranks['rdp']))#TODO put domain in c.ranks, run tests and see what breaks
+        self.classifications = dict(zip(ranks,taxonomic_ranks))
+        self.confidences = dict(zip(ranks, confidences))
         
 
 def rdp_results(rdp_file,separator):
@@ -222,38 +223,35 @@ def get_otu_library(rdp_output_file):
     return otu_library
 
 
-def create_samples_dictionary(rdp_output_file, seperator, samples):
+def create_samples_dictionary(rdp_output_file, seperator, samples,threshold=None):
     """reads RDP output file and and creates total count entries in the dictionary for matching samples in the 'samples' list"""
 
     samples_dict = {}
 
-    for line in [l for l in open(rdp_output_file).readlines() if len(l.split("\t")) == 23]:
-        line = line.replace('"', "").strip().split('\t')
-
-        sample = line[0].split(seperator)[0]
-
-        if sample in samples:
+    for res in rdp_results(open(rdp_output_file),seperator):
+        if res.sample_id in samples:
             #line is from a sample we're interested in
 
-            taxonomic_ranks = [['domain', line[5]], ['phylum', line[8]], ['class', line[11]], ['order', line[14]], ['family', line[17]], ['genus', line[20]]]
+            taxonomic_ranks = ['domain', 'phylum', 'class', 'order', 'family', 'genus']
+            taxonomic_ranks = [(k,res.classifications[k]) for k in taxonomic_ranks]
 
             #sometimes taxonomic names are empty! gotta fix that!
             last_non_empty_ranks = ['', '']
             for i in range(0, len(taxonomic_ranks)):
-                if taxonomic_ranks[i][1] == "":
-                    taxonomic_ranks[i][1] = "(%s: %s)" % (last_non_empty_ranks[0], last_non_empty_ranks[1])
+                if taxonomic_ranks[i][1] == "" or res.confidences[taxonomic_ranks[i][0]] < threshold:#all numbers are > None
+                    taxonomic_ranks[i] = (taxonomic_ranks[i][0],"(%s: %s)" % (last_non_empty_ranks[0], last_non_empty_ranks[1]))
                 else:
                     last_non_empty_ranks = taxonomic_ranks[i]
-
-            if samples_dict.has_key(sample):
-                samples_dict[sample]['tr'] += 1
+                    
+            if samples_dict.has_key(res.sample_id):
+                samples_dict[res.sample_id]['tr'] += 1
                 for taxonomic_rank in taxonomic_ranks:
-                    if samples_dict[sample][taxonomic_rank[0]].has_key(taxonomic_rank[1]):
-                        samples_dict[sample][taxonomic_rank[0]][taxonomic_rank[1]] += 1
+                    if samples_dict[res.sample_id][taxonomic_rank[0]].has_key(taxonomic_rank[1]):
+                        samples_dict[res.sample_id][taxonomic_rank[0]][taxonomic_rank[1]] += 1
                     else:
-                        samples_dict[sample][taxonomic_rank[0]][taxonomic_rank[1]] = 1
+                        samples_dict[res.sample_id][taxonomic_rank[0]][taxonomic_rank[1]] = 1
             else:
-                samples_dict[sample] = {'tr': 1,
+                samples_dict[res.sample_id] = {'tr': 1,
                                         'domain': {taxonomic_ranks[0][1]: 1},
                                         'phylum': {taxonomic_ranks[1][1]: 1},
                                         'class' : {taxonomic_ranks[2][1]: 1},

@@ -22,8 +22,16 @@ class Tests(unittest.TestCase):
         J = lambda s: os.path.join(c.base_dir,'../','unittests/test_files',s)
         self.test_fasta_file = J('example_fasta')
         self.split_analysis = [J(s) for s in ['split1.fna','split2.fna']]
+        self.confidence = J('confidence_levels.fas')
         self.analysis_id = helper_functions.get_sha1sum(self.test_fasta_file) + "-test"
         self.rdp_analysis_dir = os.path.join(c.analyses_dir, self.analysis_id)
+        
+    def tearDown(self):
+        test_files = [self.test_fasta_file,self.confidence]+self.split_analysis
+        for t in test_files:
+            self.server({'request': 'remove_analysis',
+                     'analysis_id': helper_functions.get_sha1sum(t)+'-test'})
+            
 
     def server(self, request):
         return helper_functions.server(request)
@@ -59,23 +67,54 @@ class Tests(unittest.TestCase):
             self.assertFalse(os.path.exists(os.path.join(self.rdp_analysis_dir, d)))
         self.assertFalse(os.path.exists(self.rdp_analysis_dir))
 
-        def testAppend(self):
-            initial = self.split_analysis[0]
-            append = self.split_analysis[1]
-            id = helper_functions.get_sha1sum(initial)+'-test'
-
+    def testAppend(self):
+        initial = self.split_analysis[0]
+        append = self.split_analysis[1]
+        id = helper_functions.get_sha1sum(initial)+'-test'
+        
             #create the analysis:
-            server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':initial,'seperator':':','job_description':'cat-test','analysis_type':'rdp','return_when_done': True})
-            i = server({'request':'info','resource':'analysis','analysis_id':id})
-            self.assertTrue(len(i['info']['all_unique_samples_list']) == 1)
-
+        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':initial,'seperator':':','job_description':'cat-test','analysis_type':'rdp','return_when_done': True})
+        i = self.server({'request':'info','resource':'analysis','analysis_id':id})
+        self.assertTrue(len(i['info']['all_unique_samples_list']) == 1)
+        
             #append samples:
-            server({'request':'append_samples_to_analysis','analysis_id':id,'data_file_path':append,'return_when_done':True})
-            i = server({'request':'info','resource':'analysis','analysis_id':id})
-            self.assertTrue(len(i['info']['all_unique_samples_list']) == 2)
-
+        self.server({'request':'append_samples_to_analysis','analysis_id':id,'data_file_path':append,'return_when_done':True})
+        i = self.server({'request':'info','resource':'analysis','analysis_id':id})
+        self.assertTrue(len(i['info']['all_unique_samples_list']) == 2)
+        
             #clean up:
-            server({'request': 'remove_analysis',
-                    'analysis_id': id})
+        self.server({'request': 'remove_analysis',
+                     'analysis_id': id})
+
+    def testLowConfidence(self):
+        count_seqs = lambda f: sum(1 for l in f if l.startswith('>'))
+        id = helper_functions.get_sha1sum(self.confidence)+'-test'
+
+        #also you can check the samples_dict to count how many were classified
+        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':self.confidence,'seperator':'_','job_description':'confidence test','analysis_type':'rdp','return_when_done': True,'threshold':0.8})
+        i = self.server({'request':'info','resource':'analysis','analysis_id':id})
+        n_low = count_seqs(open(os.path.join(c.analyses_dir,id,c.low_confidence_seqs_file_name)))
+        path = self.server({'request':'get_samples_dict_path','analysis_id':id})['samples_dict_path']
+        samples_dict = cPickle.load(open(path))
+        total_classified = 0
+        for _sample in samples_dict.values():
+            sample = _sample['genus']
+            total_classified += sum([sample[genus] for genus in sample if ':' not in genus]) 
+        self.assertTrue(n_low == 10)
+        self.assertTrue(n_low + total_classified == 20)
+        self.server({'request': 'remove_analysis',
+                     'analysis_id': id})
+
+        
+        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':self.confidence,'seperator':'_','job_description':'confidence test','analysis_type':'rdp','return_when_done': True,'threshold':0.9999})
+        i = self.server({'request':'info','resource':'analysis','analysis_id':id})
+        n_low = count_seqs(open(os.path.join(c.analyses_dir,id,c.low_confidence_seqs_file_name)))
+        print 'should be 11: '+str(n_low)
+        self.assertTrue(n_low == 11)
+        self.server({'request': 'remove_analysis',
+                     'analysis_id': id})
+
+        
+        
 
         

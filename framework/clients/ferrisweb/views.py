@@ -365,8 +365,6 @@ def refresh_analysis_files(request, analysis_id):
         return HttpResponse(get_template("refresh.tmpl").render(Context({'refresh_options': refresh_options,
                                                                          'functions_dict': functions_dict,
                                                                          'analysis_id': analysis_id})))
-#please read before modifying web api:
-#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
 def analyses(request):
     if request.method == 'GET':
         server_request = {'request': 'get_analyses'}
@@ -426,6 +424,17 @@ def split_fasta(request,analysis_id):
     response['Content-Disposition'] = 'attachment; filename=all_samples.zip'
     return response
 
+def get_low_confidence_seqs():
+
+    file_path = os.path.join(constants.analyses_dir, analysis_id,constants.low_confidence_seqs_file_name)
+    
+    if (os.path.exists(file_path)):
+        response = HttpResponse(FileWrapper(open(file_path)))
+    else:
+        response = HttpResponse(get_template("error.tmpl").render(Context(
+                    {'content': "This analysis has not separated sequences by confidence."})))
+
+    return response
     
 
 def get_samples_genus_OTUs(analysis_id):
@@ -631,7 +640,9 @@ def new_analysis(request, analysis_type):
 
             #update server request if we're here for rdp analysis
             if analysis_type == "rdp":
-                    server_request['seperator'] = form.cleaned_data['seperator']
+                server_request['seperator'] = form.cleaned_data['seperator']
+            if float(form.cleaned_data.get('threshold')):
+                server_request['threshold'] = float(form.cleaned_data['threshold'])
 
             server_response = server(server_request)
 

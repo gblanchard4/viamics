@@ -59,8 +59,7 @@ def err_response(server_dict):
     return HttpResponse(get_template("error.tmpl").render(Context(context_dict)))
 
 
-#please read before modifying web api:
-#http://en.wikipedia.org/wiki/Representational_State_Transfer#RESTful_web_services
+
 def analyses(request):
     if request.method == 'GET':
         server_request = {'request': 'get_analyses'}
@@ -73,5 +72,18 @@ def analyses(request):
         return HttpResponse(json.dumps(analyses))
     else:
         return err_response({'content':'Only the GET method is implemented for this resource'})
+
+def get_low_confidence_seqs():
+
+    file_path = os.path.join(constants.analyses_dir, analysis_id,constants.low_confidence_seqs_file_name)
+    
+    if (os.path.exists(file_path)):
+        response = HttpResponse(FileWrapper(open(file_path)))
+        response['Content-Disposition'] = 'attachment; filename=low-confidence.fas'
+    else:
+        response = HttpResponse("file not found", status=404)
+
+    return response
+
 
 
