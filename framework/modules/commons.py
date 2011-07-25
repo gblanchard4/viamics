@@ -40,6 +40,7 @@ def _exec(p, request_dict):
     random_taxon_colors_dict(p)
     pie_charts(p)
     pie_chart_dendrograms(p)
+    env_file(p)
 
 
 def _append(p, request_dict):
@@ -67,6 +68,7 @@ def _module_functions(p, request_dict):
         'commons_04': {'func': random_taxon_colors_dict, 'desc': 'Random taxon colors'},
         'commons_05': {'func': pie_charts, 'desc': 'Pie charts'},
         'commons_06': {'func': pie_chart_dendrograms, 'desc': 'Pie chart dendrograms'},
+        'commons_07': {'func': env_file, 'desc':'Write env file'}
     }
 
 def _sample_map_functions(p, request_dict):
@@ -77,6 +79,7 @@ def _sample_map_functions(p, request_dict):
         'commons_04': {'func': sample_dendrograms, 'desc': 'Sample dendrograms'},
         'commons_05': {'func': shannon_diversity_dot_plot, 'desc': 'Shannon diversity dot plot'},
         'commons_06': {'func': simpsons_diversity_dot_plot, 'desc': 'Simpsons diversity dot plot'},
+        'commons_07': {'func': category_map, 'desc': 'Category Map for UniFrac'}
     }
 
 
@@ -114,6 +117,7 @@ def heatmaps(p):
         debug("Creating percent abundance heatmap for '%s' level" % rank, p.files.log_file)
         SerializeToFile(heatmap_options, vars(p.files)[c.heatmap_options_file_prefix + rank + '_file_path'])
         framework.tools.heatmap.main(heatmap_options, c.analyses_dir)
+    
 
 def sample_dendrograms(p):
     samples_dict = DeserializeFromFile(p.files.sample_map_filtered_samples_dict_file_path)
@@ -135,6 +139,14 @@ def simpsons_diversity_dot_plot(p):
     samples_dict = DeserializeFromFile(p.files.sample_map_filtered_samples_dict_file_path)
     debug("Generating diversity index images...", p.files.log_file)
     framework.tools.diversityindex.generate_for_sample_map(samples_dict, p.files.sample_map_file_path, save_dir = p.dirs.sample_map_instance_dir, type = p.type, method = "simpsons")
+
+def category_map(p):
+    sample_map = open(p.files.sample_map_file_path)
+    outfile = open(p.files.category_map_path,'w')
+    headers = [(0,"SampleID"),(1,"group"),(0,"Description")]#seems like a good candidate for constants
+    helper_functions.write_category_map(
+        helper_functions.category_map(sample_map,headers),
+        outfile)
 
 #######################################
 # module functions
@@ -173,3 +185,8 @@ def pie_chart_dendrograms(p):
     framework.tools.hcluster.generate(samples_dict, DeserializeFromFile(p.files.otu_library_file_path), pie_charts_dir = p.dirs.pie_charts_dir, dendrogram_prefix = c.pie_chart_dendrogram_file_prefix, ranks = GetCopy(c.ranks[p.type]))
 
 
+def env_file(p):
+    samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
+    analysis_type = open(p.files.type_of_analysis_file_path).read()
+    outfile = open(p.files.env_file_path,'w')
+    helper_functions.write_rows(helper_functions.env_triples(samples_dict,c.ranks[analysis_type][0]),outfile)

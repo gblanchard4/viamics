@@ -49,6 +49,26 @@ class Tests(unittest.TestCase):
         self.assertTrue(response['response'] == 'error')
         self.assertFalse(os.path.exists(self.rdp_analysis_dir))
 
+    def testEnvCreation(self):
+        server_request = {'request': 'exec_analysis',
+                          'analysis_type': u'rdp',
+                          'job_description': u'test',
+                          'seperator': u'_',
+                          'data_file_sha1sum': self.analysis_id,
+                          'data_file_path': self.test_fasta_file,
+                          'return_when_done': True}
+        
+        helper_functions.server(server_request)
+        self.assertTrue(os.path.exists(self.rdp_analysis_dir))
+        self.assertTrue(os.path.exists(os.path.join(self.rdp_analysis_dir,c.env_file_name)))
+        #clean up:
+        rm_request = {'request': 'remove_analysis',
+                          'analysis_id': self.analysis_id}
+        helper_functions.server(rm_request)
+
+
+        
+
     def testRepeatAnalysis(self):
         state = helper_functions.server({'request':'get_analyses'})
         n = len(state['analyses'])

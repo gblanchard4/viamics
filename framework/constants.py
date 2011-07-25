@@ -76,9 +76,11 @@ samples_serialized_file_name = "samples_dict_serialized"
 all_unique_samples_file_name = "unique_sample_names"
 otu_library_file_name = "otu_library"
 taxa_color_dict_file_name = "taxa_color_dict"
-
-data_file_name = "data_file"
 seperator_file_name = "seperator"
+
+#general data files
+env_file_name = 'samples.env'
+data_file_name = "data_file"
 job_name_file_name = "job"
 log_file_name = "log"
 type_of_analysis_file_name = "type_of_analysis"
@@ -113,6 +115,7 @@ sample_map_dendrograms_dir_name = "dendrograms"
 sample_map_taxon_charts_dir_name = "taxon_charts"
 sample_map_name_file_name = "map_name"
 sample_map_file_name = "sample_map"
+category_map_file_name = "category_map"
 sample_map_filtered_samples_dict_file_name = "filtered_samples_dict_serialized"
 sample_map_otu_t_p_tuples_dict_file_name = "otu_t_p_tuples_dict"
 sample_map_otu_t_p_tuples_dict_real_file_name = "otu_t_p_tuples_real_dict" #for qpcr

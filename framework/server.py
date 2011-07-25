@@ -893,15 +893,18 @@ class Files:
         self.rarefaction_dict_serialized_file_path = J(c.rarefaction_dict_serialized_file_name)
         self.rarefaction_curves_all_samples_file_path = J(c.rarefaction_curves_all_samples_file_name)
         self.simpsons_diversity_index_data_path  = os.path.join(dirs.analysis_dir, c.simpsons_diversity_index_data_name)
+        self.env_file_path                         = J(c.env_file_name)
         self.shannon_diversity_index_data_path   = os.path.join(dirs.analysis_dir, c.shannon_diversity_index_data_name)
         self.blast_output_file_path                = J(c.blast_output_name)
         self.blast_db_name_path                    = J(c.blast_db_name_path)
 
+        #sample map stufff
         self.sample_map_name_file_path                     = None
         self.sample_map_file_path                          = None
         self.sample_map_otu_t_p_tuples_dict_file_path      = None
         self.sample_map_otu_t_p_tuples_dict_real_file_path = None
         self.sample_map_filtered_samples_dict_file_path    = None
+        self.category_map_path                             = None
 
         self.taxa_color_dict_file_path         = J(c.taxa_color_dict_file_name)
 
@@ -914,6 +917,7 @@ class Files:
         self.sample_map_otu_t_p_tuples_dict_file_path      = J(c.sample_map_otu_t_p_tuples_dict_file_name)
         self.sample_map_otu_t_p_tuples_dict_real_file_path = J(c.sample_map_otu_t_p_tuples_dict_real_file_name)
         self.sample_map_filtered_samples_dict_file_path    = J(c.sample_map_filtered_samples_dict_file_name)
+        self.category_map_path                             = J(c.category_map_file_name)
 
         for levels_list in c.ranks.values():
             for level in levels_list:

@@ -44,6 +44,7 @@ class HeatmapOptions:
         self.abundance_file        = None
         self.sample_color_map_file = None
         self.output_file           = None
+        self.category_map_path     = None
         self.scale                 = 'column'
         self.min_percentage        = 0.0
         self.min_present           = 0
@@ -222,6 +223,44 @@ def seqs(f):
         seq += line
     if seq != "":
         yield seq
+################################################################################
+#Unifrac export preparation
+#the following functions mung data into the necessary shape to use the
+#Fast UniFrac webapp
+################################################################################
+def env_triples(samples_dict, level):
+    """A generator of 3-tuples (otu, sample, quantity) for all samples in samples_dict. Level is the taxonomic level (genus, phylum, etc. ) to use for otus"""
+    for s_id, sample in samples_dict.iteritems():
+        for otu, quant in sample[level].iteritems():
+            yield (otu, s_id, quant)
+            
+def category_map(sample_map_lines, headers):
+    """Creates what the UniFrac people call a 'category map' from a Viamics sample_map file.
+
+    A Viamics sample_map file includes several tab-separated columns, the first of which is the sample id.
+    headers is a list of pairs (column_number, header_text) where column_number is the column in the sample_map file, and header_text is the name of the column that will be created in the category map.
+
+    The result is an iterator of len(headers)-tuples. The first is simply [text for num,text in headers]"""
+    yield tuple([text for num,text in headers])
+    for line in sample_map_lines:
+        line = line.split('\t')
+        yield tuple([line[h[0]] for h in headers])
+
+def write_category_map(rows, map_file):
+    """writes each row in rows as a tab-separated spreadsheet row to map_file, and closes map_file."""
+    rows = iter(rows)
+    map_file.write('#')
+    write_rows(rows,map_file)
+    
+
+def write_rows(rows, f,delim='\t'):
+    for r in rows:
+        f.write(str.join(delim,map(lambda x: str.strip(str(x)),r))+'\n')
+    f.close()
+
+################################################################################
+#End Fast Unifrac tools
+################################################################################
 
 def get_fs_compatible_name(fname):
     fname = fname.replace(")", "")

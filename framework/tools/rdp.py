@@ -18,7 +18,6 @@
 #which labels a group of sequences, and a unique sequence id. These are located directly after the '>', and are
 #separated by a variable separator character.
 #
-#
 # example run:
 #
 # python rdp_classifier_run.py -f BV/ferris92Labeled.fas -o RDP_output_of_all_BV.txt -s '_' -r RDP_Classifier/rdp_classifier_2.1/ -p ABUNDANCE
@@ -41,6 +40,13 @@ from optparse import OptionParser
 sys.path.append("../../")
 from framework.tools import helper_functions
 
+#I want to have 'domain' in RDPResult.classifications, but adding it to c.ranks['rdp'] breaks other
+#things in the web client. 
+ALL_RANKS = ['domain', 'phylum', 'class', 'order', 'family', 'genus']
+
+
+"""MZH-92_F58614Y04IOLGX\t\t\t\t\tBacteria\tdomain\t1.0\t"Fusobacteria"\tphylum\t1.0\t"Fusobacteria"\tclass\t1.0\t"Fusobacteriales"\torder\t1.0\t"Leptotrichiaceae"\tfamily\t1.0\tSneathia\tgenus\t1.0\n"""#breaks constructtor
+
 class RDPResult:
     """    The constructor for this class takes a single line from the RDP output in  'fixrank' format, from which it can read the taxonomic information.
 
@@ -56,6 +62,7 @@ Properties:
     confidences: a dict with the same keys as classifications, and values are the classification confidences returned by RDP"""
 
     def __init__(self, outfile_line,separator=None):
+        #import pdb;pdb.set_trace()
         self.data = outfile_line
         outfile_line = outfile_line.split('\t')
         ids = filter(lambda i: i != '',outfile_line[0].split(separator))
@@ -65,7 +72,7 @@ Properties:
         else:
             #wasn't given a separator or one id is missing, hopefully this means client is not using id
             self.sample_id = self.seq_id = outfile_line[0]
-        rank_indices = [8,11,14,17,20]
+        rank_indices = [5,8,11,14,17,20]
         taxonomic_ranks = [outfile_line[i] for i in rank_indices]
         confidences = [outfile_line[i+2] for i in rank_indices]
         for i,conf in enumerate(confidences):
@@ -73,8 +80,12 @@ Properties:
                 confidences[i] = float(conf)
             except ValueError:
                 confidences[i] = conf.strip()
-        self.classifications = dict(zip(reversed(c.ranks['rdp']),taxonomic_ranks))
-        self.confidences = dict(zip(reversed(c.ranks['rdp']), confidences))
+        ranks = ALL_RANKS#not using c.ranks['rdp'] b/c it does not include domain. Changing it breaks other things
+        self.classifications = dict(zip(ranks,taxonomic_ranks))
+        self.confidences = dict(zip(ranks, confidences))
+        filled = filled_ranks(self.classifications)
+        self.taxonomy_string = str.join(';',(filled[r] for r in ranks))
+
         
 
 def rdp_results(rdp_file,separator):
@@ -121,7 +132,6 @@ def extract_sample_names(fasta_file, seperator):
     return list(set([x[1:].split()[0].split(seperator)[0]
                      for x in open(fasta_file).readlines() if x[0] == ">"]))
 
-
 def merge(samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_file, original_rdp_output_file, seperator):
     samples_in_original_rdp_output = list(set([s.split(seperator)[0] for s in open(original_rdp_output_file).readlines()]))
     print "samples in rdp output:", samples_in_original_rdp_output
@@ -166,7 +176,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
             rdp_output_file_obj.write(line)
         rdp_output_file_obj.close()
 
-        # this could be used for to update FASTA file
+        # this could be used to update FASTA file
         #i = 0
         #while i < len(original_rdp_output_lines):
         #    if original_rdp_output_lines[i].startswith('>'):
@@ -200,12 +210,15 @@ def read_samples_dictionary(serialized_object_file):
 
 def get_otu_library(rdp_output_file):
     """returns a unique list of OTUs that were found in the library"""
+    #poor mans enum:
+    PHYLUM, CLASS, ORDER, FAMILY, GENUS = range(0, 5)
 
     genuses = []
     otu_library = []
 
     for result in rdp_results(open(rdp_output_file),separator=None):#don't care about separator b/c id does not matter at this stage
         #sometimes taxonomic names are empty! gotta fix that!
+        #TODO use filled_ranks instead of this
         last_non_empty_rank = ''
         for i in result.classifications.values():
             if i == "":
@@ -221,39 +234,48 @@ def get_otu_library(rdp_output_file):
 
     return otu_library
 
+def filled_ranks(classifications):
+    result = {}
+    ranks = ALL_RANKS
+    last_filled = ''
+    for r in ranks:
+        result[r] = classifications[r] if classifications[r] != '' else "(%s)" % last_filled
+        last_filled = result[r].strip('()')
 
-def create_samples_dictionary(rdp_output_file, seperator, samples):
+    return result
+
+
+def create_samples_dictionary(rdp_output_file, seperator, samples,threshold=None):
     """reads RDP output file and and creates total count entries in the dictionary for matching samples in the 'samples' list"""
 
     samples_dict = {}
 
-    for line in [l for l in open(rdp_output_file).readlines() if len(l.split("\t")) == 23]:
-        line = line.replace('"', "").strip().split('\t')
-
-        sample = line[0].split(seperator)[0]
-
-        if sample in samples:
+    for res in rdp_results(open(rdp_output_file),seperator):
+        if res.sample_id in samples:
             #line is from a sample we're interested in
 
-            taxonomic_ranks = [['domain', line[5]], ['phylum', line[8]], ['class', line[11]], ['order', line[14]], ['family', line[17]], ['genus', line[20]]]
+            taxonomic_ranks = ['domain', 'phylum', 'class', 'order', 'family', 'genus']
+            taxonomic_ranks = [(k,res.classifications[k]) for k in taxonomic_ranks]
+
 
             #sometimes taxonomic names are empty! gotta fix that!
+            #TODO use filled_ranks instead of this
             last_non_empty_ranks = ['', '']
             for i in range(0, len(taxonomic_ranks)):
-                if taxonomic_ranks[i][1] == "":
-                    taxonomic_ranks[i][1] = "(%s: %s)" % (last_non_empty_ranks[0], last_non_empty_ranks[1])
+                if taxonomic_ranks[i][1] == "" or res.confidences[taxonomic_ranks[i][0]] < threshold:#all numbers are > None
+                    taxonomic_ranks[i] = (taxonomic_ranks[i][0],"(%s: %s)" % (last_non_empty_ranks[0], last_non_empty_ranks[1]))
                 else:
                     last_non_empty_ranks = taxonomic_ranks[i]
-
-            if samples_dict.has_key(sample):
-                samples_dict[sample]['tr'] += 1
+                    
+            if samples_dict.has_key(res.sample_id):
+                samples_dict[res.sample_id]['tr'] += 1
                 for taxonomic_rank in taxonomic_ranks:
-                    if samples_dict[sample][taxonomic_rank[0]].has_key(taxonomic_rank[1]):
-                        samples_dict[sample][taxonomic_rank[0]][taxonomic_rank[1]] += 1
+                    if samples_dict[res.sample_id][taxonomic_rank[0]].has_key(taxonomic_rank[1]):
+                        samples_dict[res.sample_id][taxonomic_rank[0]][taxonomic_rank[1]] += 1
                     else:
-                        samples_dict[sample][taxonomic_rank[0]][taxonomic_rank[1]] = 1
+                        samples_dict[res.sample_id][taxonomic_rank[0]][taxonomic_rank[1]] = 1
             else:
-                samples_dict[sample] = {'tr': 1,
+                samples_dict[res.sample_id] = {'tr': 1,
                                         'domain': {taxonomic_ranks[0][1]: 1},
                                         'phylum': {taxonomic_ranks[1][1]: 1},
                                         'class' : {taxonomic_ranks[2][1]: 1},
