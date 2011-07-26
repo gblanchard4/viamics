@@ -129,3 +129,4 @@ blast_error_name = "blast_error"
 blast_output_name = 'blast_output'
 blast_legend_file_extension = '.blg'
 blast_db_name_path = 'db_name'
+blast_number_of_threads = 4

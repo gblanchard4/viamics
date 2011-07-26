@@ -9,7 +9,7 @@ from framework.tools.helper_functions import SerializeToFile, DeserializeFromFil
 
 sys.path.append('../..')
 
-blastn_cmd = "blastn -query %(fasta)s -outfmt %(fmt)d -num_alignments %(num)d -db %(blast_db)s -out %(blast_out)s"
+blastn_cmd = "blastn -query %(fasta)s -outfmt %(fmt)d -num_alignments %(num)d -db %(blast_db)s -out %(blast_out)s -num_threads "+ str(c.blast_number_of_threads)
 #makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s -title %(name)s -input_type %(input_type)s"
 makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s "
 
