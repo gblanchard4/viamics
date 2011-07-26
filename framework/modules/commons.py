@@ -143,7 +143,7 @@ def simpsons_diversity_dot_plot(p):
 def category_map(p):
     sample_map = open(p.files.sample_map_file_path)
     outfile = open(p.files.category_map_path,'w')
-    headers = [(0,"SampleID"),(1,"group"),(0,"Description")]#seems like a good candidate for constants
+    headers = [(0,"SampleID"),(1,"Group"),(0,"Description")]#seems like a good candidate for constants
     helper_functions.write_category_map(
         helper_functions.category_map(sample_map,headers),
         outfile)

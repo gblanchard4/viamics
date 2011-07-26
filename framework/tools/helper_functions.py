@@ -230,12 +230,14 @@ def seqs(f):
 #Fast UniFrac webapp
 ################################################################################
 NON_ALPHANUMERIC = re.compile('[\W_]+')
+import zipfile
 
 def env_triples(samples_dict, level):
     """A generator of 3-tuples (otu, sample, quantity) for all samples in samples_dict. Level is the taxonomic level (genus, phylum, etc. ) to use for otus"""
     for s_id, sample in samples_dict.iteritems():
         for otu, quant in sample[level].iteritems():
-            yield tuple(map(lambda x: NON_ALPHANUMERIC.sub('.',x),(otu, s_id, quant)))
+            yield tuple(map(lambda x: NON_ALPHANUMERIC.sub('.',x) if not isinstance(x,(int, long, float)) else x,
+                            (otu, s_id, quant)))
 
 
 def category_map(sample_map_lines, headers):
@@ -253,14 +255,20 @@ def category_map(sample_map_lines, headers):
 def write_category_map(rows, map_file):
     """writes each row in rows as a tab-separated spreadsheet row to map_file, and closes map_file."""
     rows = iter(rows)
-    map_file.write('#')
-    write_rows(rows,map_file)
+    def _rows():#add '#' to first row for category map format
+        r_0 = rows.next()
+        r_0 = tuple(('#'+r_0[0],)+r_0[1:])
+        yield r_0
+        for r in rows:
+            yield r
+    write_rows(_rows(),map_file)
     
 
 def write_rows(rows, f,delim='\t'):
-    for r in rows:
-        f.write(str.join(delim,map(lambda x: str.strip(str(x)),r))+'\n')
-    f.close()
+    z = zipfile.ZipFile(f, 'w',zipfile.ZIP_DEFLATED)
+    z.writestr(f.name.split('/')[-1],
+               reduce(lambda a,b: a+b, [str.join(delim,map(lambda x: str.strip(str(x)),r))+'\n' for r in rows]))
+    z.close()
 
 ################################################################################
 #End Fast Unifrac tools

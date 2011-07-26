@@ -21,7 +21,6 @@
 <div class="head">Sample Map » <i>{{ map.name }}</i> in <i>{{ analysis_info.name }}</i></div>
 <div class="title">{{ analysis_id }}</div>
 <div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/">Back to "<b>{{ analysis_info.name }}</b>" Info Page</a></div>
-
 <div class="smallhead">Data</div>
 <br />
 <p class="smallsmallheadtitle">» Samples in the original library: {{ analysis_info.all_unique_samples_list|length }}
@@ -61,9 +60,18 @@
     {% endfor %}
     </div>
 {% else %} 
-    None 
+    <p class="sampleslist">None</p> 
 {% endifnotequal %}
 
+<p class="smallsmallheadtitle">» Export:</p>
+<div class="sampleslist">
+	    <ul>
+	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis_id }}/sampleIDmap.zip">
+	      Sample ID mapping file</a></li>
+	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis_id }}/maps/{{ map.instance }}/categoryMap.zip">
+	      Category mapping file</a></li>
+	    </ul>
+</div>
 
 <div class="smallhead">Heat Maps</div>
 <p class="smallheadtitle">» Images below are the thumbnails of actual heatmaps. You can click on the images to re-generate them with new parameters. You can also download the percent abundance files that has been used to generate these heatmaps by clicking the links next to the taxonomic ranks.
