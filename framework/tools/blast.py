@@ -33,9 +33,11 @@ def make_blastdb(fasta_path, name,output_dir="",error_log=None,input_type="fasta
     if error_log:
         error_log = open(error_log,'w')
     out = os.path.join(output_dir,name)
-    command = makeblastdb_cmd % {"in":fasta_path, "out":out, "name":name,'input_type':input_type}
-    print "\n\nrunning "+command
-    args = shlex.split(str(command))
+    args = shlex.split(str(makeblastdb_cmd))
+    varargs = {"in":fasta_path, "out":out, "name":name,'input_type':input_type}
+    args =  [str(a % varargs) for a in args] 
+    print "\n\nrunning "+str(args)
+    
     exit_val = subprocess.call(args)
     return exit_val
 

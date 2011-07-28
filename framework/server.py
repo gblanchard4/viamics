@@ -473,17 +473,18 @@ returns self.decode_request of the data recieved.
 
 
 #server({'request':'new_blast_db','data_file_path':<datafile>,'db_name':<name>})
-    def create_blast_db(self):#really needs to write_socket before running the BLAST, this is too slow to make an HTTP request wait
+    def create_blast_db(self):
         #maybe need a parallel DB_Meta object for dbs
         fasta_path = self.request_dict['data_file_path']
         name = self.request_dict['db_name']
-        for escape_char in ['/','..']:
+        for escape_char in ['/','..',' ']:
             name = name.replace(escape_char, '_')
         out = os.path.join(c.blastdb_dir,name)#and here, to put all blastdbs in their own folder
         framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
 
         num_seqs = 0#sum((1 for l in open(fasta_path) if l.startswith('>')))
         legend = {'ranks':['species']}#this is where we can store any taxonomic information we have about the db
+        legend['name'] = name
         for s in helper_functions.seqs(open(fasta_path)):
             head = s.split('\n')
             num_seqs += 1
