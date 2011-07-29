@@ -246,7 +246,9 @@ def filled_ranks(classifications):
 
 
 def create_samples_dictionary(rdp_output_file, seperator, samples,threshold=None):
-    """reads RDP output file and and creates total count entries in the dictionary for matching samples in the 'samples' list"""
+    """reads output file and and creates total count entries in the dictionary for matching samples in the 'samples' list. This is the fundamental operation that a module needs to do - the commons module assumes that a samples_dict has already been created for any analysis.
+
+    samples_dict contains the {sample_id:{level:{otu_id:count,...},...},...} information used for the various visual and statistical analyses"""
 
     samples_dict = {}
 

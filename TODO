@@ -13,15 +13,18 @@ important stuff that should not be forgotten.
  - Exception handling should be improved.
  - UNIFRAC analysis and introspection (fairly easy, QIIME could provide
  enough inspiration).
+   -- works for blast, may get to RDP
  - Interface for exporting analysis results (as PDF or, stand-alone static
  web page).
 
 --
 
 (***)
-
+ - Figure out matplotlib backend thing
  - Code needs serious documentation.
  - Unit tests should be finished and complete.
+   -- check for individual files created
+   -- check for results of sample map creation
  - User inputs should be checked (is_fasta(), is_qpcr(), is_env(),
  is_sample_map_valid() and similar control functions should be implemented).
  - ANOVA/MANOVA analysis for sample maps comparing more than 2 groups.

@@ -1,3 +1,23 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2010 - 2011, University of New Orleans
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# Please read the COPYING file.
+#
+# --
+#Contains the process for running a viamics analysis using BLAST, using functions and classes from
+#framework.tools.blast. This depends on blast databases being stored at constants.blastdb_dir, and having blastn
+#blastn and makeblastdb executables on the path
+#
+#If the blastn or makeblastdb programs are throwing errors, one possible cause is spaces in the path to input
+#or output files. I could not for the life of me figure this out, so I just stick underscores in the name the
+#user gives. If Viamics is installed at say /home/username/Desktop/My bioinformatics folder/viamics, there could be a problem. 
 import os
 
 from framework.tools.helper_functions import SerializeToFile, DeserializeFromFile
