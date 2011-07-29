@@ -9,9 +9,44 @@
 <div class="links-bar">{% include "links.tmpl" %}</div>
 
 <div class="text">
-<p>There is nothing to see here yet.
 
-<p>Please don't hesitate to send your questions, feature requests or bug reports to a.murat.eren@gmail.com.
+  <h1>How-tos</h1>
+
+  <h2>Creating blast databases</h2>
+  <ul>
+    <li class="step">On the top-right corner of this page, click "manage BLAST databases". </li>
+    <li class="feedback">You will see a list of names, including gg_coreset, and a box on the right with the heading "Add a new BLAST DB"</li>
+    <li class="step">In the "Add a new BLAST DB" box, type the name you want to save your database under</li>
+    <li class="step">Click the "Choose file" button to select a fasta file from your computer. This file should contain the reference sequences that will be included in the database.</li>
+    <li class="feedback">The sequence headers in this fasta file are relevant. <br />
+      When fasta files (e.g. pyrosequencing results) are BLASTed against the database you are uploading, sequences in the file will be classified according to the header of the sequence they aligned with. There are currently two supported formats for these headers:
+      <p>ID only - e.g. "&gt;145928". Each sequence in the DB has a unique id in this format. Query sequences will be given the label of the sequence they are aligned with. </p>
+      <p>Additional info - e.g. "&gt;5524211|gb|AAD44166.1| cytochrome b |Elephas maximus maximus". If the header of a sequence in the database contains a pipe (|) character, it will be split into sections at each pipe and query sequences that align with it will be labeled according to the last section. E.g. query sequences that match a reference sequence with the above header will be labeled "Elephas maximus maximus". The first section should still be a uniqe id for every reference sequence</p>
+    </li>
+    <li class="step">After selecting a file, click the "upload" button to add your database. </li>
+    <li class="feedback">If the database creation succeeds, a popup window will appear with the message "uploaded", and after clicking OK the name you provided will appear in the list of databases</li>
+  </ul>
+
+  <h2>Exporting for UniFrac analysis</h2>
+  <ul>
+    <li class="step">Create a new BLAST analysis for your sequences. Select gg_coreset as the DB name when creating the analysis.</li>
+    <li class="step">When the analysis is created, create a sample map in it. The groups you assign within the sample map are the groups you will be able to manipulate in the UniFrac interface. </li>
+    <li class="step">After the sample map is created, open it.</li>
+    <li class="feedback">In the first section of the page, "Data", there are two links, "Sample ID mapping file" and "Category mapping file". These are two of the three files required for fast UniFrac. Since you used the greengenes coreset as your reference database, the third is already on the UniFrac server.</li>
+    <li class="step">Download the files by clicking their respective links. </li>
+    <li class="step"> see the <a href="http://bmf2.colorado.edu/fastunifrac/tutorial.psp">fast UniFrac tutorial</a> for steps from here.</li>
+  </ul>
+
+  <h2>Strip barcodes/primers, and split fasta file by sample</h2>
+  <ul>
+    <li class="step">Open the <a href="{{ request.META.HTTP_HOST }}/stripsplit/">split/strip webapp</a></li>
+    <li class="step">Select the two files two upload. </li>
+    <li class="feedback">The keys file is the .txt file that comes with the pyrosequencing data. It has four columns, (#SampleID, BarcodeSequence, LinkerPrimerSequence, Description) and may have the word "mapping" in its name. Fasta is the file containing the sequences.</li>
+    <li class="step">Click "submit".</li>
+    <li class="feedback">Your browser should download a zip file containing one fasta file for each sample, with primers and barcodes stripped.</li>
+  </ul>
+
+<p>Please don't hesitate to send your questions, feature requests or bug reports to a.murat.eren@gmail.com, or johnnybrown7@gmail.com.</p>
 </div>
 
 {% endblock %} 

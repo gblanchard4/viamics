@@ -360,3 +360,11 @@ a.boxpopup3:hover span{ /*DISPLAYS ONLY ON HOVER*/
   background:#EFEFFF;
   padding: 10px;}
 
+li.step {
+    font-weight: bold;
+    }
+
+li.feedback {
+    list-style: none;
+    padding-left: 10px;
+    }
