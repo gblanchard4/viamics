@@ -59,7 +59,18 @@ Viamics and if you need any help please don't hesitate to send an e-mail to:
 
  Sorry for this temporary mess and inconvenience.
 
---
+# APT INSTALLATION SCRIPT FOR UBUNTU/DEBIAN:
+#     This python script: https://raw.github.com/meren/viamics/install/install.py will 
+#     download all dependencies and install Viamics using the apt package manager and
+#     other sources (cran for R packages, pip for certain python modules).
+#
+#     After running the install script:
+cd viamics/framework;python server.py # start the viamics server
+cd viamics/framework/clients/ferrisweb;python manage.py runserver # start the django web interface
+
+# go to http://localhost:8000 in your browser to try it out
+
+--------------------------------------------------------------------------------
 
 # The framework was developed and tested on Pardus Corporate (64 bit) version.
 # It should work on any Linux distribution and even Mac, but most of the
