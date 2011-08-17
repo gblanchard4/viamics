@@ -321,8 +321,69 @@ def is_sample_map_valid(file_path):
     return True
 
 def is_fasta_valid(file_path):
-    return True
+    """Checks if a file is a valid FASTA file.
+    Viamics only handles nucleotide bases, and doesn't complain about how the
+    sequence is laid out in lines as long as it is not broken by any blank ones
 
+    The file will be validated according to the following grammar:
+    
+    <file>     ::= <token> | <token> <file>
+    <token>    ::= <ignore> | <seq>
+    <ignore>   ::= <whitespace> | <comment> <newline>
+    <seq>      ::= <header> <molecule> <newline>
+    <header>   ::= ">" <arbitrary text> <newline>
+    <molecule> ::= <base> | <base> <molecule>
+    <base>     ::= "^[ACGTURYKMSWBDHVNX-]+$" 
+    """
+
+    dna = re.compile("^[ACGTURYKMSWBDHVNX-]+$")
+    
+    try:
+        fas = open(file_path)
+    except TypeError:
+        fas = file_path
+
+    def ignore(f):
+        l = f.readline()
+        if l.strip() == '' or l.startswith(';'):
+            return True
+        else:
+            f.seek(-1*len(l),1)#put the line back
+            #print l
+            return False
+            
+    def header(f):
+        l = f.readline()
+        if l.startswith('>'):
+            return True
+        else:
+            f.seek(-1*len(l),1)#put the line back
+            #print l
+            return False
+
+    def molecule(f):
+        l = f.readline()
+        valid = False
+        while(dna.match(l.strip())):
+            valid = True
+            l = f.readline()
+        f.seek(-1*len(l),1)
+        return valid
+
+    def seq(f):
+        return header(f) and molecule(f)
+
+
+    def token(f):
+        return ignore(f) or seq(f)
+
+    valid = True
+    while(valid and fas.read(10) != ''):
+        fas.seek(-10,1)
+        valid = token(fas)
+
+    return valid
+    
 def get_sha1sum(file_path):
     h = hashlib.sha1()
     h.update(open(file_path, "rb").read())

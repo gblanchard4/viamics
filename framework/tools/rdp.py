@@ -12,12 +12,16 @@
 #
 # --
 #
-# Module functions for RDP.
+################################################################################
+#RDP stuff.
 #
-#An assumption throughout this module (and all of viamics) is that the ids of FASTA sequences are composed of a sample id,
-#which labels a group of sequences, and a unique sequence id. These are located directly after the '>', and are
+#Tools for analysing a FASTA file using the RDP classifier
+#
+#An assumption throughout this module (and all of viamics) is that the ids of
+#FASTA sequences are composed of a sample id, which labels a group of sequences,
+#and a unique sequence id. These are located directly after the '>', and are
 #separated by a variable separator character.
-#
+################################################################################
 # example run:
 #
 # python rdp_classifier_run.py -f BV/ferris92Labeled.fas -o RDP_output_of_all_BV.txt -s '_' -r RDP_Classifier/rdp_classifier_2.1/ -p ABUNDANCE
@@ -40,12 +44,12 @@ from optparse import OptionParser
 sys.path.append("../../")
 from framework.tools import helper_functions
 
-#I want to have 'domain' in RDPResult.classifications, but adding it to c.ranks['rdp'] breaks other
-#things in the web client. 
+#I want to have 'domain' in RDPResult.classifications, but adding it to
+#c.ranks['rdp'] breaks other things in the web client. hence:
 ALL_RANKS = ['domain', 'phylum', 'class', 'order', 'family', 'genus']
 
 
-"""MZH-92_F58614Y04IOLGX\t\t\t\t\tBacteria\tdomain\t1.0\t"Fusobacteria"\tphylum\t1.0\t"Fusobacteria"\tclass\t1.0\t"Fusobacteriales"\torder\t1.0\t"Leptotrichiaceae"\tfamily\t1.0\tSneathia\tgenus\t1.0\n"""#breaks constructtor
+"""MZH-92_F58614Y04IOLGX\t\t\t\t\tBacteria\tdomain\t1.0\t"Fusobacteria"\tphylum\t1.0\t"Fusobacteria"\tclass\t1.0\t"Fusobacteriales"\torder\t1.0\t"Leptotrichiaceae"\tfamily\t1.0\tSneathia\tgenus\t1.0\n"""#breaks constructor
 
 class RDPResult:
     """    The constructor for this class takes a single line from the RDP output in  'fixrank' format, from which it can read the taxonomic information.
@@ -124,13 +128,6 @@ def run_classifier(rdp_running_path, fasta_file, rdp_output_file, error_log = '/
     #ret_val = os.system(cmd % {'fasta_file': fasta_file, 'rdp_output_file': rdp_output_file, 'error_log': error_log})
     os.chdir(cur_dir)
     return (ret_val, error_log)
-
-
-def extract_sample_names(fasta_file, seperator):
-    """finds unique sample names within the entire library, e.g., returns MZH-92 for MZH-92_F58614Y04I2TQV,
-       MZH-92_F58614Y04I2TQV, MZH-92_F58614Y04IXSC2 and MZH-92_F58614Y04IKEJL"""
-    return list(set([x[1:].split()[0].split(seperator)[0]
-                     for x in open(fasta_file).readlines() if x[0] == ">"]))
 
 def merge(samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_file, original_rdp_output_file, seperator):
     samples_in_original_rdp_output = list(set([s.split(seperator)[0] for s in open(original_rdp_output_file).readlines()]))
@@ -544,7 +541,17 @@ def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_li
     pylab.close('all')
 
 
+def extract_sample_names(fasta_file, seperator):
+    """finds unique sample names within the entire library, e.g., returns MZH-92 for MZH-92_F58614Y04I2TQV,
+       MZH-92_F58614Y04I2TQV, MZH-92_F58614Y04IXSC2 and MZH-92_F58614Y04IKEJL"""
+    return list(set([x[1:].split()[0].split(seperator)[0]
+                     for x in open(fasta_file).readlines() if x[0] == ">"]))
 
+
+
+################################################################################
+#Command line usage:
+################################################################################
 def main(options, samples):
     error_val, error_log = run_classifier(options.rdp_running_path, options.fasta_file, options.rdp_output_file)
     # fix error handling..
