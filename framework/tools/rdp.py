@@ -12,10 +12,16 @@
 #
 # --
 #
-# Module functions for RDP.
+################################################################################
+#RDP stuff.
 #
-
+#Tools for analysing a FASTA file using the RDP classifier
 #
+#An assumption throughout this module (and all of viamics) is that the ids of
+#FASTA sequences are composed of a sample id, which labels a group of sequences,
+#and a unique sequence id. These are located directly after the '>', and are
+#separated by a variable separator character.
+################################################################################
 # example run:
 #
 # python rdp_classifier_run.py -f BV/ferris92Labeled.fas -o RDP_output_of_all_BV.txt -s '_' -r RDP_Classifier/rdp_classifier_2.1/ -p ABUNDANCE
@@ -473,6 +479,11 @@ def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_li
 
 
 
+
+
+################################################################################
+#Command line usage:
+################################################################################
 def main(options, samples):
     error_val, error_log = run_classifier(options.rdp_running_path, options.fasta_file, options.rdp_output_file)
     # fix error handling..
