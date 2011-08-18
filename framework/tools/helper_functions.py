@@ -28,6 +28,7 @@ import socket
 import string
 import hashlib
 import cPickle
+import re
 
 from scipy import log2
 
@@ -316,10 +317,12 @@ def is_fasta_valid(file_path):
         return ignore(f) or seq(f)
 
     valid = True
-    while(valid and fas.read(10) != ''):
-        fas.seek(-10,1)
+    done = '1'
+    while(valid and done != ''):
+        done = fas.read(10)
+        fas.seek(-1*len(done),1)
         valid = token(fas)
-
+        
     return valid
     
 def get_sha1sum(file_path):
