@@ -22,6 +22,9 @@
 <div class="head" style="background: url(/static/{{ analysis.info.type }}.png) bottom right no-repeat;">Info » {{ analysis.info.name }}</div>
 <div class="title">{{ analysis.info.id }}</div>
 <div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis.info.id }}/0">Create New Sample Map</a></div>
+{% if analysis.info.data_comment %}
+     <p class="info">{{ analysis.info.data_comment|linebreaksbr }}</p>
+{%  endif %}
 
 <div class="smallhead">Table of Contents</div>
 <div class="toc">

@@ -21,10 +21,25 @@ import framework.tools.rdp
 
 from framework import constants as c
 from framework.tools import helper_functions
+from framework.tools import fasta
 
 from framework.tools.logger import debug
 from framework.tools.helper_functions import DeserializeFromFile, SerializeToFile, GetCopy
 
+def _preprocess(p, request_dict):
+    #fasta.stripped specifies an open keyfile object, but all it does is
+    #"for line in keys" so a list of strings works here. Using a list avoids all
+    #the nonsense of sending another file from the client.
+    mode = request_dict.get("qa_mode")
+    
+    return fasta.fasta_qa_preprocess(
+        mode,
+        request_dict.get("data_file_path"),
+        request_dict.get("codes_primers"),#keyfile. see above
+        chimeras = request_dict.get("chim"),
+        homopolymer_length = request_dict.get("homopolymer_length"))
+                                     
+    
 def _exec(p, request_dict):
     """execute a pristine analysis with"""
 
@@ -40,6 +55,13 @@ def _exec(p, request_dict):
         with open(p.files.threshold_path,'w') as f:
             f.write(str(p.threshold))
 
+    debug("Extracting QA info", p.files.log_file)
+    cmt = open(p.files.data_comment_file_path,'w')
+    for line in open(p.files.data_file_path):
+        if line.startswith(';'):
+            cmt.write(line)
+    cmt.close()
+            
     #running rdp on data
     number_of_sequences = helper_functions.get_number_of_lines(p.files.data_file_path) / 2
     debug("running rdp on %d sequences" % number_of_sequences, p.files.log_file)
@@ -190,3 +212,4 @@ def separate_low_confidence(p):
     for s in lo_seqs:
         o.write(s)
     o.close()
+

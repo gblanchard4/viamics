@@ -12,7 +12,7 @@
 <div class="form">
 <form enctype="multipart/form-data" method="post" action="/new/rdp/">
 <div class="fields">
-{{ form.as_p }}
+{% include "general_fasta_form.tmpl"%}
 <a href="#" onclick="prepend_input(this,this.parentElement.childElementCount);"><p>More Files <img src="/static/pulldown.jpg" /></p></a>
 </div>
 <input type="submit" value="Submit" />

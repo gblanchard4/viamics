@@ -14,7 +14,7 @@ import unittest
 sys.path.append("../../")
 
 from framework import constants as c
-from framework.tools import helper_functions
+from framework.tools import helper_functions, fasta
 
 
 class Tests(unittest.TestCase):
@@ -23,18 +23,58 @@ class Tests(unittest.TestCase):
         self.test_fasta_file = J('example_fasta')
         self.split_analysis = [J(s) for s in ['split1.fna','split2.fna']]
         self.confidence = J('confidence_levels.fas')
+        self.QA_test_fasta = J("QA_test_fasta")
+        self.QA_keyfile = J('QA_keyfile')
+        self.QA_result = J('QA_stripped')
         self.analysis_id = helper_functions.get_sha1sum(self.test_fasta_file) + "-test"
         self.rdp_analysis_dir = os.path.join(c.analyses_dir, self.analysis_id)
+
+        self.test_files = [self.test_fasta_file,
+                           self.confidence,
+                           self.QA_test_fasta]+self.split_analysis
         
     def tearDown(self):
-        test_files = [self.test_fasta_file,self.confidence]+self.split_analysis
-        for t in test_files:
+        
+        for t in self.test_files:
             self.server({'request': 'remove_analysis',
                      'analysis_id': helper_functions.get_sha1sum(t)+'-test'})
             
 
     def server(self, request):
         return helper_functions.server(request)
+
+    def analysis_complete(self,id):
+        analysis_dir = os.path.join(c.analyses_dir, id)
+
+        self.assertTrue(os.path.exists(analysis_dir))
+        
+        images = ['simpsons_diversity_index.png',
+                  'rarefaction_all_samples.png',
+                  'rdp_confidence_per_sample.png',
+                  'rdp_confidence.png',
+                  'samples_sequences_bar.png',
+                  'shannon_diversity_index.png',]
+        for i in images:
+            self.assertTrue(os.path.exists(os.path.join(analysis_dir,i)),
+                            msg="Failed to find:" + i)
+            
+        files = ['otu_library',
+                 'rarefaction_dict',
+                 'rdp_output',
+                 'taxa_color_dict',
+                 'samples_dict_serialized',
+                 'type_of_analysis',
+                 'unique_sample_names']
+        for f in files:
+            self.assertTrue(os.path.exists(os.path.join(analysis_dir,f)))
+
+        dirs = ['maps',
+                'piecharts',
+                'rarefaction',
+                'type_specific_figures']
+        for d in dirs:
+            self.assertTrue(os.path.exists(os.path.join(analysis_dir, d)))
+        
 
     def testRDP(self):
         server_request = {'request': 'exec_analysis',
@@ -47,24 +87,12 @@ class Tests(unittest.TestCase):
         server_response = self.server(server_request)
         self.assertTrue(os.path.exists(self.rdp_analysis_dir))
 
-        images = ['rarefaction_all_samples.png', 'rdp_confidence_per_sample.png', 'rdp_confidence.png', 'samples_sequences_bar.png', 'shannon_diversity_index.png', 'simpsons_diversity_index.png']
-        for i in images:
-            self.assertTrue(os.path.exists(os.path.join(self.rdp_analysis_dir, i)))
-
-        files = ['otu_library', 'rarefaction_dict', 'rdp_output', 'taxa_color_dict', 'samples_dict_serialized', 'type_of_analysis', 'unique_sample_names']
-        for f in files:
-            self.assertTrue(os.path.exists(os.path.join(self.rdp_analysis_dir, f)))
-
-        dirs = ['maps', 'piecharts', 'rarefaction', 'type_specific_figures']
-        for d in dirs:
-            self.assertTrue(os.path.exists(os.path.join(self.rdp_analysis_dir, d)))
-
+        self.analysis_complete(self.analysis_id)
 
         server_request = {'request': 'remove_analysis',
                           'analysis_id': self.analysis_id}
         server_response = self.server(server_request)
-        for d in dirs:
-            self.assertFalse(os.path.exists(os.path.join(self.rdp_analysis_dir, d)))
+
         self.assertFalse(os.path.exists(self.rdp_analysis_dir))
 
     def testAppend(self):
@@ -110,11 +138,39 @@ class Tests(unittest.TestCase):
         i = self.server({'request':'info','resource':'analysis','analysis_id':id})
         n_low = count_seqs(open(os.path.join(c.analyses_dir,id,c.low_confidence_seqs_file_name)))
         print 'should be 11: '+str(n_low)
-        self.assertTrue(n_low == 11)
+        self.assertTrue(n_low == 11)#expect occasional random failure
         self.server({'request': 'remove_analysis',
                      'analysis_id': id})
 
+    def testStrip(self):
+        id = helper_functions.get_sha1sum(self.QA_test_fasta)+'-test'
+        keyfile = open(self.QA_keyfile).readlines()
         
         
+        self.server({'request':'exec_analysis',
+                     'data_file_sha1sum':id,
+                     'data_file_path':self.QA_test_fasta,
+                     'seperator':'_',
+                     'job_description':'QA test',
+                     'analysis_type':'rdp',
+                     'codes_primers':keyfile,
+                     "qa_mode":fasta.STRIP_BARCODES_PRIMERS,
+                     #'return_when_done': True,
+                     })
+        i = self.server({'request':'info',
+                         'resource':'analysis',
+                         'analysis_id':id})
+        while(True):
+            dat = open(os.path.join(c.analyses_dir,id,'log'))
+            try:                
+                dat.read().index("Filling job description")
+                dat.close()
+                break
+            except:
+                dat.close()
 
+        correct = helper_functions.get_sha1sum(self.QA_result)
+        framework = helper_functions.get_sha1sum(self.QA_test_fasta)
         
+        #self.analysis_complete(id)
+                    

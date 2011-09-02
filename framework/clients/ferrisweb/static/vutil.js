@@ -1,8 +1,24 @@
 function hide(el){document.getElementById(el).style.display = 'none'}
 
-function show(el){document.getElementById(el).style.display = 'block'}
+function show(el,display){
+    var display = display ? display : "block";
+    document.getElementById(el).style.display = display;
+}
 
 function swap(a,b){hide(a);show(b);}
+
+function set_disabled(el,newval)
+{
+    el.disabled = newval
+}
+
+function set_dependent(container, newval) 
+{
+    var inputs =container.getElementsByTagName("input");
+    var selects = container.getElementsByTagName("select");
+    $.each(inputs, function(i, el){ set_disabled(el,newval)});
+    $.each(selects, function(i, el){ set_disabled(el,newval)});
+}
 
 function prepend(obj,new_element)
 {

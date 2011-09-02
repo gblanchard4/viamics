@@ -42,6 +42,12 @@ from framework.clients.ferrisweb import webforms
 
 server = helper_functions.server
 
+templates = {"rdp":"fasta_upload_form.tmpl",
+             "qpcr":"qpcr_upload_form.tmpl",
+             "env":"env_upload_form.tmpl",
+             "vamps":"vamps_upload_form.tmpl"}
+
+
 def server_err(server_dict):
     if server_dict.has_key('response'):
         return server_dict['response'] == 'error'
@@ -210,13 +216,14 @@ def heatmap_detail(request, analysis_id, instance, rank):
         pass
 
 
-    return HttpResponse(get_template("heatmap_detail.tmpl").render(Context({'options': options,
-                                                                            'analysis_name': analysis_name,
-                                                                            'analysis_id': analysis_id,
-                                                                            'image': image,
-                                                                            'rank': rank,
-                                                                            'sample_map_name': sample_map_name,
-                                                                            'instance': instance})))
+    return HttpResponse(get_template("heatmap_detail.tmpl").render(
+        Context({'options': options,
+                 'analysis_name': analysis_name,
+                 'analysis_id': analysis_id,
+                 'image': image,
+                 'rank': rank,
+                 'sample_map_name': sample_map_name,
+                 'instance': instance})))
 
 def csvformat(text):
     n_rows = 2
@@ -230,7 +237,7 @@ def rowfrom(line,rowlen):
     if len(l) != rowlen:
         l = [i for i in line.split(',') if i.strip() != '']
     if len(l) == rowlen:
-        return tuple([i.strip(""" '" """) for i in l])#remove any quotes surrounding the cell
+        return tuple([i.strip(""" "' """) for i in l])#remove any quotes surrounding the cell'
     elif len(l) == 0:
         return ('',) * rowlen
     else:
@@ -614,10 +621,13 @@ def new_analysis(request, analysis_type):
             job_description = form.cleaned_data['job_description']
             time_stamp = helper_functions.get_time_stamp()
             if len(request.FILES) == 1:
-                data_file_path = helper_functions.save_uploaded_file(form.cleaned_data['data_file'],
-                                                                     time_stamp, output_file_name = constants.data_file_name)
+                data_file_path = helper_functions.save_uploaded_file(
+                    form.cleaned_data['data_file'],
+                    time_stamp, output_file_name = constants.data_file_name)
             elif len(request.FILES) > 1:
-                data_file_path = cat(request.FILES.values())
+                files = [request.FILES[f] for f in request.FILES.keys() if
+                         f.startswith("data_file")]
+                data_file_path = cat(files)
 
             data_file_sha1sum = helper_functions.get_sha1sum(data_file_path)
 
@@ -638,20 +648,33 @@ def new_analysis(request, analysis_type):
                               'data_file_path': data_file_path,
                               'data_file_sha1sum': data_file_sha1sum}
 
-            #update server request if we're here for rdp analysis
-            if analysis_type == "rdp":
-                server_request['seperator'] = form.cleaned_data['seperator']
-            if float(form.cleaned_data.get('threshold')):
-                server_request['threshold'] = float(form.cleaned_data['threshold'])
+            #update server request with special options for certain analysis types
+            #if your module needs information not contained in a standard request,
+            #(say phase of the moon or something), add it here in a tuple of
+            #(name, function) where name is the name attribute in the form, and
+            #the function converts the or cleaned_data into
+            #whatever it needs to be
+            special_options = [("seperator",str),
+                               ("qa_mode", int),
+                               ("threshold",float),
+                               ("codes_primers",list),
+                               ("homopolymer_length",int),
+                               ("chim",bool)]
+            for opt in special_options:
+                if form.cleaned_data.get(opt[0]):
+                    server_request[opt[0]] = opt[1](form.cleaned_data[opt[0]])
+                    
+             
 
             server_response = server(server_request)
 
             if server_response['response'] == 'OK':
                 return HttpResponse(get_template("simple.tmpl").render(Context({'content': "Your request is being processed. This is your process id: %s" % server_response['process_id']})))
             else:
-                return HttpResponse(get_template("simple.tmpl").render(Context({'content': "something happened. has no clue. seriously :("})))
+                return HttpResponse(get_template("simple.tmpl").render(Context({'content': "Server error:"+str(server_response.get("exception"))})))
         else:
-            return HttpResponse(get_template("error.tmpl").render(Context({'content': "Form wasn't valid :( Please click 'back' button of your browser and re-submit the form."})))
+            return HttpResponse(get_template(templates[analysis_type]).render(
+                Context({"form":form})))
     else:
         if analysis_type == "rdp":
             form = webforms.FastaUploadForm()

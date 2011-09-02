@@ -41,6 +41,8 @@ except AttributeError:
     print "'rdp_running_path' needs to be defined in config.py"
     sys.exit(-1)
 
+uchime_running_path = config.uchime_running_path if config.uchime_running_path else ''
+
 
 
 #################################################################
@@ -78,6 +80,7 @@ low_confidence_seqs_file_name = 'low_confidence_seqs'
 threshold_file_name           = 'confidence_threshold'
 
 data_file_name = "data_file"
+data_comment_file_path = "data_comments"
 seperator_file_name = "seperator"
 job_name_file_name = "job"
 log_file_name = "log"
