@@ -57,6 +57,19 @@ def analyses(request):
     else:
         return err_response({'content':'Only the GET method is implemented for this resource'})
 
+def get_low_confidence_seqs():
+
+    file_path = os.path.join(constants.analyses_dir, analysis_id,constants.low_confidence_seqs_file_name)
+    
+    if (os.path.exists(file_path)):
+        response = HttpResponse(FileWrapper(open(file_path)))
+        response['Content-Disposition'] = 'attachment; filename=low-confidence.fas'
+    else:
+        response = HttpResponse("file not found", status=404)
+
+    return response
+
+
 
 def blastdbs(request):
     #import pdb; pdb.set_trace()

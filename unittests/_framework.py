@@ -19,9 +19,10 @@ from framework.tools import helper_functions
 class Tests(unittest.TestCase):
     def setUp(self):
         self.socket_name = c.socket_name
-        self.rdp_analysis_dir = os.path.join(c.analyses_dir, "b7782ab61207929a9e8a2f12eb52b977800d8979-test")
         self.test_fasta_file = os.path.join(c.base_dir, "../", 'unittests/test_files/example_fasta')
         self.analysis_id = helper_functions.get_sha1sum(self.test_fasta_file) + "-test"
+        self.rdp_analysis_dir = os.path.join(c.analyses_dir,
+                                             self.analysis_id)
 
 
     def server(self, request):

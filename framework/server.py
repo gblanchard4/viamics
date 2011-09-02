@@ -224,9 +224,13 @@ returns self.decode_request of the data recieved.
         return self.decode_request(data)
 
     def remove_analysis(self):
+        self._remove_analysis()
+        
+        self.write_socket({'response': 'OK'})
+
+    def _remove_analysis(self):
         analysis_id             = self.request_dict['analysis_id']
 
-        #import pdb; pdb.set_trace()
         p = Meta(analysis_id)
 
         if analysis_id in self.serverstate.running_analyses:
@@ -236,14 +240,13 @@ returns self.decode_request of the data recieved.
 
         shutil.rmtree(p.dirs.analysis_dir)
 
-        self.write_socket({'response': 'OK'})
-
 
     def exec_analysis(self):
         analysis_id             = self.request_dict['data_file_sha1sum']
         data_file_temp_path     = self.request_dict['data_file_path']
         job_description         = self.request_dict['job_description']
         analysis_type           = self.request_dict['analysis_type']
+        analysis_module	        = server_modules_dict[analysis_type]
 
         late_response_request = self.request_dict.has_key('return_when_done') and self.request_dict['return_when_done'] == True
         #import pdb; pdb.set_trace()
@@ -261,26 +264,51 @@ returns self.decode_request of the data recieved.
         debug("Server state is being updated, running processes.APPEND(this)", p.files.log_file)
         self.serverstate.running_analyses.append(analysis_id)
 
-        debug("Copying data file", p.files.log_file)
-        shutil.copy(data_file_temp_path, os.path.join(p.dirs.analysis_dir, c.data_file_name))
+        
+        ########################################################################
+        #in addition to copying the file, the module can perform any pre-
+        #processing at this stage e.g. stripping barcodes/primers, chimera
+        #checking, etc. 
+        ########################################################################
+        try:
+            if hasattr(analysis_module, "_preprocess"):
+                data_file = analysis_module._preprocess(p,self.request_dict)
+            else:
+                data_file = open(data_file_temp_path)
+            data_file_dest = open(os.path.join(p.dirs.analysis_dir,
+                                               c.data_file_name),'w')
+                
+            debug("Copying data file", p.files.log_file)
+            for line in data_file:
+                data_file_dest.write(line)
+            data_file.close()
+            data_file_dest.close()
+    
+            ################################################################
+    
+            debug("Filling job description: '%s'" % job_description, p.files.log_file)
+            open(p.files.job_file, 'w').write(job_description + '\n')
+        except:
+            self.request_dict["analysis_id"] = analysis_id
+            self._remove_analysis()
+            raise
 
-        debug("Filling job description: '%s'" % job_description, p.files.log_file)
-        open(p.files.job_file, 'w').write(job_description + '\n')
 
         if late_response_request is False:
             debug("Response is being sent", p.files.log_file)
             self.write_socket({'response': 'OK', 'process_id': analysis_id})
 
-        ################################################################
-        # call sever modules..
+    
+        # call server modules..
         ################################################################
         # analysis specific stuff.
         server_modules_dict[analysis_type]._exec(p, self.request_dict)
-
+    
         # common analysis routines..
+        
         server_modules_dict['commons']._exec(p, self.request_dict)
         ################################################################
-
+        
         # update server state so the info page is browsable.
         debug("Server state is being updated, running analyses.REMOVE(this), done analyses.APPEND(this)", p.files.log_file)
         self.serverstate.running_analyses.remove(analysis_id)
@@ -780,7 +808,12 @@ returns self.decode_request of the data recieved.
                      'shannon_diversity_index_img': os.path.join(analysis_id, c.shannon_diversity_index_img_name),
                      'simpsons_diversity_index_img': os.path.join(analysis_id, c.simpsons_diversity_index_img_name),
                      'shannon_diversity_index_data': os.path.join(analysis_id, c.shannon_diversity_index_data_name),
-                     'simpsons_diversity_index_data': os.path.join(analysis_id, c.simpsons_diversity_index_data_name)}
+                     'simpsons_diversity_index_data': os.path.join(analysis_id, c.simpsons_diversity_index_data_name)
+                                           }
+        #
+        if(os.path.exists(p.files.data_comment_file_path)):
+            info_dict['data_comment'] = open(p.files.data_comment_file_path).read().replace(';','')
+            
 
         self.write_socket({'response': 'OK', 'info': info_dict})
 
@@ -898,6 +931,8 @@ class Files:
         self.shannon_diversity_index_data_path   = os.path.join(dirs.analysis_dir, c.shannon_diversity_index_data_name)
         self.blast_output_file_path                = J(c.blast_output_name)
         self.blast_db_name_path                    = J(c.blast_db_name_path)
+        self.low_confidence_seqs_path              = J(c.low_confidence_seqs_file_name)
+        self.threshold_path                        = J(c.threshold_file_name)
 
         #sample map stufff
         self.sample_map_name_file_path                     = None
@@ -908,6 +943,8 @@ class Files:
         self.category_map_path                             = None
 
         self.taxa_color_dict_file_path         = J(c.taxa_color_dict_file_name)
+
+        self.data_comment_file_path = J(c.data_comment_file_path)
 
     def update_sample_map_files_info(self):
         J = lambda x: os.path.join(self.dirs.sample_map_instance_dir, x)
