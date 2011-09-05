@@ -1,20 +1,15 @@
-{% extends "base.tmpl" %}
+{% extends "fasta_upload_form.tmpl" %}
 
 {% block title %}Info..{% endblock %}
 
-{% block content %}
-<div class="head">Viamics » New BLAST Analysis</div>
-<div class="title">Select a database and upload your sequences</div>
-<div class="links-bar">{% include "links.tmpl" %}</div>
+{% block header %}Viamics » New BLAST analysis{% endblock header %}
 
-<p class="info">Hai there.
+{% block info %}Upload FASTA file for analysis{% endblock info%}
 
-<div class="form">
-<form enctype="multipart/form-data" method="post" action="/new/blast/">
-<table>
-{{ form.as_table }}
-</table>
-<input type="submit" value="Submit" />
-</form>
-</div>
-{% endblock %}
+{% block extra_fields %}
+   <p >
+  {{ form.db_name.errors }}<label class="{% if form.db_name.errors %}error_field{% endif %}" for="id_db_name">BLAST database:</label>
+  {{ form.db_name}}
+</p>
+
+{% endblock extra_fields %}

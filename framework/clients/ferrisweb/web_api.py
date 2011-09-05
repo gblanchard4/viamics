@@ -100,13 +100,16 @@ def blastdb(request, db_name):
 def blast_request(request, req_type):
     if len(request.FILES)>0:#uploaded file
         #import pdb;pdb.set_trace()
-        tmp_data_file = os.path.join(constants.temp_files_dir,request.POST['db_name'])
+        tmp_data_file = os.path.join(constants.temp_files_dir,request.POST['db_name'].replace(' ',"_"))
         f = open(tmp_data_file,'w')
         f.write(request.FILES[request.FILES.keys()[0]].read())
         f.close()
         if request.POST['file_type'] == 'fasta':
             req = {'request':req_type,'data_file_path':tmp_data_file,'db_name':request.POST['db_name']}
-            return server_resp_json(req)
+            r = server_resp_json(req)
+            os.unlink(tmp_data_file)
+            return r
+        
         elif request.POST['file_type'] == 'blast_db':
             pass#TODO basically just give the file to the server and let it save it.
     else:

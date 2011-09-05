@@ -3,19 +3,92 @@
 {% block title %}Info..{% endblock %}
 
 {% block content %}
-<div class="head">Viamics » New Pyrosequencing Analysis</div>
+<div class="head">{% block header %}
+Viamics » New Pyrosequencing Analysis
+{% endblock header %}</div>
 <div class="title">Hmm..</div>
 <div class="links-bar">{% include "links.tmpl" %}</div>
 
-<p class="info">Upload your sequences for analysis. If you provide a confidence threshold (between 0 and 1), any sequences classified with a confidence lower than the threshold will be regarded as unclassified.</p>
-
+<p class="info">{% block info%}Upload your sequences for analysis. If you provide a confidence threshold (between 0 and 1), any sequences classified with a confidence lower than the threshold will be regarded as unclassified.{% endblock info%}</p>
+<!-- Upload form -->
 <div class="form">
-<form enctype="multipart/form-data" method="post" action="/new/rdp/">
+<form enctype="multipart/form-data" method="post" action="{{ form.CREATE_URL }}">
 <div class="fields">
-{% include "general_fasta_form.tmpl"%}
+
+{{ form.non_field_errors }}
+
+<p >
+  {{ form.job_description.errors }} <label class="{% if form.job_description.errors %}error_field{% endif %}" for="id_job_description">Job description:</label>
+  {{ form.job_description}} </p>
+
+<p >
+  {{ form.seperator.errors }}<label class="{% if form.seperator.errors %}error_field{% endif %}" for="id_seperator">Seperator:</label>
+  {{ form.seperator }}
+</p>
+{% block extra_fields %}
+<p >
+  {{ form.threshold.errors }}<label class="{% if form.threshold.errors %}error_field{% endif %}" for="id_threshold">Confidence threshold:</label>
+  {{ form.threshold}}
+</p>
+
+{% endblock extra_fields %}
+
+<div class="connected">
+<p >
+  {{ form.strip.errors }}<label class="{% if form.strip.errors %}error_field{% endif %}" for="id_strip">Strip barcodes and primers?</label> {{ form.strip }}</p> 
+
+<!-- The all_strip div controls which fields are dependent on the
+     'strip' checkbox -->
+<div id="all_strip">
+<p>{{ form.keyfile.errors }}<label class="{% if form.keyfile.errors %}error_field{% endif %}" for="id_keyfile">Keyfile (barcodes and primers):</label> {{ form.keyfile }}</p>
+
+<p >
+  {{ form.strip_mode_errors }}<label class="{% if form.strip_mode.errors %}error_field{% endif %}" for="id_strip_mode">mode:</label>
+  {{ form.strip_mode }}{{form.strip_mode.help_text}}
+</p>
+
+<div class="connected">
+<p >
+  {{ form.homopolymers.errors }}<label class="{% if form.homopolymers.errors %}error_field{% endif %}" for="id_homopolymers">Strip homopolymers?</label> {{ form.homopolymers }}</p>
+
+<p >
+  {{ form.homopolymer_length.errors }}<label class="{% if form.homopolymer_length.errors %}error_field{% endif %}" for="id_homopolymer_length">Max homopolymer length:</label> {{ form.homopolymer_length }}</p>
+</div>
+</div><!-- The all_strip div controls which fields are dependent on the
+	   'strip' checkbox -->
+</div>
+
+<p >
+  {{ form.chim.errors }}<label class="{% if form.chim.errors %}error_field{% endif %}" for="id_chim">Remove chimeras?</label>
+  {{ form.chim }}
+</p>
+
+
+<p>
+  {{ form.data_file.errors }}<label class="{% if form.data_file.errors %}error_field{% endif %}" for="id_data_file">Data file:</label>
+  {{ form.data_file}}
+</p> 
+
+
+<script type="text/javascript">
+var strip = $("form input[name='strip']")
+strip.click(function () { 
+    set_dependent(document.getElementById("all_strip"),!strip[0].checked);
+});
+
+homo = $("form input[name='homopolymers']")
+homo.click(function () { 
+    set_disabled(document.getElementById("id_homopolymer_length"),!homo[0].checked);
+});
+
+</script>
+
+
+
 <a href="#" onclick="prepend_input(this,this.parentElement.childElementCount);"><p>More Files <img src="/static/pulldown.jpg" /></p></a>
 </div>
 <input type="submit" value="Submit" />
 </form>
 </div>
+<!-- end upload form -->
 {% endblock %}

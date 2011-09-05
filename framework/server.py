@@ -440,7 +440,7 @@ returns self.decode_request of the data recieved.
             self.write_socket({'response': 'OK'})
 
 
-
+    #server({"request":"delete", "resource":<type>, "id":<id>})
     def delete_resource(self):
         res = self.request_dict['resource']
         if res == 'analyses' or res == 'analysis':
@@ -523,6 +523,8 @@ returns self.decode_request of the data recieved.
 
         legend['length'] = num_seqs
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
+
+
 
         self.write_socket({'response': 'OK','length':num_seqs,"id":name})
 

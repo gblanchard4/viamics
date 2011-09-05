@@ -22,9 +22,24 @@ import os
 
 from framework.tools.helper_functions import SerializeToFile, DeserializeFromFile
 from framework.tools.logger import debug
+from framework.tools import fasta
 import framework.constants as c
 import framework.tools.blast
 import framework.tools.helper_functions as helper_functions
+
+def _preprocess(p, request_dict):
+    #fasta.stripped specifies an open keyfile object, but all it does is
+    #"for line in keys" so a list of strings works here. Using a list avoids all
+    #the nonsense of sending another file from the client.
+    mode = request_dict.get("qa_mode")
+    
+    return fasta.fasta_qa_preprocess(
+        mode,
+        request_dict.get("data_file_path"),
+        request_dict.get("codes_primers"),#keyfile. see above
+        chimeras = request_dict.get("chim"),
+        homopolymer_length = request_dict.get("homopolymer_length"))
+
 
 def _exec(p, request_dict):
     p.set_analysis_type('blast')

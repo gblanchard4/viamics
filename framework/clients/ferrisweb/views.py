@@ -43,6 +43,7 @@ from framework.clients.ferrisweb import webforms
 server = helper_functions.server
 
 templates = {"rdp":"fasta_upload_form.tmpl",
+             "blast":"blast_upload_form.tmpl",
              "qpcr":"qpcr_upload_form.tmpl",
              "env":"env_upload_form.tmpl",
              "vamps":"vamps_upload_form.tmpl"}
@@ -618,7 +619,7 @@ def update_analysis_append_samples(request, analysis_id):
 def new_analysis(request, analysis_type):
     if request.method == 'POST':
 
-#        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         if analysis_type == "rdp":
             form = webforms.FastaUploadForm(request.POST, request.FILES)
         if analysis_type == "qpcr":
@@ -669,6 +670,7 @@ def new_analysis(request, analysis_type):
             #whatever it needs to be
             special_options = [("seperator",str),
                                ("qa_mode", int),
+                               ("db_name",str),
                                ("threshold",float),
                                ("codes_primers",list),
                                ("homopolymer_length",int),

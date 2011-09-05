@@ -7,27 +7,10 @@ from framework.tools import helper_functions
 from framework.tools import fasta
 
 
-class BlastUploadForm(forms.Form):
-    job_description = forms.CharField(max_length = 256)
-    data_file = forms.Field(widget=forms.FileInput())
-    seperator = forms.CharField(max_length = 1)
-    #db_select = forms.ChoiceField( choices = [])
-
-    def __init__(self, *args, **kwargs):
-        super(BlastUploadForm, self).__init__(*args, **kwargs)
-        req = {'request':'list','resource':'blastdb'}
-        resp = helper_functions.server(req)
-        self.fields['db_name'] = forms.ChoiceField(choices=[(r['id'],r['id']) for r in resp['resources']])
-        
-
-class FastaUploadForm(forms.Form):
+class AllFastaUploadForm(forms.Form):
     error_css_class = "error_field"
     job_description = forms.CharField(max_length = 256)
     seperator = forms.CharField(max_length = 1)
-    threshold = forms.DecimalField(max_value = D(1),
-                                   min_value = D(0),
-                                label = "Confidence threshold",
-                                initial = D(0))
     strip = forms.BooleanField(label="Strip barcodes and primers?",
                                initial=True,
                                required=False)
@@ -94,6 +77,25 @@ class FastaUploadForm(forms.Form):
             cleaned_data["codes_primers"] = keyfile.readlines()
 
         return cleaned_data
+
+
+class BlastUploadForm(AllFastaUploadForm):
+    CREATE_URL = "/new/blast/"
+    
+
+    def __init__(self, *args, **kwargs):
+        super(BlastUploadForm, self).__init__(*args, **kwargs)
+        req = {'request':'list','resource':'blastdb'}
+        resp = helper_functions.server(req)
+        self.fields['db_name'] = forms.ChoiceField(choices=[(r['id'],r['id']) for r in resp['resources']])
+        
+class FastaUploadForm(AllFastaUploadForm):
+    CREATE_URL = "/new/blast/"
+    
+    threshold = forms.DecimalField(max_value = D(1),
+                                   min_value = D(0),
+                                label = "Confidence threshold",
+                                initial = D(0))
 
 class QpcrUploadForm(forms.Form):
     job_description = forms.CharField(max_length = 256)

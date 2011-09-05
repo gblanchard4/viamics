@@ -49,6 +49,10 @@ def run_blastn(sequences_path,blast_output_path,blast_db_path,fmt=7,num=5,error_
 def make_blastdb(fasta_path, name,output_dir="",error_log=None,input_type="fasta"):
     """runs makeblastdb (executable must be on path) to package the file at input_file into a BLAST DB. May choke on filenames with spaces in them """
     #error_log = os.path.join(c.blastdb_dir,name,c.blast_error_name)
+
+    if not (output_dir == '' or os.path.exists(output_dir)):
+        os.makedirs(output_dir)
+    
     if error_log:
         error_log = open(error_log,'w')
     out = os.path.join(output_dir,name)
