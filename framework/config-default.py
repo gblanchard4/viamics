@@ -23,3 +23,7 @@
 
 base_dir = "/path/to/framework"
 rdp_running_path = "/path/to/rdp/classifier"
+
+#if uchime is on your path (i.e. typing 'uchime' at a command line just works)
+#leave this alone.
+uchime_running_path = None
