@@ -151,9 +151,10 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
         pylab.rc('grid', color='0.50', linestyle='-', linewidth=0.1)
         pylab.grid(True)
 
-        for i in range(0, len(plot_dict)):
-            key = plot_dict.keys()[i]
+        keys = helper_functions.sorted_copy(plot_dict.keys())
 
+        for key in keys:
+            i = keys.index(key)
             if real_abundance:
                 """if abundance is 0.0, make it 1 so it would look better on log scale"""
                 for j in range(0, len(plot_dict[key])):
@@ -163,7 +164,7 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             pylab.title(otu)
 
             # scattering the samples in X axis, so it would be easier to see them when there are a bunch of them
-            # at the same spot. instead of this, [i] * len(plot_dict[key]) could be used to plot them.
+            # at the same spot. instead of this, i * len(plot_dict[key]) could be used to plot them.
             y_positions =  [((1 - (r.gauss(100, 3) /100)) + i) for x in range(0, len(plot_dict[key]))]
 
             pylab.plot(y_positions, [t[0] for t in plot_dict[key]], 'o', color = group_colors[key], ms = 10, mew = 0.6, alpha = .5)
@@ -180,13 +181,13 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             ax.yaxis.set_major_formatter(formatter)
 
             pylab.xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-            pylab.xticks(pylab.      arange(len(plot_dict)), plot_dict.keys(), rotation=90)
+            pylab.xticks(pylab.arange(len(plot_dict)), keys, rotation=90)
             pylab.ylim(ymin=1e-1, ymax=max_y)
         else:
             pylab.ylim(ymin=-5, ymax=105)
             pylab.xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
-            pylab.xticks(pylab.      arange(len(plot_dict)), plot_dict.keys(), rotation=90)
-            pylab.yticks(pylab.      arange(0, 101, 10))
+            pylab.xticks(pylab.arange(len(plot_dict)), keys, rotation=90)
+            pylab.yticks(pylab.arange(0, 101, 10))
 
         if not save_dir:
             pylab.show()
@@ -217,4 +218,3 @@ if __name__ == "__main__":
     otu_t_p_tuples_dict = get_t_p_values_dict_for_subset(samples_dict, otu_library, sample_map_file_path, ranks = ["species"], real_abundance = True)
 
     generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "species", save_dir = None, is_transparent = False, real_abundance = True)
-
