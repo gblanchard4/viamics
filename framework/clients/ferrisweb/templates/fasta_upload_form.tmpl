@@ -3,11 +3,11 @@
 {% block title %}Info..{% endblock %}
 
 {% block content %}
-<div class="head">Viamics » New Pyrosequencing Analysis</div>
+<div class="head">Viamics » New RDP Analysis</div>
 <div class="title">Hmm..</div>
 <div class="links-bar">{% include "links.tmpl" %}</div>
 
-<p class="info">Hai there.
+<p class="info">Please submit your FASTA formatted sequences file.<br /> <br /><b>Separator</b> is the character that separates sample names form unique accession numbers assigned by the 454 machine. <br /><br /> For instance, if this is the sample name in your FASTA file <b>'ENVIRON-SAMPLE-028_GJVX16M02DZ2OU'</b>, then '_' is your separator. Separator helps the framework to group sequences that are coming from one sample and should be the same for every sequence through the FASTA file.<br /><br /><b>Job description</b> is going to be used to define this study on the framework.
 
 <div class="form">
 <form enctype="multipart/form-data" method="post" action="/new/rdp/">
