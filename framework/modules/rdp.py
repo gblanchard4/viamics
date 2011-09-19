@@ -36,7 +36,6 @@ def _preprocess(p, request_dict):
         mode,
         request_dict.get("data_file_path"),
         request_dict.get("codes_primers"),#keyfile. see above
-        chimeras = request_dict.get("chim"),
         homopolymer_length = request_dict.get("homopolymer_length"))
                                      
     
