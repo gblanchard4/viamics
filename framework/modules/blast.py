@@ -16,8 +16,9 @@
 #blastn and makeblastdb executables on the path
 #
 #If the blastn or makeblastdb programs are throwing errors, one possible cause is spaces in the path to input
-#or output files. I could not for the life of me figure this out, so I just stick underscores in the name the
-#user gives. If Viamics is installed at say /home/username/Desktop/My bioinformatics folder/viamics, there could be a problem. 
+#or output files. I could not for the life of me figure this out (I think the blastn and makeblastdb programs just
+#can't handle it), so I just stick underscores in the name the user gives. If Viamics is installed at say
+#/home/username/Desktop/My bioinformatics folder/viamics, there could be a problem. 
 import os
 
 from framework.tools.helper_functions import SerializeToFile, DeserializeFromFile
@@ -32,14 +33,15 @@ def _preprocess(p, request_dict):
     #"for line in keys" so a list of strings works here. Using a list avoids all
     #the nonsense of sending another file from the client.
     mode = request_dict.get("qa_mode")
-    
-    return fasta.fasta_qa_preprocess(
-        mode,
-        request_dict.get("data_file_path"),
-        request_dict.get("codes_primers"),#keyfile. see above
-        chimeras = request_dict.get("chim"),
-        homopolymer_length = request_dict.get("homopolymer_length"))
-
+    try:
+        return fasta.fasta_qa_preprocess(
+            mode,
+            request_dict.get("data_file_path"),
+            request_dict.get("codes_primers"),#keyfile. see above
+            chimeras = request_dict.get("chim"),
+            homopolymer_length = request_dict.get("homopolymer_length"))
+    except:
+        debug(helper_functions.formatExceptionInfo())
 
 def _exec(p, request_dict):
     p.set_analysis_type('blast')
@@ -57,6 +59,15 @@ def _exec(p, request_dict):
     name = request_dict['db_name']
         #run blast on data
     blast_db = os.path.join(c.blastdb_dir,name,name)
+
+    
+    debug("Extracting QA info", p.files.log_file)
+    cmt = open(p.files.data_comment_file_path,'w')
+    for line in open(p.files.data_file_path):
+        if line.startswith(';'):
+            cmt.write(line)
+    cmt.close()
+
     
     debug(("running blast on %d sequences against database: %s " % (num_seqs, request_dict['db_name'])), p.files.log_file)
     framework.tools.blast.run_blastn(p.files.data_file_path, p.files.blast_output_file_path, blast_db,num=1)

@@ -78,8 +78,10 @@ def stripped(fas, codes_primers,
     
     samples = keys_dict(codes_primers)
     total_seqs = 0
+    excluded = deque()
     
     for s in seqs(fas):
+        total_seqs += 1
         seq_id = s.split()[0].strip('>')
 
     #Find which sample this seq is from. We use the longest part of the sequence id
@@ -91,28 +93,29 @@ def stripped(fas, codes_primers,
                 sample_name = seq_id[0:id_len-i]
                 break
 
+        
+        head = s.split("\n")[0]
+        molecule = s[len(head)+1:]
         if sample_name == '':
             sys.stderr.write('WARNING: No sample name match for %s. Read ignored.\n' % seq_id)
+            excluded.append(head.strip()+"\n"+molecule.strip()+"\n")
         else:#strip barcode/primer TODO should use startswith/replace instead of re
-            excluded = deque()
             barcode = re.compile("^"+samples[sample_name]["barcode"])
             primer = re.compile("^"+samples[sample_name]["primer"])
-            head = s.split("\n")[0]
-            molecule = s[len(head)+1:]
             molecule = barcode.sub('',molecule)
             primer_found = primer.match(molecule)
             molecule = primer.sub('',molecule)
-            total_seqs += 1
             if primer_found or liberal:
                 stripped_seq = head.strip()+"\n"+molecule.strip()+"\n"
                 yield stripped_seq
             else:
                 excluded.append(head.strip()+"\n"+molecule.strip()+"\n")
+                
 
     percent = float(len(excluded))/total_seqs
     
     if percent > max_excluded:
-        yield ";The following %d sequences should be excluded due to either missing ID in keyfile or missing barcode/primer.\n;They are included because this would exclude more than %s%% of sequences.\n" (len(excluded),str(max_excluded))
+        yield ";The following %d sequences should be excluded due to either missing ID in keyfile or missing barcode/primer.\n;They are included because this would exclude more than %s%% of sequences.\n" % (len(excluded),str(max_excluded))
         for s in excluded:
             yield s
     else:

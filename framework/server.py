@@ -63,20 +63,6 @@ import framework.tools.taxons
 import framework.tools.hcluster
 
 
-def formatExceptionInfo(maxTBlevel=5):
-    cla, exc, trbk = sys.exc_info()
-    excName = cla.__name__
-    try:
-        excArgs = exc.__dict__["args"]
-    except KeyError:
-        excArgs = "<no args>"
-    excTb = traceback.format_tb(trbk, maxTBlevel)
-    text = ""
-    text += excName + '\n'
-    text += excArgs + '\n'
-    for line in excTb:
-        text += line
-    return text
 
 J = os.path.join
 
@@ -264,6 +250,14 @@ returns self.decode_request of the data recieved.
         debug("Server state is being updated, running processes.APPEND(this)", p.files.log_file)
         self.serverstate.running_analyses.append(analysis_id)
 
+        if late_response_request is False:
+            debug("Response is being sent", p.files.log_file)
+            self.write_socket({'response': 'OK', 'process_id': analysis_id})
+
+    
+        debug("Filling job description: '%s'" % job_description, p.files.log_file)
+        open(p.files.job_file, 'w').write(job_description + '\n')
+
         
         ########################################################################
         #in addition to copying the file, the module can perform any pre-
@@ -285,18 +279,11 @@ returns self.decode_request of the data recieved.
             data_file_dest.close()
     
             ################################################################
-    
-            debug("Filling job description: '%s'" % job_description, p.files.log_file)
-            open(p.files.job_file, 'w').write(job_description + '\n')
+
         except:
             self.request_dict["analysis_id"] = analysis_id
             self._remove_analysis()
             raise
-
-
-        if late_response_request is False:
-            debug("Response is being sent", p.files.log_file)
-            self.write_socket({'response': 'OK', 'process_id': analysis_id})
 
     
         # call server modules..
@@ -342,7 +329,7 @@ returns self.decode_request of the data recieved.
         try:
             framework.tools.heatmap.main(options, c.analyses_dir)
         except:
-            self.write_socket({'response': 'error', 'content': formatExceptionInfo()})
+            self.write_socket({'response': 'error', 'content': helper_functions.formatExceptionInfo()})
             return
 
         self.write_socket({'response': 'OK', 'options': options})

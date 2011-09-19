@@ -29,6 +29,7 @@ import string
 import hashlib
 import cPickle
 import re
+import traceback
 
 from scipy import log2
 
@@ -157,6 +158,22 @@ def get_random_taxa_color_dict(p, samples_dict, cm):
         taxa_color_dict[rank] = level_color_dict
 
     return taxa_color_dict
+
+def formatExceptionInfo(maxTBlevel=5):
+    cla, exc, trbk = sys.exc_info()
+    excName = cla.__name__
+    try:
+        excArgs = exc.__dict__["args"]
+    except KeyError:
+        excArgs = "<no args>"
+    excTb = traceback.format_tb(trbk, maxTBlevel)
+    text = ""
+    text += excName + '\n'
+    text += excArgs + '\n'
+    for line in excTb:
+        text += line
+    return text
+
 
 
 def get_largest_abundance_number_in_all_samples(samples_dict):
