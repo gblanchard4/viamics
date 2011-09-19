@@ -132,6 +132,7 @@ def chimera_check(_seqs, threshold = 0.3):
 
     def get_label(s):
         return s.split()[0].strip(">")
+    comments = {}
     
     tmp_file = os.path.join(constants.temp_files_dir, str(time.time()))
     uchime_out = os.path.join(constants.temp_files_dir, "uOut_"+str(time.time()))
@@ -155,8 +156,8 @@ def chimera_check(_seqs, threshold = 0.3):
         if score > threshold:
             chimeras.add(label)
     chims = 0
-    for seq in seqs(open(tmp_file)):
-        if get_label(seq) not in chimeras:
+    for seq in seqs(open(tmp_file), include_comments = True):
+        if get_label(seq) not in chimeras or seq.startswith(';'):
             yield seq
         else:
             yield ";Sequence %s is suspected of being chimeric and was excluded" % get_label(seq)

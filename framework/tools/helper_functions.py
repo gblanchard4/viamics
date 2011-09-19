@@ -231,10 +231,11 @@ def generate_feature_vectors_from_samples_dict(samples_dict, otu_library, rank =
     return samples, components, features
 
 
-def seqs(f):
+def seqs(f, include_comments = False):
     """A generator for the sequences in a FASTA file"""
     seq = ""
-    for line in (l for l in f if not l.startswith(";")):
+    f = f if include_comments else (l for l in f if not l.startswith(";"))
+    for line in f:
         if seq != "" and line.startswith('>'):
             yield seq
             seq = ""
