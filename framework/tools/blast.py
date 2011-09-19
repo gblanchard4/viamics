@@ -143,7 +143,10 @@ def create_samples_dictionary(blast_output_path, legend_path, separator):
     
     for result in blast:#iterate over blast results for each query seq
         a = best_alignment(result)
-        sample, sequence = a.qseqid.split(separator)
+        try:
+            sample, sequence = a.qseqid.split(separator)
+        except ValueError:
+            raise ValueError("something went wrong extracting IDs from sequence labeled: %s" % a.qseqid)
         if sample not in samples:
             samples[sample] = dict(zip(ranks, iter(dict,0)))
         #get the name of matched sequence from the legend, if possible

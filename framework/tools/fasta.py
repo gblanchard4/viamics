@@ -154,10 +154,14 @@ def chimera_check(_seqs, threshold = 0.3):
         score, label = float(line[0]), line[1]#.strip()? split()[0]?
         if score > threshold:
             chimeras.add(label)
-
+    chims = 0
     for seq in seqs(open(tmp_file)):
         if get_label(seq) not in chimeras:
             yield seq
+        else:
+            yield ";Sequence %s is suspected of being chimeric and was excluded" % get_label(seq)
+            chims += 1
+    yield ";%d chimeras found" % chims
 
 def fasta_qa_preprocess(mode, fasta_path, codes_primers,
                         chimeras=None, homopolymer_length=None):
@@ -174,6 +178,7 @@ def fasta_qa_preprocess(mode, fasta_path, codes_primers,
         -
         """
     mode = mode if mode else 0
+
     if mode  & STRIP_BARCODES_PRIMERS:
         result = stripped(open(fasta_path),
                               codes_primers,#keyfile. see above
@@ -182,7 +187,7 @@ def fasta_qa_preprocess(mode, fasta_path, codes_primers,
             result = strip_homopolymers(result,
                                              n=homopolymer_length)
         if mode & REMOVE_CHIMERAS:
-            result = uchime(result)
+            result = chimera_check(result)#FIXME this should not happen twice
     elif mode & REMOVE_HOMOPOLYMERS:#homopolymers but not codes/primers
         raise ValueError(
             "Removing homopolymers requires removing barcodes and primers")
