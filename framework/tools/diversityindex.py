@@ -105,11 +105,9 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
         pylab.setp(b['fliers'], color='black', alpha=0.3)
         pylab.setp(b['caps'], color='black', alpha=0.3)
 
-        pylab.plot([0], [max_val], visible = False)
-        pylab.plot([-0.9], [-max_val * 10 / 100], visible = False)
-        pylab.plot([i + 0.9], [max_val], visible = False)
         pylab.ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-        pylab.xticks(pylab.      arange(len(plot_dict)), keys, rotation=90)
+        pylab.xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
+        pylab.xticks(pylab.arange(len(plot_dict)), keys, rotation=90)
 
     if not save_dir:
         pylab.show()
