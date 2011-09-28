@@ -9,11 +9,9 @@ important stuff that should not be forgotten.
 (****)
 
  - Installation shouldn't be a big hassle.
+ - "Comparison map" - Users create tuples of samples e.g. (vag, ur, us)
  - User manual with some toy runs, hypothesis testing examples, et cetera.
  - Exception handling should be improved.
- - UNIFRAC analysis and introspection (fairly easy, QIIME could provide
- enough inspiration).
-   -- works for blast, may get to RDP
  - Interface for exporting analysis results (as PDF or, stand-alone static
  web page).
 
