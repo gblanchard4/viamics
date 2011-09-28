@@ -38,7 +38,6 @@ def _preprocess(p, request_dict):
             mode,
             request_dict.get("data_file_path"),
             request_dict.get("codes_primers"),#keyfile. see above
-            chimeras = None,#request_dict.get("chim"),#wtf why is this info sent 2x
             homopolymer_length = request_dict.get("homopolymer_length"))
     except:
         debug(helper_functions.formatExceptionInfo(), p.files.log_file)

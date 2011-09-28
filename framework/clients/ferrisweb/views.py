@@ -673,8 +673,7 @@ def new_analysis(request, analysis_type):
                                ("db_name",str),
                                ("threshold",float),
                                ("codes_primers",list),
-                               ("homopolymer_length",int),
-                               ("chim",bool)]
+                               ("homopolymer_length",int)]
             for opt in special_options:
                 if form.cleaned_data.get(opt[0]):
                     server_request[opt[0]] = opt[1](form.cleaned_data[opt[0]])

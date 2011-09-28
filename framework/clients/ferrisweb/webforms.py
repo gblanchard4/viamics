@@ -90,7 +90,7 @@ class BlastUploadForm(AllFastaUploadForm):
         self.fields['db_name'] = forms.ChoiceField(choices=[(r['id'],r['id']) for r in resp['resources']])
         
 class FastaUploadForm(AllFastaUploadForm):
-    CREATE_URL = "/new/blast/"
+    CREATE_URL = "/new/rdp/"
     
     threshold = forms.DecimalField(max_value = D(1),
                                    min_value = D(0),

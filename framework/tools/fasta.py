@@ -165,15 +165,13 @@ def chimera_check(_seqs, threshold = 0.3):
     yield ";%d chimeras found" % chims
 
 def fasta_qa_preprocess(mode, fasta_path, codes_primers,
-                        chimeras=None, homopolymer_length=None):
+                        homopolymer_length=None):
     """Runs QA steps to remove primers, barcodes, homopolymers and chimeras from the data.
     ARGS:
         -mode: bitwise or of 0-n of the constants at the top of this file
         -fasta_path: the file to be preprocessed
         -codes_primers: the "keyfile". Also a list of lines will work, as it is
         used like: `for l in codes_primers`
-        -chimeras=None: whether to remove chimeras or not. this can take a long
-        time
         -homopolymer_length: the maximum lenght of a repeated nucleotide that can
         be kept
         -
@@ -186,16 +184,14 @@ def fasta_qa_preprocess(mode, fasta_path, codes_primers,
                               mode)
         if mode & REMOVE_HOMOPOLYMERS:
             result = strip_homopolymers(result,
-                                             n=homopolymer_length)
-        if mode & REMOVE_CHIMERAS:
-            result = chimera_check(result)#FIXME this should not happen twice
+                                        n=homopolymer_length)
     elif mode & REMOVE_HOMOPOLYMERS:#homopolymers but not codes/primers
         raise ValueError(
             "Removing homopolymers requires removing barcodes and primers")
     else:
         result = open(fasta_path)
 
-    if chimeras:
+    if mode & REMOVE_CHIMERAS:
         result = chimera_check(result)
         
     return result
