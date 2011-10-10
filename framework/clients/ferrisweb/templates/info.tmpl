@@ -194,6 +194,9 @@
         <p align="center"><small><a href="#pie-{{ rank }}" onclick="toggle_visibility('{{ rank }}-rest'); toggle_visibility('{{ rank }}-first-row')">Hide</a></small></p>
     </div>
 {% endfor %}
-
+<form method="post" action="/api/analyses/{{ analysis.info.id }}/">
+  <input name="_method" type="hidden" value="DELETE">
+  <input onclick="return confirm('are you sure?');" type="submit" value="delete">
+</form>
 
 {% endblock %}

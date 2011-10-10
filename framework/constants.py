@@ -56,6 +56,7 @@ analyses_dir = join(base_dir, "analyses")
 error_logs_dir = join(base_dir, "errors")
 temp_files_dir = join(base_dir, "tmp")
 blastdb_dir = join(base_dir, 'blastdb')
+trash_bin = join(base_dir, 'trash')
 
 socket_name = join(temp_files_dir, "sock")
 

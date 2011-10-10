@@ -12,7 +12,7 @@
             <div class="smallheadindex" ><%= id %> <a href="/blastdb/<%= id %>">»</a></div>
             <div class="smalltitle"><span class="analysis_id"><%= length %> sequences   
 	    <span class="secondary_control">
-	      <a href="#" onclick="window.DBs.get('<%= id %>').destroy()">Delete</a>
+	      <a href="#" onclick="if(confirm('Are you sure you want to delete: <%= id %>')){window.DBs.get('<%= id %>').destroy()}">Delete</a>
 	    </span></div>
 	    <div class="logs">
 	      <form id="file_upload_form" method="post" enctype="multipart/form-data" action="/api/blastdb/<%= id %>/" target="upload_target" class="input" style="width: 75%;" > 

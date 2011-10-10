@@ -54,8 +54,20 @@ def analyses(request):
         
         analyses = server_response['analyses']
         return HttpResponse(json.dumps(analyses))
+
     else:
         return err_response({'content':'Only the GET method is implemented for this resource'})
+
+def analysis(request, analysis_id):
+    if request._method == 'DELETE':
+        server_request = {"request":"delete","resource":"analysis", 'id':analysis_id}
+        server_response = server(server_request)
+        if server_err(server_response):
+            return err_response(server_response)
+        else:
+            return HttpResponse(json.dumps(server_response))
+    else:
+        return err_response({'content':'Only the DELETE method is implemented for this resource'})
 
 def get_low_confidence_seqs():
 

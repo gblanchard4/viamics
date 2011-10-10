@@ -2,6 +2,25 @@
 {%block script%}
 <script src="/static/refresh.js" type="text/javascript">
 </script>
+<script type="text/javascript">
+function remove_analysis(id){
+    analysis = document.getElementById(id);
+    table = analysis.parentElement;
+    e = function(xhr,status,e){
+	    alert(status+": "+e);
+	}
+    s = function(xhr,status,e){
+	    table.removeChild(analysis);
+	}
+    
+    $.ajax({
+        url: "/api/analyses/"+id+"/",
+	error: e,
+	success: s,
+        type: 'DELETE'
+    });
+}
+</script>
 {%endblock%}
 {% block title %}Viamics ({{analyses|length}} analys{{ analyses|length|pluralize:"is,es" }}){% endblock %}
 
@@ -17,11 +36,15 @@
 <div class="form">
 <table width="800">
 {% for analysis in analyses %}
-    <tr>
+    <tr id="{{ analysis.id }}">
         <td width="30" valign="top" style="padding-top: 20px;" ><img src="{{ request.META.HTTP_HOST }}/static/{{ analysis.state }}.gif" id="analysis_state_{{forloop.counter}}"></td>
         <td>
             <div class="smallheadindex" style="background: url(/static/{{ analysis.type }}.png) bottom right no-repeat;">{{ analysis.name }} {% ifequal analysis.state "done" %}<a href="./info/{{ analysis.id }}">»</a>{% endifequal %}</div>
-            <div class="smalltitle">id: <span class="analysis_id">{{ analysis.id }}</span></div>
+            <div class="smalltitle">id: <span class="analysis_id">{{ analysis.id }}</span>
+	        <span class="secondary_control">
+		  <a href="javascript:void(0)" onclick="if(confirm('Are you sure you want to delete: {{ analysis.name }}?')){remove_analysis('{{ analysis.id }}');}" >Delete</a>
+		</span>
+	    </div>
             <div class="logs"><ul>{% for log in analysis.log %}<li>{{ log }}</li>{% endfor %}</ul></div>
         </td>
     </tr>

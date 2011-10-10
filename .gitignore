@@ -11,6 +11,7 @@ framework/tmp/*
 framework/analyses/*
 framework/errors/*
 framework/blastdb/*
+framework/trash/*
 
 #nonsense
 *.DS_Store

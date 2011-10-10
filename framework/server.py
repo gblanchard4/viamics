@@ -224,7 +224,7 @@ returns self.decode_request of the data recieved.
         if analysis_id in self.serverstate.done_analyses:
             self.serverstate.done_analyses.remove(analysis_id)
 
-        shutil.rmtree(p.dirs.analysis_dir)
+        shutil.move(p.dirs.analysis_dir,c.trash_bin)
 
 
     def exec_analysis(self):
@@ -431,10 +431,12 @@ returns self.decode_request of the data recieved.
     def delete_resource(self):
         res = self.request_dict['resource']
         if res == 'analyses' or res == 'analysis':
+            if self.request_dict.get('id'):
+                self.request_dict['analysis_id'] = self.request_dict['id']
             self.remove_analysis()
         else:
             if(hasattr(c,res+'_dir')):
-                shutil.rmtree(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']))
+                shutil.move(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
                 self.write_socket({'response':'OK'})
             else:
                 error_log = os.path.join(c.error_logs_dir, time_stamp.__str__())

@@ -45,6 +45,7 @@ from stripper.views import strip_split
 
 urlpatterns = patterns('',
     (r'^$', index),
+    (r'^api/analyses/(?P<analysis_id>[a-zA-Z0-9_.-]+)/$', web_api.analysis),
     (r'^api/analyses', web_api.analyses),
     (r'^about/$', about),
     (r'^status/$', status_request),

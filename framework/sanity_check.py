@@ -37,7 +37,8 @@ def dirs():
     critical_777_dirs = {
             "Analyses dirirectory": c.analyses_dir,
             "Error logs directory": c.error_logs_dir,
-            "Temporary files directory": c.temp_files_dir
+            "Temporary files directory": c.temp_files_dir,
+            "Trash directory"          : c.trash_bin
             }
 
     missing_dirs = [dir for dir in critical_777_dirs if not os.path.exists(critical_777_dirs[dir])]
