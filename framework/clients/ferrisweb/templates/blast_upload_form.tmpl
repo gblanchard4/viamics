@@ -11,7 +11,7 @@
     {{ form.threshold_type.errors}}<br />
     {{ form.threshold.errors}}
     <label class="{% if form.db_name.errors %}error_field{% endif %}" for="id_threshold_type">Confidence threshold?</label>
-    {{form.threshold_type}}{{ form.threshold }}
+    {{form.threshold_type}}{{ form.threshold }}%
   </p>
    <p >
   {{ form.db_name.errors }}<label class="{% if form.db_name.errors %}error_field{% endif %}" for="id_db_name">BLAST database:</label>
