@@ -50,7 +50,7 @@ from framework.tools import helper_functions
 from framework.tools.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
 from framework.tools.logger import debug
 
-import framework.tools.rdp
+import framework.tools.rdp 
 import framework.tools.env
 import framework.tools.qpcr
 import framework.tools.vamps
@@ -224,7 +224,10 @@ returns self.decode_request of the data recieved.
         if analysis_id in self.serverstate.done_analyses:
             self.serverstate.done_analyses.remove(analysis_id)
 
-        shutil.move(p.dirs.analysis_dir,c.trash_bin)
+        if self.request_dict.get('id'):
+            shutil.rmtree(p.dirs.analysis_dir)
+        else:
+            shutil.move(p.dirs.analysis_dir,c.trash_bin)
 
 
     def exec_analysis(self):
@@ -436,7 +439,10 @@ returns self.decode_request of the data recieved.
             self.remove_analysis()
         else:
             if(hasattr(c,res+'_dir')):
-                shutil.move(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
+                if os.path.exists(os.path.join(c.trash_bin,self.request_dict['id'])):
+                    shutil.rmtree(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']))
+                else:
+                    shutil.move(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
                 self.write_socket({'response':'OK'})
             else:
                 error_log = os.path.join(c.error_logs_dir, time_stamp.__str__())

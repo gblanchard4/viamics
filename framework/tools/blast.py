@@ -130,8 +130,28 @@ def blast_results(f, fmt=7):
             result += line
     if result.strip() != '':
         yield Blast_Result(result)#lazy fix to catch last result
+
+def result_fails_threshold(result,thresholds):
+    a = best_alignment(result)
+    fail_pid = thresholds.get("pident") and float(a.pident) < thresholds['pident']
+    fail_evalue = thresholds.get("evalue") and float(a.evalue) > thresholds["evalue"]
+    fail_bitscore = thresholds.get("bitscore") and float(a.bitscore) < thresholds["bitscore"]
+    return fail_pid or fail_evalue or fail_bitscore
+
+
+def low_confidence_seqs(fasta_file, blast_outfile, thresholds, separator):
+    """Sequences which blastn marked as below the given threshold. The expected case is that blastn was run against the fasta file to generate the output """
+    #import pdb;pdb.set_trace()
+    results = blast_results(blast_outfile)
+    sequences = helper_functions.seqs(fasta_file)
+    below_threshold = set(best_alignment(res).qseqid for res in results if result_fails_threshold(res,thresholds))
+    for seq in sequences:
+        s_id = seq.split()[0].strip('>')
+        if s_id in below_threshold:
+            yield seq
+
             
-def create_samples_dictionary(blast_output_path, legend_path, separator):
+def create_samples_dictionary(blast_output_path, legend_path, separator,thresholds=None):
     """reads output file and and creates total count entries in the dictionary for matching samples in the 'samples' list. This is the fundamental operation that a module needs to do - the commons module assumes that a samples_dict has already been created for any analysis.
 
     samples_dict contains the {sample_id:{level:{otu_id:count,...},...},...} information used for the various visual and statistical analyses"""
@@ -140,8 +160,11 @@ def create_samples_dictionary(blast_output_path, legend_path, separator):
     legend = DeserializeFromFile(legend_path)
     ranks = legend['ranks']
     blast = blast_results(open(blast_output_path))
-    
+    #import pdb;pdb.set_trace()
     for result in blast:#iterate over blast results for each query seq
+        if thresholds:
+            if result_fails_threshold(result,thresholds):
+                continue
         a = best_alignment(result)
         try:
             sample, sequence = a.qseqid.split(separator)

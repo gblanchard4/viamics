@@ -666,14 +666,15 @@ def new_analysis(request, analysis_type):
             #if your module needs information not contained in a standard request,
             #(say phase of the moon or something), add it here in a tuple of
             #(name, function) where name is the name attribute in the form, and
-            #the function converts the or cleaned_data into
+            #the function converts the raw value or cleaned_data into
             #whatever it needs to be
             special_options = [("seperator",str),
                                ("qa_mode", int),
                                ("db_name",str),
                                ("threshold",float),
                                ("codes_primers",list),
-                               ("homopolymer_length",int)]
+                               ("homopolymer_length",int),
+                               ("threshold_dict",dict)]
             for opt in special_options:
                 if form.cleaned_data.get(opt[0]):
                     server_request[opt[0]] = opt[1](form.cleaned_data[opt[0]])

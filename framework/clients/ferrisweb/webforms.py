@@ -17,9 +17,8 @@ class AllFastaUploadForm(forms.Form):
     keyfile = forms.Field(label="Keyfile (barcodes and primers)",
                           widget=forms.FileInput(),
                           required=False)
-    strip_mode = forms.ChoiceField(choices=[(0,
-                                             "conservative"),
-                                             (fasta.STRIP_LIBERAL,"liberal")],
+    strip_mode = forms.ChoiceField(choices=[(0,"conservative"),
+                                            (fasta.STRIP_LIBERAL,"liberal")],
                                    label="mode",
                                    help_text="Conservative mode discards sequences"
                                              " if the barcode and primer are not "
@@ -81,6 +80,36 @@ class AllFastaUploadForm(forms.Form):
 
 class BlastUploadForm(AllFastaUploadForm):
     CREATE_URL = "/new/blast/"
+
+    threshold_type = forms.ChoiceField(choices=[
+                                         (0,"none (keep all alignments)"),
+                                         ("pident","percent identity >"),
+                                         ("evalue","e-value <"),
+                                         ("bitscore","bit score >")],
+                                   help_text="Which  measure of alignment quality"
+                                             " to use when classifying sequences "
+                                             "sequences that do not meet the quality"
+                                             " criterion will be placed in a separate"
+                                             " and excluded from analysis.",
+                                   required=False)
+    threshold = forms.DecimalField(initial = D(0),
+                                   widget=forms.TextInput(attrs={"size":5}))
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        if cleaned_data.get('threshold_type') and cleaned_data['threshold_type'] != 0:
+            try:
+                t = float(cleaned_data.get('threshold'))
+                cleaned_data["threshold_dict"] = {cleaned_data['threshold_type']:t}
+                cleaned_data.pop('threshold')
+            except (TypeError,ValueError ):
+                e = self.error_class("Please provide a confidence threshold or select 'none' for "
+                                     "threshold type")
+                self._errors["threshold"] = e
+        else:
+            cleaned_data.pop("threshold")
+
+        return cleaned_data
     
 
     def __init__(self, *args, **kwargs):
@@ -90,12 +119,14 @@ class BlastUploadForm(AllFastaUploadForm):
         self.fields['db_name'] = forms.ChoiceField(choices=[(r['id'],r['id']) for r in resp['resources']])
         
 class FastaUploadForm(AllFastaUploadForm):
+    """FastaUploadForm is the upload form specific to RDP analyses. It has this name for historical reasons. see AllFastaUploadForm for the general form that any analysis of a FASTA file should extend """
     CREATE_URL = "/new/rdp/"
     
     threshold = forms.DecimalField(max_value = D(1),
                                    min_value = D(0),
                                 label = "Confidence threshold",
-                                initial = D(0))
+                                initial = D(0),
+                                widget=forms.TextInput(attrs={"size":5}))
 
 class QpcrUploadForm(forms.Form):
     job_description = forms.CharField(max_length = 256)

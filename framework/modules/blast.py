@@ -20,6 +20,7 @@
 #can't handle it), so I just stick underscores in the name the user gives. If Viamics is installed at say
 #/home/username/Desktop/My bioinformatics folder/viamics, there could be a problem. 
 import os
+import cPickle
 
 from framework.tools.helper_functions import SerializeToFile, DeserializeFromFile
 from framework.tools.logger import debug
@@ -39,19 +40,25 @@ def _preprocess(p, request_dict):
             request_dict.get("data_file_path"),
             request_dict.get("codes_primers"),#keyfile. see above
             homopolymer_length = request_dict.get("homopolymer_length"))
-    except:
+    except: 
         debug(helper_functions.formatExceptionInfo(), p.files.log_file)
         raise
 
 def _exec(p, request_dict):
     p.set_analysis_type('blast')
+    p.threshold = request_dict.get('threshold_dict') 
 
     
     separator = request_dict['seperator']#sic
     debug("storing separator: '%s'" % separator, p.files.log_file)
     open(p.files.seperator_file_path, 'w').write(separator)
-    debug("storing DB name: '%s'" % request_dict['db_name'], p.files.log_file)
+    debug("storing DB name: '%s'" % request_dict['db_name'], p.files.log_file) 
     open(p.files.blast_db_name_path, 'w').write(request_dict['db_name'])
+    if p.threshold:
+        debug("storing confidence threshold", p.files.log_file) 
+        with open(p.files.threshold_path,'w') as f:
+            f.write(cPickle.dumps(p.threshold))
+
     
     
     #add length info to legend
@@ -85,7 +92,10 @@ def _exec(p, request_dict):
         open(p.files.all_unique_samples_file_path, 'w').write('\n'.join(samples) + '\n')
         debug("%d unique sample names stored" % len(samples), p.files.log_file)
         otu_library(p)
-
+        if hasattr(p,'threshold'):
+            separate_low_confidence(p)
+    
+    
 
 def samples_dictionary(p):
     debug("Computing sample dictionary", p.files.log_file)
@@ -94,7 +104,8 @@ def samples_dictionary(p):
                                db_name,db_name+c.blast_legend_file_extension)
     samples_dict = framework.tools.blast.create_samples_dictionary(p.files.blast_output_file_path,
                                                                    legend_path,
-                                                                   open(p.files.seperator_file_path).read())
+                                                                   open(p.files.seperator_file_path).read(),
+                                                                   thresholds=p.threshold)
     debug("Serializing samples dictionary object", p.files.log_file)
     SerializeToFile(samples_dict, p.files.samples_serialized_file_path)
 
@@ -108,6 +119,16 @@ def otu_library(p):
                                                         open(p.files.seperator_file_path).read())
     SerializeToFile(otu_library, p.files.otu_library_file_path)
 
+def separate_low_confidence(p):
+    debug("Separating low confidence sequences", p.files.log_file)
+    separator = open(p.files.seperator_file_path).read()    
+    lo_seqs = framework.tools.blast.low_confidence_seqs(open(p.files.data_file_path),
+                                                      open(p.files.blast_output_file_path),
+                                                      p.threshold,
+                                                      separator)
+    with open(p.files.low_confidence_seqs_path,'w') as o:
+        for s in lo_seqs:
+            o.write(s)
 
 
 def _module_functions(p, request_dict):
