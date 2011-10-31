@@ -10,7 +10,7 @@ from framework.tools import fasta
 class AllFastaUploadForm(forms.Form):
     error_css_class = "error_field"
     job_description = forms.CharField(max_length = 256)
-    seperator = forms.CharField(max_length = 1)
+    seperator = forms.CharField(max_length = 1,initial="_")
     strip = forms.BooleanField(label="Strip barcodes and primers?",
                                initial=True,
                                required=False)
