@@ -109,6 +109,11 @@ class Alignment:
             raise ValueError('Blast output format appears to be incorrect: %s' % str(vals))
         for field,val in zip(fields, vals):
             setattr(self, field, val)
+
+        #MAD DEPENDENCY WARNING:
+        #THIS CODE IS DUPLICATED IN server.py, LINE 516
+        if '|' in self.sseqid and self.sseqid[1].isdigit():
+                self.sseqid = self.sseqid.strip('>').split('|')[0]
         
 def blast_results(f, fmt=7):
     """f is a file-like object that contains the output of a blastn search. Returns an iterator of BlastResult objects. """
@@ -160,7 +165,6 @@ def create_samples_dictionary(blast_output_path, legend_path, separator,threshol
     legend = DeserializeFromFile(legend_path)
     ranks = legend['ranks']
     blast = blast_results(open(blast_output_path))
-    #import pdb;pdb.set_trace()
     for result in blast:#iterate over blast results for each query seq
         if thresholds:
             if result_fails_threshold(result,thresholds):

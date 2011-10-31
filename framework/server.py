@@ -508,13 +508,17 @@ returns self.decode_request of the data recieved.
         num_seqs = 0#sum((1 for l in open(fasta_path) if l.startswith('>')))
         legend = {'ranks':['species']}#this is where we can store any taxonomic information we have about the db
         legend['name'] = name
+        #import pdb;pdb.set_trace()
         for s in helper_functions.seqs(open(fasta_path)):
-            head = s.split('\n')
+            head = s.split('\n')[0]
             num_seqs += 1
-            if '|' in head:
+            #MAD DEPENDENCY WARNING:
+            #THIS CODE IS DUPLICATED IN tools/blast.py, LINE 114
+            if '|' in head and head[1].isdigit():
                 head = head.split('|')
                 id = head[0].strip('>')
-                legend[id] = head[-1]
+                #expects header to look like: '>5524211|gb|AAD44166.1| cytochrome b |Elephas maximus maximus'
+                legend[id] = [head[3].strip()]#aah magic number.
 
         legend['length'] = num_seqs
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
