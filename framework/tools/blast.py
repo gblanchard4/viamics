@@ -28,7 +28,7 @@ sys.path.append('../..')
 
 blastn_cmd = "blastn -query %(fasta)s -outfmt %(fmt)d -num_alignments %(num)d -db %(blast_db)s -out %(blast_out)s -num_threads "+ str(c.blast_number_of_threads)
 #makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s -title %(name)s -input_type %(input_type)s"
-makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s "
+makeblastdb_cmd = "makeblastdb -in %(in)s -dbtype nucl -out %(out)s -input_type %(input_type)s"
 
 def run_blastn(sequences_path,blast_output_path,blast_db_path,fmt=7,num=5,error_log='/tmp/error_log'):
     """Runs blastn on the fasta file at sequences_path against the db at blast_db_path. Blocks until blast is finished. The blastn executable is assumed to be on the path.
@@ -54,7 +54,7 @@ def make_blastdb(fasta_path, name,output_dir="",error_log=None,input_type="fasta
         os.makedirs(output_dir)
     
     if error_log:
-        error_log = open(error_log,'w')
+        error_log = open(error_log,'a')
     out = os.path.join(output_dir,name)
     args = shlex.split(str(makeblastdb_cmd))
     varargs = {"in":fasta_path, "out":out, "name":name,'input_type':input_type}
