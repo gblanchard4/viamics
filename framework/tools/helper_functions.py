@@ -18,6 +18,7 @@
 
 import os
 import sys
+import shutil
 import zlib
 import mmap
 import time
@@ -133,6 +134,14 @@ def get_groups_colors_from_sample_map_file(sample_map_file_path):
             group_colors[row[1]] = row[2]
 
     return (sample_groups, group_colors)
+
+def move_or_delete(src,dest_dir):
+    try:
+        shutil.move(src,dest_dir)
+    except:
+        shutil.rmtree(src)
+        
+    
 
 
 def get_random_taxa_color_dict(p, samples_dict, cm):

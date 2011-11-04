@@ -26,6 +26,7 @@ import sys
 import time
 import copy
 import zlib
+import json
 import shutil
 import socket
 import base64
@@ -80,7 +81,7 @@ class ServerState:
 
 
 class Server:
-    def __init__(self, socket_name):
+    def __init__(self, socket_name, data_format=cPickle):
         serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
             os.remove(c.socket_name)
@@ -106,9 +107,9 @@ class Server:
                 sys.exit(0)
 
             threadid = str(time.time())
-            thread = threading.Thread(target=ProcessRequest, args=(clientsocket,
-                                                                   serverstate,
-                                                                   threadid))
+            thread = threading.Thread(target=ProcessRequest,
+                                      args=(clientsocket,serverstate,threadid),
+                                      kwargs={'data_format':data_format})
             thread.setName(threadid)
             thread.start()
 
@@ -124,7 +125,7 @@ in `executors` will be called based on `dict["request"]`
 
 
     """
-    def __init__(self, clientsocket, serverstate, threadid):
+    def __init__(self, clientsocket, serverstate, threadid,data_format=cPickle):
         """
         reads one line of text from the clientsocket, passes the text through
         cPickle, then calls one of the functions in executors.
@@ -133,8 +134,9 @@ in `executors` will be called based on `dict["request"]`
         self.clientsocket = clientsocket
         self.socket_is_alive = True
         self.serverstate = serverstate
-        self.encode_response = lambda x: base64.encodestring(zlib.compress(cPickle.dumps(x), 9))
-        self.decode_request  = lambda x: cPickle.loads(zlib.decompress(base64.decodestring(x)))
+        self.encode_response = lambda x: base64.encodestring(zlib.compress(data_format.dumps(x), 9))
+        self.decode_request  = lambda x: data_format.loads(zlib.decompress(base64.decodestring(x)))
+        
         self.request_dict = self.read_socket()
 
         print "\n\n* Incoming Data: ", self.request_dict
@@ -224,7 +226,7 @@ returns self.decode_request of the data recieved.
         if analysis_id in self.serverstate.done_analyses:
             self.serverstate.done_analyses.remove(analysis_id)
 
-        shutil.move(p.dirs.analysis_dir,c.trash_bin)
+        helper_functions.move_or_delete(p.dirs.analysis_dir,c.trash_bin)
 
 
     def exec_analysis(self):
@@ -436,7 +438,7 @@ returns self.decode_request of the data recieved.
             self.remove_analysis()
         else:
             if(hasattr(c,res+'_dir')):
-                shutil.move(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
+                helper_functions.move_or_delete(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
                 self.write_socket({'response':'OK'})
             else:
                 error_log = os.path.join(c.error_logs_dir, time_stamp.__str__())
@@ -497,23 +499,38 @@ returns self.decode_request of the data recieved.
         for escape_char in ['/','..',' ']:
             name = name.replace(escape_char, '_')
         out = os.path.join(c.blastdb_dir,name)#and here, to put all blastdbs in their own folder
-        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
+        err = os.path.join(out,name+".err")
+        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out,error_log=err)
 
         num_seqs = 0#sum((1 for l in open(fasta_path) if l.startswith('>')))
         legend = {'ranks':['species']}#this is where we can store any taxonomic information we have about the db
         legend['name'] = name
         for s in helper_functions.seqs(open(fasta_path)):
-            head = s.split('\n')
+            head = s.split('\n')[0]
             num_seqs += 1
-            if '|' in head:
+            #MAD DEPENDENCY WARNING:
+            #THIS CODE IS DUPLICATED IN tools/blast.py, LINE 114
+            if '|' in head and head[1].isdigit():
                 head = head.split('|')
                 id = head[0].strip('>')
-                legend[id] = head[-1]
+                #expects header to look like: '>5524211|gb|AAD44166.1| cytochrome b |Elephas maximus maximus'
+                legend[id] = [head[3].strip()]#aah magic number.
 
         legend['length'] = num_seqs
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
 
+        exts = [".nhr",".nin",".nsq",c.blast_legend_file_extension]
 
+        for e in exts:
+            if not os.path.exists(os.path.join(out,name+e)):
+                msg = "BLAST DB creation failed: \n"
+                try:
+                    msg += open(err).read()
+                except:
+                    pass
+                shutil.rmtree(out)
+                self.write_socket({'response':'error','exception':msg})
+                return
 
         self.write_socket({'response': 'OK','length':num_seqs,"id":name})
 
@@ -522,6 +539,7 @@ returns self.decode_request of the data recieved.
         name = self.request_dict['db_name']
         num_seqs = sum((1 for l in open(fasta_path) if l.startswith('>')))
         out = os.path.join(c.blastdb_dir,name)
+        #why in the name of FSM is this called twice?
         framework.tools.blast.make_blastdb(fasta_path, 'additional',output_dir=out)
         framework.tools.blast.make_blastdb('"%s %s"' % ( J(out,'additional'),J(out,name)),name,output_dir=out,input_type='blastdb')
 
@@ -993,4 +1011,5 @@ desc - str
 
 if __name__ == '__main__':
     """Initializes the Server with the socket specified in config.py"""
+    df = json if len(sys.argv) > 1 and sys.argv[1] == "-d" and sys.argv[2] == "json" else cPickle
     Server(c.socket_name)
