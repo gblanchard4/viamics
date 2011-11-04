@@ -61,7 +61,10 @@ def make_blastdb(fasta_path, name,output_dir="",error_log=None,input_type="fasta
     args =  [str(a % varargs) for a in args] 
     print "\n\nrunning "+str(args)
     
-    exit_val = subprocess.call(args)
+    exit_val = subprocess.call(args,stderr=error_log)
+    if error_log:
+        error_log.close()
+        
     return exit_val
 
 class Blast_Result:

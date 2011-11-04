@@ -131,7 +131,7 @@ function uploadDone(frame) { //Function will be called when iframe is loaded.
 		    window.DBs.addOrUpdate(data)
                }
                else { //Upload failed - show user the reason.
-                   throw ret
+                   alert("Blast DB creation failed: "+data.exception);
                }
             } 
         } catch(err){

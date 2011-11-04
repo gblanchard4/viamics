@@ -503,7 +503,8 @@ returns self.decode_request of the data recieved.
         for escape_char in ['/','..',' ']:
             name = name.replace(escape_char, '_')
         out = os.path.join(c.blastdb_dir,name)#and here, to put all blastdbs in their own folder
-        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out)
+        err = os.path.join(out,name+".err")
+        framework.tools.blast.make_blastdb(fasta_path, name,output_dir=out,error_log=err)
 
         num_seqs = 0#sum((1 for l in open(fasta_path) if l.startswith('>')))
         legend = {'ranks':['species']}#this is where we can store any taxonomic information we have about the db
@@ -523,7 +524,18 @@ returns self.decode_request of the data recieved.
         legend['length'] = num_seqs
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
 
+        exts = [".nhr",".nin",".nsq",c.blast_legend_file_extension]
 
+        for e in exts:
+            if not os.path.exists(os.path.join(out,name+e)):
+                msg = "BLAST DB creation failed: \n"
+                try:
+                    msg += open(err).read()
+                except:
+                    pass
+                shutil.rmtree(out)
+                self.write_socket({'response':'error','exception':msg})
+                return
 
         self.write_socket({'response': 'OK','length':num_seqs,"id":name})
 
@@ -532,6 +544,7 @@ returns self.decode_request of the data recieved.
         name = self.request_dict['db_name']
         num_seqs = sum((1 for l in open(fasta_path) if l.startswith('>')))
         out = os.path.join(c.blastdb_dir,name)
+        #why in the name of FSM is this called twice?
         framework.tools.blast.make_blastdb(fasta_path, 'additional',output_dir=out)
         framework.tools.blast.make_blastdb('"%s %s"' % ( J(out,'additional'),J(out,name)),name,output_dir=out,input_type='blastdb')
 
