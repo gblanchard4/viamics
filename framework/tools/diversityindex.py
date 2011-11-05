@@ -88,9 +88,10 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
 
     pylab.title(__title)
 
-    for i in range(0, len(plot_dict)):
-        key = plot_dict.keys()[i]
+    keys = helper_functions.sorted_copy(plot_dict.keys())
 
+    for key in keys:
+        i = keys.index(key)
         # scattering the samples in X axis, so it would be easier to see them when there are a bunch of them
         # at the same spot. instead of this, [i] * len(plot_dict[key]) could be used to plot them.
         y_positions =  [((1 - (r.gauss(100, 3) /100)) + i) for x in range(0, len(plot_dict[key]))]
@@ -104,11 +105,9 @@ def generate_for_sample_map(samples_dict, sample_map_file_path, save_dir = None,
         pylab.setp(b['fliers'], color='black', alpha=0.3)
         pylab.setp(b['caps'], color='black', alpha=0.3)
 
-        pylab.plot([0], [max_val], visible = False)
-        pylab.plot([-0.9], [-max_val * 10 / 100], visible = False)
-        pylab.plot([i + 0.9], [max_val], visible = False)
         pylab.ylim(ymin=-max_val * 10 / 100, ymax=max_val)
-        pylab.xticks(pylab.      arange(len(plot_dict)), sample_groups.keys(), rotation=90)
+        pylab.xlim(xmin=-0.75, xmax=len(plot_dict) - 0.15)
+        pylab.xticks(pylab.arange(len(plot_dict)), keys, rotation=90)
 
     if not save_dir:
         pylab.show()
