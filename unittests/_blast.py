@@ -134,7 +134,7 @@ class Tests(unittest.TestCase):
                      'analysis_type':'blast',
                      'codes_primers':keyfile,
                      "qa_mode":fasta.STRIP_BARCODES_PRIMERS,
-                     #'return_when_done': True,
+                     'return_when_done': True,
                      })
         i = self.server({'request':'info',
                          'resource':'analysis',

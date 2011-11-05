@@ -152,7 +152,7 @@ def low_confidence_seqs(fasta_file, blast_outfile, thresholds, separator):
     #import pdb;pdb.set_trace()
     results = blast_results(blast_outfile)
     sequences = helper_functions.seqs(fasta_file)
-    below_threshold = set(best_alignment(res).qseqid for res in results if result_fails_threshold(res,thresholds))
+    below_threshold = set(best_alignment(res).qseqid for res in results if thresholds and result_fails_threshold(res,thresholds))
     for seq in sequences:
         s_id = seq.split()[0].strip('>')
         if s_id in below_threshold:

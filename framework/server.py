@@ -26,6 +26,7 @@ import sys
 import time
 import copy
 import zlib
+import json
 import shutil
 import socket
 import base64
@@ -50,7 +51,7 @@ from framework.tools import helper_functions
 from framework.tools.helper_functions import HeatmapOptions, SerializeToFile, DeserializeFromFile, GetCopy, RelativePath
 from framework.tools.logger import debug
 
-import framework.tools.rdp 
+import framework.tools.rdp
 import framework.tools.env
 import framework.tools.qpcr
 import framework.tools.vamps
@@ -80,7 +81,7 @@ class ServerState:
 
 
 class Server:
-    def __init__(self, socket_name):
+    def __init__(self, socket_name, data_format=cPickle):
         serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
             os.remove(c.socket_name)
@@ -106,9 +107,9 @@ class Server:
                 sys.exit(0)
 
             threadid = str(time.time())
-            thread = threading.Thread(target=ProcessRequest, args=(clientsocket,
-                                                                   serverstate,
-                                                                   threadid))
+            thread = threading.Thread(target=ProcessRequest,
+                                      args=(clientsocket,serverstate,threadid),
+                                      kwargs={'data_format':data_format})
             thread.setName(threadid)
             thread.start()
 
@@ -124,7 +125,7 @@ in `executors` will be called based on `dict["request"]`
 
 
     """
-    def __init__(self, clientsocket, serverstate, threadid):
+    def __init__(self, clientsocket, serverstate, threadid,data_format=cPickle):
         """
         reads one line of text from the clientsocket, passes the text through
         cPickle, then calls one of the functions in executors.
@@ -133,8 +134,9 @@ in `executors` will be called based on `dict["request"]`
         self.clientsocket = clientsocket
         self.socket_is_alive = True
         self.serverstate = serverstate
-        self.encode_response = lambda x: base64.encodestring(zlib.compress(cPickle.dumps(x), 9))
-        self.decode_request  = lambda x: cPickle.loads(zlib.decompress(base64.decodestring(x)))
+        self.encode_response = lambda x: base64.encodestring(zlib.compress(data_format.dumps(x), 9))
+        self.decode_request  = lambda x: data_format.loads(zlib.decompress(base64.decodestring(x)))
+        
         self.request_dict = self.read_socket()
 
         print "\n\n* Incoming Data: ", self.request_dict
@@ -224,10 +226,7 @@ returns self.decode_request of the data recieved.
         if analysis_id in self.serverstate.done_analyses:
             self.serverstate.done_analyses.remove(analysis_id)
 
-        if self.request_dict.get('id'):
-            shutil.rmtree(p.dirs.analysis_dir)
-        else:
-            shutil.move(p.dirs.analysis_dir,c.trash_bin)
+        helper_functions.move_or_delete(p.dirs.analysis_dir,c.trash_bin)
 
 
     def exec_analysis(self):
@@ -439,10 +438,7 @@ returns self.decode_request of the data recieved.
             self.remove_analysis()
         else:
             if(hasattr(c,res+'_dir')):
-                if os.path.exists(os.path.join(c.trash_bin,self.request_dict['id'])):
-                    shutil.rmtree(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']))
-                else:
-                    shutil.move(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
+                helper_functions.move_or_delete(os.path.join(getattr(c,res+'_dir'),self.request_dict['id']), c.trash_bin)
                 self.write_socket({'response':'OK'})
             else:
                 error_log = os.path.join(c.error_logs_dir, time_stamp.__str__())
@@ -1016,4 +1012,5 @@ desc - str
 
 if __name__ == '__main__':
     """Initializes the Server with the socket specified in config.py"""
+    df = json if len(sys.argv) > 1 and sys.argv[1] == "-d" and sys.argv[2] == "json" else cPickle
     Server(c.socket_name)
