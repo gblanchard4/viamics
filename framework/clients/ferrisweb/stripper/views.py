@@ -34,7 +34,7 @@ def run_stripper(fasta_file, key_file):
 
     cmd = stripper_cmd % {'keyfile':key_tmp,'fasta':fasta_tmp, 'prefix':filehash, 'stripper':Xstrip}
     #import pdb; pdb.set_trace()
-    subprocess.call(shlex.split(cmd))
+    subprocess.call(shlex.split(str(cmd)))
 
     ids = filter(lambda i: i.startswith(filehash),os.listdir('.'))
     real_ids = [i.strip(filehash) for i in ids]

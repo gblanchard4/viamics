@@ -1011,6 +1011,21 @@ desc - str
             return None
 
 if __name__ == '__main__':
-    """Initializes the Server with the socket specified in config.py"""
-    df = json if len(sys.argv) > 1 and sys.argv[1] == "-d" and sys.argv[2] == "json" else cPickle
-    Server(c.socket_name)
+    """Initializes the Server with the socket specified in config.py
+
+    Uses the pickle api by default. Pass the '-d json' argument to use the JSON api instead.
+    """
+
+    args = iter(sys.argv)
+    while(True):
+        try:
+            a = args.next()
+            if a == "-d":
+                form = args.next()
+                json_format = form if form == "json" else None
+                break
+        except StopIteration:
+            break
+    
+    df = json if json_format else cPickle
+    Server(c.socket_name,data_format=df)

@@ -26,7 +26,10 @@ class Tests(unittest.TestCase):
 
 
     def server(self, request):
-        return helper_functions.server(request)
+        if os.environ.get("data_format") == "json":
+            return helper_functions.server_json(request)
+        else:
+            return helper_functions.server(request)
 
     def testFrameworkStatus(self):
         server_request = {'request': 'status'}
@@ -46,7 +49,7 @@ class Tests(unittest.TestCase):
                           'data_file_sha1sum': self.analysis_id,
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}
-        response = helper_functions.server(server_request)
+        response = self.server(server_request)
         self.assertTrue(response['response'] == 'error')
         self.assertFalse(os.path.exists(self.rdp_analysis_dir))
 
@@ -59,19 +62,19 @@ class Tests(unittest.TestCase):
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}
         
-        helper_functions.server(server_request)
+        self.server(server_request)
         self.assertTrue(os.path.exists(self.rdp_analysis_dir))
         self.assertTrue(os.path.exists(os.path.join(self.rdp_analysis_dir,c.env_file_name)))
         #clean up:
         rm_request = {'request': 'remove_analysis',
                           'analysis_id': self.analysis_id}
-        helper_functions.server(rm_request)
+        self.server(rm_request)
 
 
         
 
     def testRepeatAnalysis(self):
-        state = helper_functions.server({'request':'get_analyses'})
+        state = self.server({'request':'get_analyses'})
         n = len(state['analyses'])
         #test analysis not already present:
         self.assertFalse(os.path.exists(self.rdp_analysis_dir))
@@ -84,21 +87,21 @@ class Tests(unittest.TestCase):
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}
 
-        helper_functions.server(server_request)
+        self.server(server_request)
         #request was executed:
         self.assertTrue(os.path.exists(self.rdp_analysis_dir))
 
-        state = helper_functions.server({'request':'get_analyses'})
+        state = self.server({'request':'get_analyses'})
         self.assertTrue(len(state['analyses']) == n+1) 
         #try to run the analysis again:
-        server_response = helper_functions.server(server_request)
+        server_response = self.server(server_request)
         #len should still be n+1:
         self.assertTrue(len(state['analyses']) == n+1)
         #clean up:
         rm_request = {'request': 'remove_analysis',
                           'analysis_id': self.analysis_id}
-        helper_functions.server(rm_request)
-        state = helper_functions.server({'request':'get_analyses'})
+        self.server(rm_request)
+        state = self.server({'request':'get_analyses'})
         #remove was successful:
         self.assertTrue(len(state['analyses']) == n)
         #print "state " + str(state)

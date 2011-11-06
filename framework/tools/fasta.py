@@ -146,7 +146,7 @@ def chimera_check(_seqs, threshold = 0.3):
     out.close()
 
     cmd = UCHIME_COMMAND % {"input":tmp_file,"output":uchime_out}
-    args = shlex.split(cmd)
+    args = shlex.split(str(cmd))
     subprocess.call(args)
 
     chimeras = set()

@@ -29,6 +29,7 @@ import socket
 import string
 import hashlib
 import cPickle
+import json
 import re
 import traceback
 
@@ -59,7 +60,13 @@ class HeatmapOptions:
         self.cexRow                = 1.5
         self.cexCol                = 1
 
-def server(request):
+def server_pickle(request):
+    return server(request)
+
+def server_json(request):
+    return server(request,data_format=json)
+
+def server(request,data_format=cPickle): 
     """
     #takes a python dict "request", and passes it to the Viamics server through
     #(currently) a UNIX domain socket. 
@@ -97,7 +104,6 @@ def server(request):
     #perform analysis:
     server({'request': 'exec_analysis', 'analysis_type': u'rdp',     'job_description': u'fasta', 'seperator': u'_',  'data_file_sha1sum': 'dad183c64f8d0d3516b5cf2c153ab9e97cdf97b4', 'data_file_path': '/home/johnny/Desktop/viamics/framework/tmp/1293740788.36/data_file'})
     #
-    #see [the wiki](https://github.com/meren/viamics/wiki/Client-API) for more details
     """
     serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
@@ -108,7 +114,7 @@ def server(request):
     # include a time stamp to the request
     request['time_stamp'] = get_time_stamp()
 
-    serversocket.send(base64.encodestring(zlib.compress(cPickle.dumps(request), 9)))
+    serversocket.send(base64.encodestring(zlib.compress(data_format.dumps(request), 9)))
 
     data = ""
     while True:
@@ -117,7 +123,7 @@ def server(request):
         if chunk[-1] == "\n":
             break
 
-    response = cPickle.loads(zlib.decompress(base64.decodestring(data)))
+    response = data_format.loads(zlib.decompress(base64.decodestring(data)))
     serversocket.close()
 
     return response

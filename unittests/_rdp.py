@@ -32,16 +32,19 @@ class Tests(unittest.TestCase):
         self.test_files = [self.test_fasta_file,
                            self.confidence,
                            self.QA_test_fasta]+self.split_analysis
-        
+
     def tearDown(self):
-        
+
         for t in self.test_files:
             self.server({'request': 'remove_analysis',
                      'analysis_id': helper_functions.get_sha1sum(t)+'-test'})
-            
+
 
     def server(self, request):
-        return helper_functions.server(request)
+        if os.environ.get("data_format") == "json":
+            return helper_functions.server_json(request)
+        else:
+            return helper_functions.server(request)
 
     def analysis_complete(self,id):
         analysis_dir = os.path.join(c.analyses_dir, id)

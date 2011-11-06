@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import sys
+import os
 
 #unittest declerations
 import _sanity
@@ -19,4 +21,19 @@ def __suite():
     return suite
 
 if __name__ == "__main__":
+    args = iter(sys.argv)
+    while(True):
+        try:
+            a = args.next()
+            if a == "-d":
+                form = args.next()
+                json_format = form if form == "json" else None
+                break
+        except StopIteration:
+            break
+        
+    if json_format:
+        print "using json data format"
+        os.environ["data_format"] = "json"
+    
     unittest.TextTestRunner(verbosity=3).run(__suite())

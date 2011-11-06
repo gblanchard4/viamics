@@ -123,7 +123,7 @@ def run_classifier(rdp_running_path, fasta_file, rdp_output_file, error_log = '/
     #we can add a condition to check the version. may need to do other stuff 
     #too as os.system was seeming to not block in some cases.
     command = (cmd % {'fasta_file': fasta_file, 'rdp_output_file': rdp_output_file, 'error_log': error_log})
-    args = shlex.split(command)
+    args = shlex.split(str(command))
     ret_val = subprocess.call(args)
     #ret_val = os.system(cmd % {'fasta_file': fasta_file, 'rdp_output_file': rdp_output_file, 'error_log': error_log})
     os.chdir(cur_dir)

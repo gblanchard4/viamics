@@ -66,7 +66,10 @@ class Tests(unittest.TestCase):
             
 
     def server(self, request):
-        return helper_functions.server(request)
+        if os.environ.get("data_format") == "json":
+            return helper_functions.server_json(request)
+        else:
+            return helper_functions.server(request)
 
     def analysis_complete(self,id):
         analysis_dir = os.path.join(c.analyses_dir, id)
