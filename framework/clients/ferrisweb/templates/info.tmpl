@@ -113,11 +113,12 @@
 <p align="center"><img src="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.shannon_diversity_index_img }}">
 
 
-<div class="smallhead">Rarefaction Curves <span style="font-size: 0.4em;"><a name="rarefaction_curves_sect" href="#top" title="top">^</a></span></div>
-<p class="smallheadtitle">» All Samples: Eeach curve on the image shows the rarefaction curve of the sample compared to others. Curves may not be very informative due to scaling.
+
 {% ifnotequal analysis.info.type "rdp" %}
-    <p class="info">Rarefaction curves are not being computed for this type of analysis.
+    <!--<p class="info">Rarefaction curves are not being computed for this type of analysis.-->
 {% else %}
+      <div class="smallhead">Rarefaction Curves <span style="font-size: 0.4em;"><a name="rarefaction_curves_sect" href="#top" title="top">^</a></span></div>
+<p class="smallheadtitle">» All Samples: Eeach curve on the image shows the rarefaction curve of the sample compared to others. Curves may not be very informative due to scaling.</p>
     {% ifequal analysis.info.rarefaction_all_samples_exists 0 %}
         <p class="info">Rarefaction curves are being computed. It may take a while.
         <p align="center"><img src="{{ request.META.HTTP_HOST }}/static/running.gif">
