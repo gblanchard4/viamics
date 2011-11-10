@@ -23,7 +23,9 @@
 <div class="title">{{ analysis.info.id }}</div>
 <div class="links-bar">{% include "links.tmpl" %} / <a href="{{ request.META.HTTP_HOST }}/create_sample_map/{{ analysis.info.id }}/0">Create New Sample Map</a></div>
 {% if analysis.info.data_comment %}
-     <p class="info">{{ analysis.info.data_comment|linebreaksbr }}</p>
+     <p class="info">{{ analysis.info.data_comment|linebreaksbr }}
+       
+     </p>
 {%  endif %}
 
 <div class="smallhead">Table of Contents</div>
@@ -79,6 +81,7 @@
         {% for otu, count in value %}
             <i>{{ otu }}:</i> <b>{{ count }}</b><br />
         {% endfor %}
+
     {% endifequal %}
 {% endfor %}
 </div><b class="spiffy"><b class="spiffy5"></b><b class="spiffy4"></b><b class="spiffy3"></b><b class="spiffy2"><b></b></b><b class="spiffy1"><b></b></b></b></div></span></a>

@@ -818,7 +818,7 @@ returns self.decode_request of the data recieved.
                      'shannon_diversity_index_img': os.path.join(analysis_id, c.shannon_diversity_index_img_name),
                      'simpsons_diversity_index_img': os.path.join(analysis_id, c.simpsons_diversity_index_img_name),
                      'shannon_diversity_index_data': os.path.join(analysis_id, c.shannon_diversity_index_data_name),
-                     'simpsons_diversity_index_data': os.path.join(analysis_id, c.simpsons_diversity_index_data_name)
+                     'simpsons_diversity_index_data': os.path.join(analysis_id, c.simpsons_diversity_index_data_name),
                                            }
         #
         if(os.path.exists(p.files.data_comment_file_path)):
@@ -1016,6 +1016,7 @@ if __name__ == '__main__':
     Uses the pickle api by default. Pass the '-d json' argument to use the JSON api instead.
     """
 
+    json_format = None
     args = iter(sys.argv)
     while(True):
         try:

@@ -16,6 +16,7 @@
 #
 
 import os
+import numpy
 
 import framework.tools.rdp
 
@@ -74,6 +75,7 @@ def _exec(p, request_dict):
     rarefaction_curves(p)
     if hasattr(p,'threshold'):
         separate_low_confidence(p)
+    read_length_distribution(p)
 
 
 def _append(p, request_dict):
@@ -180,6 +182,24 @@ def rdp_samples_confidence_image(p):
     seperator = open(p.files.seperator_file_path).read()
     samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
     framework.tools.rdp.sample_confidence_analysis(p.files.rdp_output_file_path, p.dirs.analysis_dir, seperator, samples)
+    
+
+def read_length_distribution(p):
+    separator = open(p.files.seperator_file_path).read()
+    
+    seqs=framework.tools.helper_functions.seqs(open(p.files.data_file_path))
+    lows=framework.tools.helper_functions.seqs(open(p.files.low_confidence_seqs_path))
+    low_ids = set([s.split()[0].strip(">") for s in lows])
+    
+    lens = [len(s.strip().split("\n")[1]) for s in seqs
+            if s.split()[0].strip(">") not in low_ids]
+    m = numpy.mean(lens)
+    std = numpy.std(lens)
+
+    with open(p.files.data_comment_file_path,"a") as c:
+        c.write("\n%d total reads, with %d excluded due to confidence threshold (threshold is %d)\n"%(len(lens)+len(low_ids),len(low_ids),p.threshold if p.threshold else 0))
+        c.write("Mean read length of %d (standard dev. of %d)\n"%(m,std))
+    
 
 
 def otu_library(p):

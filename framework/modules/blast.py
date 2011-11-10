@@ -21,6 +21,7 @@
 #/home/username/Desktop/My bioinformatics folder/viamics, there could be a problem. 
 import os
 import cPickle
+import numpy
 
 from framework.tools.helper_functions import SerializeToFile, DeserializeFromFile
 from framework.tools.logger import debug
@@ -95,7 +96,7 @@ def _exec(p, request_dict):
         if hasattr(p,'threshold'):
             separate_low_confidence(p)
     
-    
+    read_length_distribution(p)
 
 def samples_dictionary(p):
     debug("Computing sample dictionary", p.files.log_file)
@@ -129,6 +130,23 @@ def separate_low_confidence(p):
     with open(p.files.low_confidence_seqs_path,'w') as o:
         for s in lo_seqs:
             o.write(s)
+
+def read_length_distribution(p):
+    separator = open(p.files.seperator_file_path).read()
+    
+    seqs=framework.tools.helper_functions.seqs(open(p.files.data_file_path))
+    lows=framework.tools.helper_functions.seqs(open(p.files.low_confidence_seqs_path))
+    low_ids = set([s.split()[0].strip(">") for s in lows])
+    
+    lens = [len(s.strip().split("\n")[1]) for s in seqs
+            if s.split()[0].strip(">") not in low_ids]
+    m = numpy.mean(lens)
+    std = numpy.std(lens)
+
+    with open(p.files.data_comment_file_path,"a") as c:
+        c.write("\n%d total reads, with %d excluded due to confidence threshold\n"%(len(lens)+len(low_ids),len(low_ids)))
+        c.write("Mean read length of %d (standard dev. of %d)\n"%(m,std))
+
 
 
 def _module_functions(p, request_dict):

@@ -474,6 +474,8 @@ def get_samples_genus_OTUs(analysis_id):
         else:
             samples_genus_OTUs[sample] = Sort(samples_dict[sample]['species'])
 
+    for sample in samples_genus_OTUs.itervalues():
+        sample.append(("total reads",sum([v[1] for v in sample])))
 
     return samples_genus_OTUs
 
