@@ -116,7 +116,8 @@ class Alignment:
         #MAD DEPENDENCY WARNING:
         #THIS CODE IS DUPLICATED IN server.py, LINE 516
         if '|' in self.sseqid and self.sseqid[1].isdigit():
-                self.sseqid = self.sseqid.strip('>').split('|')[0]
+            id,val = helper_functions.id_and_classification(self.sseqid,"|",0,3)#aah magic number.
+            self.sseqid = id
         
 def blast_results(f, fmt=7):
     """f is a file-like object that contains the output of a blastn search. Returns an iterator of BlastResult objects. """

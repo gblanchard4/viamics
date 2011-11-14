@@ -189,6 +189,9 @@ def formatExceptionInfo(maxTBlevel=5):
         text += line
     return text
 
+def id_and_classification(defline,delim,id_position,classification_position):
+    l = defline.strip(">").split(delim)
+    return (l[id_position].strip(),l[classification_position].strip())
 
 
 def get_largest_abundance_number_in_all_samples(samples_dict):

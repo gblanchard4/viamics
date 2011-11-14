@@ -509,13 +509,14 @@ returns self.decode_request of the data recieved.
         for s in helper_functions.seqs(open(fasta_path)):
             head = s.split('\n')[0]
             num_seqs += 1
+
             #MAD DEPENDENCY WARNING:
-            #THIS CODE IS DUPLICATED IN tools/blast.py, LINE 114
+            #THIS CODE IS DUPLICATED IN tools/blast.py, LINE 119 (BlastResult.__init__)
             if '|' in head and head[1].isdigit():
-                head = head.split('|')
-                id = head[0].strip('>')
                 #expects header to look like: '>5524211|gb|AAD44166.1| cytochrome b |Elephas maximus maximus'
-                legend[id] = [head[3].strip()]#aah magic number.
+                id,val = helper_functions.id_and_classification(head,"|",0,3)#aah magic number.
+                legend[id] = val
+
 
         legend['length'] = num_seqs
         cPickle.dump(legend,open(os.path.join(out, name+c.blast_legend_file_extension),'w'))
