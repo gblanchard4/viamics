@@ -38,6 +38,7 @@ def dirs():
             "Analyses dirirectory": c.analyses_dir,
             "Error logs directory": c.error_logs_dir,
             "Temporary files directory": c.temp_files_dir,
+            "BLAST db directory"       : c.blastdb_dir,
             "Trash directory"          : c.trash_bin
             }
 
