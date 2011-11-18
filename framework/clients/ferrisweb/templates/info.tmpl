@@ -41,12 +41,14 @@
         <li class="fancy"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis.info.id }}/dendrograms/">Dendrograms (Sample Clusters)</a></li>
 	<li class="fancy">Downloads
 	    <ul>
-	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/data_file">
-	      All sequences data file</a></li>
-	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/split_fasta/">
-	      Sequences split by sample</a></li>
+        {% if analysis.info.type == "rdp" or  analysis.info.type == "blast"  %}
+	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/data_file">All sequences data file</a></li>
+	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/split_fasta/">Sequences split by sample</a></li>
 	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/low_confidence_seqs/">Sequences below confidence threshold</a></li>
-	    </ul>
+        {% else %}
+	      <li><a href="{{ request.META.HTTP_HOST }}/media/{{ analysis.info.id }}/data_file">Data file</a></li>
+	    {% endif %} 
+        </ul>
 	</li>
         <br />
         <br />
