@@ -1,13 +1,18 @@
 {% extends "base.tmpl" %}
 
-{% block title %}Info..{% endblock %}
+{% block title %}Viamics » New RDP Analysis{% endblock %}
 
 {% block content %}
+
+{% block header_section %}
 <div class="head">Viamics » New RDP Analysis</div>
 <div class="title">Hmm..</div>
 <div class="links-bar">{% include "links.tmpl" %}</div>
+{% endblock header_section %}
+
 
 <p class="info">{% block info%}Upload your sequences for analysis. If you provide a confidence threshold (between 0 and 1), any sequences classified with a confidence lower than the threshold will be regarded as unclassified.{% endblock info%}</p>
+
 <!-- Upload form -->
 <div class="form">
 <form enctype="multipart/form-data" method="post" action="{{ form.CREATE_URL }}">

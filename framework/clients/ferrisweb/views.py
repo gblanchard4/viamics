@@ -626,7 +626,7 @@ def new_analysis(request, analysis_type):
             form = webforms.QpcrUploadForm(request.POST, request.FILES)
         if analysis_type == "env":
             form = webforms.EnvUploadForm(request.POST, request.FILES)
-        if analysis_type == 'blast':
+        if analysis_type == "blast":
             form = webforms.BlastUploadForm(request.POST, request.FILES)
         if analysis_type == "vamps":
             form = webforms.VampsUploadForm(request.POST, request.FILES)
