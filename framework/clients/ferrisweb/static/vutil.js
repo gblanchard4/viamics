@@ -22,7 +22,7 @@ function set_dependent(container, newval)
 
 function prepend(obj,new_element)
 {
-    p = obj.parentElement;
+    p = obj.parentNode;
     p.insertBefore(new_element,obj);
 
 }
