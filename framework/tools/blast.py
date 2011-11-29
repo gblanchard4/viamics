@@ -115,8 +115,8 @@ class Alignment:
 
         #MAD DEPENDENCY WARNING:
         #THIS CODE IS DUPLICATED IN server.py, LINE 516
-        if '|' in self.sseqid and self.sseqid[1].isdigit():
-            id,val = helper_functions.id_and_classification(self.sseqid,"|",0,3)#aah magic number.
+        id,val = helper_functions.id_and_classification(self.sseqid)
+        if id:
             self.sseqid = id
         
 def blast_results(f, fmt=7):

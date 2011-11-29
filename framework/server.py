@@ -512,10 +512,9 @@ returns self.decode_request of the data recieved.
 
             #MAD DEPENDENCY WARNING:
             #THIS CODE IS DUPLICATED IN tools/blast.py, LINE 119 (BlastResult.__init__)
-            if '|' in head and head[1].isdigit():
-                #expects header to look like: '>5524211|gb|AAD44166.1| cytochrome b |Elephas maximus maximus'
-                id,val = helper_functions.id_and_classification(head,"|",0,3)#aah magic number.
-                legend[id] = val
+            id,val = helper_functions.id_and_classification(head)
+            if val:
+                legend[id] = [val]
 
 
         legend['length'] = num_seqs

@@ -189,11 +189,60 @@ def formatExceptionInfo(maxTBlevel=5):
         text += line
     return text
 
-def id_and_classification(defline,delim,id_position,classification_position):
+
+### VIAMICS SUPPORTED DEFLINE FORMATS: ########################
+#  GenBank                           gi|gi-number|gb|accession|locus
+#  EMBL Data Library                 gi|gi-number|emb|accession|locus
+#  DDBJ, DNA Database of Japan       gi|gi-number|dbj|accession|locus
+#  General database identifier       gnl|database|identifier
+#  NCBI Reference Sequence           ref|accession|locus
+#  Local Sequence identifier         lcl|identifier
+#  Interim (CHNOLA)		     identifier|xxx|xxx|locus
+#  Local (CHNOLA)		     lcl|unique id|locus
+#  GenInfo Backbone Id               bbs|number
+#
+### NOT SUPPORTED: ############################################
+#  NBRF PIR                          pir||entry
+#  Protein Research Foundation       prf||name
+#  SWISS-PROT                        sp|accession|name
+#  Brookhaven Protein Data Bank (1)  pdb|entry|chain
+#  Brookhaven Protein Data Bank (2)  entry:chain|PDBID|CHAIN|SEQUENCE
+#  Patents                           pat|country|number
+#  
+#  in most cases what we want for the classification is 'locus'
+
+def _gnl(l):
+    l = defline.strip(">").split(DLM)
+    res = l[1]+":"+l[2]
+    return (res,res)
+    
+    
+DLM = '|'
+#  dict from type of defline to parsing function:
+ID_GETTERS = {
+    "gi":lambda l: nthelem(l,DLM,1,4),
+    "interim":lambda l:nthelem(l,DLM,0,3),
+    "gnl":_gnl,
+    "lcl":lambda l:nthelem(l,DLM,1,2) if len(l.split(DLM)) == 3 else nthelem(l,DLM,1,1),
+    "bbs":lambda l:nthelem(l,DLM,1,1),
+    "ref":lambda l:nthelem(l,DLM,1,2)
+    }
+
+def nthelem(defline,delim,id_position,classification_position):
     l = defline.strip(">").split(delim)
     return (l[id_position].strip(),l[classification_position].strip())
 
+def id_and_classification(l):
+    tag = l.strip('>').split(DLM)[0].strip()
+    if tag in ID_GETTERS:
+        return ID_GETTERS[tag](l)
+    elif DLM in l and l[1].isdigit():#awkward interim CHNOLA format. Mea maxima culpa
+        return ID_GETTERS['interim'](l)
+    else:
+        return (None,None)
 
+#^^^end defline code##############################
+    
 def get_largest_abundance_number_in_all_samples(samples_dict):
     abundance_values = []
     for sample in samples_dict:
