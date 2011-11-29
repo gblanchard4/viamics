@@ -223,7 +223,7 @@ ID_GETTERS = {
     "gi":lambda l: nthelem(l,DLM,1,4),
     "interim":lambda l:nthelem(l,DLM,0,3),
     "gnl":_gnl,
-    "lcl":lambda l:nthelem(l,DLM,1,2) if len(l.split(DLM)) == 3 else nthelem(l,DLM,1,1),
+    "lcl":lambda l:nthelem(l,DLM,1,2) if len(l.split(DLM)) >= 3 else nthelem(l,DLM,1,1),
     "bbs":lambda l:nthelem(l,DLM,1,1),
     "ref":lambda l:nthelem(l,DLM,1,2)
     }
