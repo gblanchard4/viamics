@@ -185,4 +185,4 @@ def env_file(p):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
     analysis_type = open(p.files.type_of_analysis_file_path).read()
     outfile = open(p.files.env_file_path,'w')
-    helper_functions.write_rows(helper_functions.env_triples(samples_dict,c.ranks[analysis_type][0]),outfile)
+    helper_functions.write_rows(helper_functions.env_triples(samples_dict,c.ranks[analysis_type.strip()][0]),outfile)

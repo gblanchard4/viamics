@@ -32,6 +32,9 @@ import cPickle
 import json
 import re
 import traceback
+import zipfile
+import tarfile
+import StringIO
 
 from scipy import log2
 
@@ -315,7 +318,7 @@ def seqs(f, include_comments = False):
 #Fast UniFrac webapp
 ################################################################################
 NON_ALPHANUMERIC = re.compile('[\W_]+')
-import zipfile
+
 
 def env_triples(samples_dict, level):
     """A generator of 3-tuples (otu, sample, quantity) for all samples in samples_dict. Level is the taxonomic level (genus, phylum, etc. ) to use for otus"""
@@ -350,10 +353,14 @@ def write_category_map(rows, map_file):
     
 
 def write_rows(rows, f,delim='\t'):
-    z = zipfile.ZipFile(f, 'w',zipfile.ZIP_DEFLATED)
-    z.writestr(f.name.split('/')[-1],
-               reduce(lambda a,b: a+b, [str.join(delim,map(lambda x: str.strip(str(x)),r))+'\n' for r in rows]))
-    z.close()
+    fo = tarfile.open('','w:gz',f)
+    s = StringIO.StringIO()
+    s.write(reduce(lambda a,b: a+b, [str.join(delim,map(lambda x: str.strip(str(x)),r))+'\n' for r in rows]))
+    s.seek(0)
+    inf = tarfile.TarInfo(name=f.name.split('/')[-1].strip(".tar.gz"))
+    inf.size = len(s.buf)
+    fo.addfile(tarinfo=inf, fileobj=s)
+    fo.close()
 
 ################################################################################
 #End Fast Unifrac tools

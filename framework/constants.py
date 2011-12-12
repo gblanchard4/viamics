@@ -83,7 +83,7 @@ low_confidence_seqs_file_name = 'low_confidence_seqs'
 threshold_file_name           = 'confidence_threshold'
 
 #general data files
-env_file_name = 'sampleIDmap.zip'
+env_file_name = 'sampleIDmap.tar.gz'
 data_file_name = "data_file"
 data_comment_file_path = "data_comments"
 seperator_file_name = "seperator"
@@ -121,7 +121,7 @@ sample_map_dendrograms_dir_name = "dendrograms"
 sample_map_taxon_charts_dir_name = "taxon_charts"
 sample_map_name_file_name = "map_name"
 sample_map_file_name = "sample_map"
-category_map_file_name = "categoryMap.zip"
+category_map_file_name = "categoryMap.tar.gz"
 sample_map_filtered_samples_dict_file_name = "filtered_samples_dict_serialized"
 sample_map_otu_t_p_tuples_dict_file_name = "otu_t_p_tuples_dict"
 sample_map_otu_t_p_tuples_dict_real_file_name = "otu_t_p_tuples_real_dict" #for qpcr
