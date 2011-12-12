@@ -258,14 +258,25 @@ def create_sample_map(request, analysis_id, step):
         server_response = server(server_request)
         return server_response['name']
 
-    def is_valid(sample_map):
+    def validate(sample_map):        
         if len(sample_map) < 2:
             raise ValueError(str(sample_map))
         names = set(get_sample_names())
         for line in sample_map:
-            if line[0] not in names:
+            try:
+                numeric_name = str(int(line[0]))
+            except ValueError:
+                numeric_name = line[0]
+            if line[0] in names: 
+                valid_name = line[0]
+            elif line[0].strip() in names:
+                valid_name = line[0].strip()
+            elif numeric_name in names:
+                valid_name = numeric_name
+            else:                
                 raise ValueError(line[0]+' is not a valid sample name for this analysis')
-        return True
+            line[0] = valid_name
+            yield line
         
 
 
@@ -281,9 +292,8 @@ def create_sample_map(request, analysis_id, step):
         if len(request.FILES)>0:#uploaded file
             f = request.FILES[request.FILES.keys()[0]].read()
             try:
-                f = csvformat(f)
-                is_valid(f)
-                for l in f:
+                map_rows = validate(csvformat(f))
+                for l in map_rows:
                     sample_map_dict["sample_map_list"].append({'sample': l[0], 'group': l[1]})
             except ValueError as e:
                 return err_response({"content":"The uploaded file is not valid. "+str(e)})
