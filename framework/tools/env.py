@@ -87,7 +87,10 @@ def create_samples_dictionary(env_file):
         abundance = int(line.split("\t")[2].strip())
 
         if samples_dict.has_key(sample):
-            samples_dict[sample]['species'][species] = abundance
+            if samples_dict[sample]['species'].has_key(species):
+                samples_dict[sample]['species'][species] += abundance
+            else:
+                samples_dict[sample]['species'][species] = abundance
         else:
             samples_dict[sample] = {}
             samples_dict[sample]['species'] = {species: abundance}
