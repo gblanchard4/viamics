@@ -45,7 +45,7 @@ class Tests(unittest.TestCase):
         server_request = {'request': 'exec_analysis',
                           'analysis_type': u'bad_value',
                           'job_description': u'test',
-                          'seperator': u'_',
+                          'separator': u'_',
                           'data_file_sha1sum': self.analysis_id,
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}
@@ -57,7 +57,7 @@ class Tests(unittest.TestCase):
         server_request = {'request': 'exec_analysis',
                           'analysis_type': u'rdp',
                           'job_description': u'test',
-                          'seperator': u'_',
+                          'separator': u'_',
                           'data_file_sha1sum': self.analysis_id,
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}
@@ -82,7 +82,7 @@ class Tests(unittest.TestCase):
         server_request = {'request': 'exec_analysis',
                           'analysis_type': u'rdp',
                           'job_description': u'test',
-                          'seperator': u'_',
+                          'separator': u'_',
                           'data_file_sha1sum': self.analysis_id,
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}

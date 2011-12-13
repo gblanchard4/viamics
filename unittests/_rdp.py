@@ -83,7 +83,7 @@ class Tests(unittest.TestCase):
         server_request = {'request': 'exec_analysis',
                           'analysis_type': u'rdp',
                           'job_description': u'test',
-                          'seperator': u'_',
+                          'separator': u'_',
                           'data_file_sha1sum': self.analysis_id,
                           'data_file_path': self.test_fasta_file,
                           'return_when_done': True}
@@ -104,7 +104,7 @@ class Tests(unittest.TestCase):
         id = helper_functions.get_sha1sum(initial)+'-test'
         
             #create the analysis:
-        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':initial,'seperator':':','job_description':'cat-test','analysis_type':'rdp','return_when_done': True})
+        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':initial,'separator':':','job_description':'cat-test','analysis_type':'rdp','return_when_done': True})
         i = self.server({'request':'info','resource':'analysis','analysis_id':id})
         self.assertTrue(len(i['info']['all_unique_samples_list']) == 1)
         
@@ -122,7 +122,7 @@ class Tests(unittest.TestCase):
         id = helper_functions.get_sha1sum(self.confidence)+'-test'
 
         #also you can check the samples_dict to count how many were classified
-        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':self.confidence,'seperator':'_','job_description':'confidence test','analysis_type':'rdp','return_when_done': True,'threshold':0.8})
+        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':self.confidence,'separator':'_','job_description':'confidence test','analysis_type':'rdp','return_when_done': True,'threshold':0.8})
         i = self.server({'request':'info','resource':'analysis','analysis_id':id})
         n_low = count_seqs(open(os.path.join(c.analyses_dir,id,c.low_confidence_seqs_file_name)))
         path = self.server({'request':'get_samples_dict_path','analysis_id':id})['samples_dict_path']
@@ -137,7 +137,7 @@ class Tests(unittest.TestCase):
                      'analysis_id': id})
 
         
-        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':self.confidence,'seperator':'_','job_description':'confidence test','analysis_type':'rdp','return_when_done': True,'threshold':0.9999})
+        self.server({'request':'exec_analysis','data_file_sha1sum':id,'data_file_path':self.confidence,'separator':'_','job_description':'confidence test','analysis_type':'rdp','return_when_done': True,'threshold':0.9999})
         i = self.server({'request':'info','resource':'analysis','analysis_id':id})
         n_low = count_seqs(open(os.path.join(c.analyses_dir,id,c.low_confidence_seqs_file_name)))
         print 'should be 11: '+str(n_low)
@@ -153,7 +153,7 @@ class Tests(unittest.TestCase):
         self.server({'request':'exec_analysis',
                      'data_file_sha1sum':id,
                      'data_file_path':self.QA_test_fasta,
-                     'seperator':'_',
+                     'separator':'_',
                      'job_description':'QA test',
                      'analysis_type':'rdp',
                      'codes_primers':keyfile,
