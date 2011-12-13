@@ -22,6 +22,7 @@ def __suite():
 
 if __name__ == "__main__":
     args = iter(sys.argv)
+    json_format = False
     while(True):
         try:
             a = args.next()
