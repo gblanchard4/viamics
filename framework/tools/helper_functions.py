@@ -105,7 +105,7 @@ def server(request,data_format=cPickle):
     server({ 'request': 'remove_analysis', 'analysis_id':             'b7782ab61207929a9e8a2f12eb52b977800d8979-test'})
     #
     #perform analysis:
-    server({'request': 'exec_analysis', 'analysis_type': u'rdp',     'job_description': u'fasta', 'seperator': u'_',  'data_file_sha1sum': 'dad183c64f8d0d3516b5cf2c153ab9e97cdf97b4', 'data_file_path': '/home/johnny/Desktop/viamics/framework/tmp/1293740788.36/data_file'})
+    server({'request': 'exec_analysis', 'analysis_type': u'rdp',     'job_description': u'fasta', 'separator': u'_',  'data_file_sha1sum': 'dad183c64f8d0d3516b5cf2c153ab9e97cdf97b4', 'data_file_path': '/home/johnny/Desktop/viamics/framework/tmp/1293740788.36/data_file'})
     #
     """
     serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

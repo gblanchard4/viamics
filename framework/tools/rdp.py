@@ -129,8 +129,8 @@ def run_classifier(rdp_running_path, fasta_file, rdp_output_file, error_log = '/
     os.chdir(cur_dir)
     return (ret_val, error_log)
 
-def merge(samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_file, original_rdp_output_file, seperator):
-    samples_in_original_rdp_output = list(set([s.split(seperator)[0] for s in open(original_rdp_output_file).readlines()]))
+def merge(samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_file, original_rdp_output_file, separator):
+    samples_in_original_rdp_output = list(set([s.split(separator)[0] for s in open(original_rdp_output_file).readlines()]))
     print "samples in rdp output:", samples_in_original_rdp_output
     print "samples in fasta:", original_samples
     print "additional samples:", additional_samples
@@ -155,7 +155,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
         # tmp_rdp_output += (original samples) - (samples to replace)
         i = 0
         while i < len(original_rdp_output_lines):
-            sample = original_rdp_output_lines[i].split(seperator)[0]
+            sample = original_rdp_output_lines[i].split(separator)[0]
             if sample in samples_to_replace:
                 i += 1
             else:
@@ -177,7 +177,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
         #i = 0
         #while i < len(original_rdp_output_lines):
         #    if original_rdp_output_lines[i].startswith('>'):
-        #        sample = original_rdp_output_lines[i].split(seperator)[0][1:]
+        #        sample = original_rdp_output_lines[i].split(separator)[0][1:]
         #        if sample in samples_to_replace:
         #            i += 1
         #            while True:
@@ -193,7 +193,7 @@ def merge(samples_serialized_file_path, additional_samples, original_samples, ad
         #        i += 1
 
     all_samples = list(set(original_samples + additional_samples))
-    updated_samples_dict = create_samples_dictionary(original_rdp_output_file, seperator, all_samples)
+    updated_samples_dict = create_samples_dictionary(original_rdp_output_file, separator, all_samples)
     write_samples_dictionary(samples_serialized_file_path, updated_samples_dict)
 
 
@@ -242,14 +242,14 @@ def filled_ranks(classifications):
     return result
 
 
-def create_samples_dictionary(rdp_output_file, seperator, samples,threshold=None):
+def create_samples_dictionary(rdp_output_file, separator, samples,threshold=None):
     """reads output file and and creates total count entries in the dictionary for matching samples in the 'samples' list. This is the fundamental operation that a module needs to do - the commons module assumes that a samples_dict has already been created for any analysis.
 
     samples_dict contains the {sample_id:{level:{otu_id:count,...},...},...} information used for the various visual and statistical analyses"""
 
     samples_dict = {}
 
-    for res in rdp_results(open(rdp_output_file),seperator):
+    for res in rdp_results(open(rdp_output_file),separator):
         if res.sample_id in samples:
             #line is from a sample we're interested in
 
@@ -285,7 +285,7 @@ def create_samples_dictionary(rdp_output_file, seperator, samples,threshold=None
     return samples_dict
 
 
-def otu_confidence_analysis(rdp_output_file, save_path, seperator, samples, rank = "genus"):
+def otu_confidence_analysis(rdp_output_file, save_path, separator, samples, rank = "genus"):
     otu_loc_in_rdp_output = {}
     # silly magic numbers.. one day I'll be very sorry for not storing them in one location.
     # please don't hate me; just consider fixing it :p
@@ -304,7 +304,7 @@ def otu_confidence_analysis(rdp_output_file, save_path, seperator, samples, rank
     # fill the information into a dictionary with one pass.
     for line in lines:
         s = line.split('\t')
-        sample = s[0].split(seperator)[0]
+        sample = s[0].split(separator)[0]
         otu = s[otu_loc]
         rdp_confidence = float(s[otu_loc + 2].strip())
 
@@ -472,7 +472,7 @@ def general_confidence_analysis(rdp_output_file, save_path):
         pass
     pylab.close('all')
 
-def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_list = []):
+def sample_confidence_analysis(rdp_output_file, save_path, separator, samples_list = []):
     """parses rdp output and stores classification confidence
        for every sample at genus level to generate an image
        with box plots"""
@@ -486,7 +486,7 @@ def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_li
 
     for line in lines:
         s = line.split('\t')
-        sample = s[0].split(seperator)[0]
+        sample = s[0].split(separator)[0]
         genus_level_confidence = s[22]
         if sample in samples_list:
             if not confidence_dict.has_key(sample):
@@ -541,10 +541,10 @@ def sample_confidence_analysis(rdp_output_file, save_path, seperator, samples_li
     pylab.close('all')
 
 
-def extract_sample_names(fasta_file, seperator):
+def extract_sample_names(fasta_file, separator):
     """finds unique sample names within the entire library, e.g., returns MZH-92 for MZH-92_F58614Y04I2TQV,
        MZH-92_F58614Y04I2TQV, MZH-92_F58614Y04IXSC2 and MZH-92_F58614Y04IKEJL"""
-    return list(set([x[1:].split()[0].split(seperator)[0]
+    return list(set([x[1:].split()[0].split(separator)[0]
                      for x in open(fasta_file).readlines() if x[0] == ">"]))
 
 
@@ -560,7 +560,7 @@ def main(options, samples):
         sys.exit(3)
     #else: we have options.rdp_output_file ready.
 
-    samples_dict = create_samples_dictionary(options.rdp_output_file, options.seperator, samples)
+    samples_dict = create_samples_dictionary(options.rdp_output_file, options.separator, samples)
 
     if options.serialized_object_file:
         write_samples_dictionary(options.serialized_object_file, samples_dict)
@@ -576,7 +576,7 @@ if __name__ == "__main__":
                               type="string", help="FASTA formatted input file with sequences", metavar="FILE")
     parser.add_option("-o", "--output-file", dest="rdp_output_file",
                               help="RDP classifier output", metavar="FILE")
-    parser.add_option("-s", "--seperator", type="string", dest="seperator",
+    parser.add_option("-s", "--separator", type="string", dest="separator",
                               help="character that seperates sample name from unique sequenec id (e.g., '_' for 'MZH-92_F58614Y04I2TQV' where MZH-92 is the sample name and F58614Y04I2TQV is the unique sequence id in the FASTA library)")
     parser.add_option("-r", "--rdp-classifier-directory", type="string", dest="rdp_running_path",
                               help="full path to the directory where RDP classifier is on the file system")
@@ -617,15 +617,15 @@ if __name__ == "__main__":
         sys.exit(2)
 
 
-    if not options.seperator:
-        print "\nError: You need to provide a 'seperator'\n"
+    if not options.separator:
+        print "\nError: You need to provide a 'separator'\n"
         parser.print_help()
         sys.exit(1)
 
-    samples = extract_sample_names(options.fasta_file, options.seperator)
+    samples = extract_sample_names(options.fasta_file, options.separator)
 
     if len(samples) == 0:
-        print "\nError: It seems either input file is not a FASTA file or 'seperator' is not correct\n"
+        print "\nError: It seems either input file is not a FASTA file or 'separator' is not correct\n"
         parser.print_help()
         sys.exit(1)
 

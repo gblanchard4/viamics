@@ -929,7 +929,7 @@ class Files:
         self.all_unique_samples_file_path          = J(c.all_unique_samples_file_name)
         self.otu_library_file_path                 = J(c.otu_library_file_name)
         self.rdp_error_log_file_path               = J(c.rdp_error_log_file_name)
-        self.seperator_file_path                   = J(c.seperator_file_name)
+        self.separator_file_path                   = J(c.separator_file_name)
         self.log_file                              = J(c.log_file_name)
         self.job_file                              = J(c.job_name_file_name)
         self.type_of_analysis_file_path            = J(c.type_of_analysis_file_name)

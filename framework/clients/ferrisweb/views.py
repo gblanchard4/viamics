@@ -421,7 +421,7 @@ def blastdbs(request):
 def split_fasta(request,analysis_id):
     """Really it would be better to just write the zip file directly to the socket somehow (if possible, I'm not sure how the zip format works). But this writing to disk and then reading off and rm-ing seems wasteful"""
     original_file = os.path.join(constants.analyses_dir, analysis_id,constants.data_file_name)
-    sep = open(os.path.join(constants.analyses_dir,analysis_id,constants.seperator_file_name)).read()
+    sep = open(os.path.join(constants.analyses_dir,analysis_id,constants.separator_file_name)).read()
     of = helper_functions.seqs(open(original_file))
     time_stamp = str(helper_functions.get_time_stamp())
     ids = []
@@ -680,7 +680,7 @@ def new_analysis(request, analysis_type):
             #(name, function) where name is the name attribute in the form, and
             #the function converts the raw value or cleaned_data into
             #whatever it needs to be
-            special_options = [("seperator",str),
+            special_options = [("separator",str),
                                ("qa_mode", int),
                                ("db_name",str),
                                ("threshold",float),

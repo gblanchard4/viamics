@@ -50,9 +50,9 @@ def _exec(p, request_dict):
     p.threshold = request_dict.get('threshold_dict') 
 
     
-    separator = request_dict['seperator']#sic
+    separator = request_dict['separator']
     debug("storing separator: '%s'" % separator, p.files.log_file)
-    open(p.files.seperator_file_path, 'w').write(separator)
+    open(p.files.separator_file_path, 'w').write(separator)
     debug("storing DB name: '%s'" % request_dict['db_name'], p.files.log_file) 
     open(p.files.blast_db_name_path, 'w').write(request_dict['db_name'])
     if p.threshold:
@@ -105,7 +105,7 @@ def samples_dictionary(p):
                                db_name,db_name+c.blast_legend_file_extension)
     samples_dict = framework.tools.blast.create_samples_dictionary(p.files.blast_output_file_path,
                                                                    legend_path,
-                                                                   open(p.files.seperator_file_path).read(),
+                                                                   open(p.files.separator_file_path).read(),
                                                                    thresholds=p.threshold)
     debug("Serializing samples dictionary object", p.files.log_file)
     SerializeToFile(samples_dict, p.files.samples_serialized_file_path)
@@ -117,12 +117,12 @@ def otu_library(p):
                                db_name,db_name+c.blast_legend_file_extension)
     otu_library = framework.tools.blast.get_otu_library(p.files.blast_output_file_path,
                                                         legend_path,
-                                                        open(p.files.seperator_file_path).read())
+                                                        open(p.files.separator_file_path).read())
     SerializeToFile(otu_library, p.files.otu_library_file_path)
 
 def separate_low_confidence(p):
     debug("Separating low confidence sequences", p.files.log_file)
-    separator = open(p.files.seperator_file_path).read()    
+    separator = open(p.files.separator_file_path).read()    
     lo_seqs = framework.tools.blast.low_confidence_seqs(open(p.files.data_file_path),
                                                       open(p.files.blast_output_file_path),
                                                       p.threshold,
@@ -132,7 +132,7 @@ def separate_low_confidence(p):
             o.write(s)
 
 def read_length_distribution(p):
-    separator = open(p.files.seperator_file_path).read()
+    separator = open(p.files.separator_file_path).read()
     
     seqs=framework.tools.helper_functions.seqs(open(p.files.data_file_path))
     lows=framework.tools.helper_functions.seqs(open(p.files.low_confidence_seqs_path))

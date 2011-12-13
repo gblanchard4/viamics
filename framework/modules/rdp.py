@@ -46,9 +46,9 @@ def _exec(p, request_dict):
     p.set_analysis_type("rdp")
     p.threshold = request_dict.get('threshold')
 
-    seperator = request_dict['seperator']
-    debug("storing seperator: '%s'" % seperator, p.files.log_file)
-    open(p.files.seperator_file_path, 'w').write(seperator)
+    separator = request_dict['separator']
+    debug("storing separator: '%s'" % separator, p.files.log_file)
+    open(p.files.separator_file_path, 'w').write(separator)
 
     if p.threshold:
         debug("storing confidence threshold", p.files.log_file)
@@ -94,9 +94,9 @@ def _append(p, request_dict):
 
     debug("Extracting unique sample names from additional FASTA file", p.files.log_file)
     additional_data_file_path = request_dict['additional_data_file_path']
-    seperator = open(p.files.seperator_file_path).read()
+    separator = open(p.files.separator_file_path).read()
 
-    additional_samples = framework.tools.helper_functions.sorted_copy(framework.tools.rdp.extract_sample_names(additional_data_file_path, seperator))
+    additional_samples = framework.tools.helper_functions.sorted_copy(framework.tools.rdp.extract_sample_names(additional_data_file_path, separator))
     original_samples = framework.tools.helper_functions.sorted_copy([sample.strip() for sample in open(p.files.all_unique_samples_file_path).readlines()])
 
     number_of_sequences = sum(1 for l in open(additional_data_file_path) if l.startswith('>'))
@@ -110,7 +110,7 @@ def _append(p, request_dict):
         lo_seqs = framework.tools.rdp.low_confidence_seqs(open(additional_data_file_path),
                                                           open(additional_rdp_output_path),
                                                           p.threshold,
-                                                          seperator)
+                                                          separator)
         o = open(p.files.low_confidence_seqs_path,'a')
         for s in lo_seqs:
             o.write(s)
@@ -118,7 +118,7 @@ def _append(p, request_dict):
 
     #import pdb; pdb.set_trace()
     debug("Merging additional data with the original RDP results", p.files.log_file)
-    framework.tools.rdp.merge(p.files.samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_path, p.files.rdp_output_file_path, seperator)
+    framework.tools.rdp.merge(p.files.samples_serialized_file_path, additional_samples, original_samples, additional_rdp_output_path, p.files.rdp_output_file_path, separator)
 
     debug("Reading updated samples dict", p.files.log_file)
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
@@ -154,13 +154,13 @@ def _sample_map_functions(p, request_dict):
 
 def samples_dictionary(p):
     debug("Computing samples dictionary", p.files.log_file)
-    seperator = open(p.files.seperator_file_path).read()
+    separator = open(p.files.separator_file_path).read()
     thresh = p.threshold if hasattr(p,'threshold') else None
 
     # read samples from RDP since it may have been updated.
-    samples = list(set([sample.split(seperator)[0] for sample in open(p.files.rdp_output_file_path).readlines()]))
+    samples = list(set([sample.split(separator)[0] for sample in open(p.files.rdp_output_file_path).readlines()]))
     open(p.files.all_unique_samples_file_path, 'w').write('\n'.join(samples) + '\n')
-    samples_dict = framework.tools.rdp.create_samples_dictionary(p.files.rdp_output_file_path, seperator, samples,threshold=thresh)
+    samples_dict = framework.tools.rdp.create_samples_dictionary(p.files.rdp_output_file_path, separator, samples,threshold=thresh)
     debug("Serializing samples dictionary object", p.files.log_file)
     SerializeToFile(samples_dict, p.files.samples_serialized_file_path)
 
@@ -172,20 +172,20 @@ def rdp_otu_confidence_analysis(p):
     debug("Generating RDP confidence per otu figures", p.files.log_file)
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
     samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
-    seperator = open(p.files.seperator_file_path).read()
-    framework.tools.rdp.otu_confidence_analysis(p.files.rdp_output_file_path, p.dirs.type_specific_data_dir, seperator, samples)
+    separator = open(p.files.separator_file_path).read()
+    framework.tools.rdp.otu_confidence_analysis(p.files.rdp_output_file_path, p.dirs.type_specific_data_dir, separator, samples)
 
 
 def rdp_samples_confidence_image(p):
     debug("Refreshing RDP Confidence per sample figure", p.files.log_file)
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
-    seperator = open(p.files.seperator_file_path).read()
+    separator = open(p.files.separator_file_path).read()
     samples = framework.tools.helper_functions.sorted_copy(samples_dict.keys())
-    framework.tools.rdp.sample_confidence_analysis(p.files.rdp_output_file_path, p.dirs.analysis_dir, seperator, samples)
+    framework.tools.rdp.sample_confidence_analysis(p.files.rdp_output_file_path, p.dirs.analysis_dir, separator, samples)
     
 
 def read_length_distribution(p):
-    separator = open(p.files.seperator_file_path).read()
+    separator = open(p.files.separator_file_path).read()
     
     seqs=framework.tools.helper_functions.seqs(open(p.files.data_file_path))
     lows=framework.tools.helper_functions.seqs(open(p.files.low_confidence_seqs_path))
@@ -222,7 +222,7 @@ def rarefaction_curves(p):
 
 def separate_low_confidence(p):
     debug("Separating low confidence sequences", p.files.log_file)
-    separator = open(p.files.seperator_file_path).read()    
+    separator = open(p.files.separator_file_path).read()    
     lo_seqs = framework.tools.rdp.low_confidence_seqs(open(p.files.data_file_path),
                                                       open(p.files.rdp_output_file_path),
                                                       p.threshold,
