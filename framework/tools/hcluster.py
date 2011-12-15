@@ -42,7 +42,7 @@ def L1dist(v1, v2):
 #     return sqrt(sum((v1 - v2)**2))
 
 def hcluster(features, distance = L2dist):
-    """cluster the rows of the "features" matrix using the given distance function"""
+    """cluster the rows of the "features" matrix using the given distance function. Defaults to Euclidian (L2), and average (UPGMA) linkage."""
     distances = {}
     currentclustid =  - 1
 

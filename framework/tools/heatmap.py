@@ -92,6 +92,7 @@ def main(options, analyses_dir = ''):
 
 
 def generate_heatmap(options, col_names, row_names, data_matrix, sample_colours, dist_func=robjects.r.dist):
+    """Create a heatmap from data_matrix, as specified by options, and save to options.output_file. Defaults to Euclidian (L2) distance, and hierarchical clustering with complete linkage. """
     robjects.r.library('gplots')
     grdevices = importr('grDevices')
 
