@@ -70,9 +70,9 @@ Properties:
         self.data = outfile_line
         outfile_line = outfile_line.split('\t')
         ids = filter(lambda i: i != '',outfile_line[0].split(separator))
-        if separator and len(ids) == 2:
+        if separator and len(ids):
             self.sample_id = ids[0]
-            self.seq_id = ids[1]
+            self.seq_id = '_'.join(ids[1:])
         else:
             #wasn't given a separator or one id is missing, hopefully this means client is not using id
             self.sample_id = self.seq_id = outfile_line[0]
