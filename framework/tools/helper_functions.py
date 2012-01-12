@@ -302,16 +302,22 @@ def generate_feature_vectors_from_samples_dict(samples_dict, otu_library, rank =
 
 
 def seqs(f, include_comments = False):
-    """A generator for the sequences in a FASTA file"""
+    """A generator for the sequences in a FASTA file
+
+    f: An open file object or iterable of lines from a FASTA file
+    include_comments: Whether to discard lines beginning with ';'"""
+    #fix Windows newlines, trim whitespace:
+    clean = lambda s: s.replace("\r\n",'\n').strip()+"\n"
+    
     seq = ""
     f = f if include_comments else (l for l in f if not l.startswith(";"))
     for line in f:
-        if seq != "" and line.startswith('>'):
-            yield seq
+        if seq.strip() != "" and line.startswith('>'):
+            yield clean(seq)
             seq = ""
         seq += line
     if seq != "":
-        yield seq
+        yield clean(seq)
 ################################################################################
 #Unifrac export preparation
 #the following functions mung data into the necessary shape to use the
