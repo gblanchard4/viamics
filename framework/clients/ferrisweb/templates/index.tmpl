@@ -50,4 +50,15 @@ function remove_analysis(id){
     </tr>
 {% endfor %}
 </table>
+
+<script type="text/javascript">
+function sort_rows(){
+  var rows = $(document.getElementsByTagName("table")[0].getElementsByTagName('tr'));
+  var tt = document.getElementsByTagName("table")[0];
+  $.each(rows.sort(function(a,b){return updated(b)-updated(a)}),function(i,r){tt.appendChild(r);});
+}
+
+window.onload = sort_rows;
+</script>
+
 {% endblock %}

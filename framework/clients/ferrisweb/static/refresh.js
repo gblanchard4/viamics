@@ -1,3 +1,10 @@
+
+function updated(a){
+    var updates = a.getElementsByTagName("ul")[0].getElementsByTagName("li");
+    var t = $(updates[updates.length -1])[0].innerHTML.split('|')[0];
+    return Date.parse(t);    
+}
+
 function refresh_analyses(timer)
 {
 
