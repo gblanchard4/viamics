@@ -723,7 +723,9 @@ def new_analysis(request, analysis_type):
 
 def about(request):
     tmpl = get_template("about.tmpl")
-    return HttpResponse(tmpl.render(Context({'content': "something happened"})))
+    return HttpResponse(tmpl.render(
+        Context({'content': "something happened",
+                 "headerhelp":helper_functions.id_and_classification.__doc__})))
 
 def cat(files):
     tmpfile = os.path.join('/tmp',str(time()))

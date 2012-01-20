@@ -193,26 +193,6 @@ def formatExceptionInfo(maxTBlevel=5):
     return text
 
 
-### VIAMICS SUPPORTED DEFLINE FORMATS: ########################
-#  GenBank                           gi|gi-number|gb|accession|locus
-#  EMBL Data Library                 gi|gi-number|emb|accession|locus
-#  DDBJ, DNA Database of Japan       gi|gi-number|dbj|accession|locus
-#  General database identifier       gnl|database|identifier
-#  NCBI Reference Sequence           ref|accession|locus
-#  Local Sequence identifier         lcl|identifier
-#  Interim (CHNOLA)		     identifier|xxx|xxx|locus
-#  Local (CHNOLA)		     lcl|unique id|locus
-#  GenInfo Backbone Id               bbs|number
-#
-### NOT SUPPORTED: ############################################
-#  NBRF PIR                          pir||entry
-#  Protein Research Foundation       prf||name
-#  SWISS-PROT                        sp|accession|name
-#  Brookhaven Protein Data Bank (1)  pdb|entry|chain
-#  Brookhaven Protein Data Bank (2)  entry:chain|PDBID|CHAIN|SEQUENCE
-#  Patents                           pat|country|number
-#  
-#  in most cases what we want for the classification is 'locus'
 
 def _gnl(l):
     l = defline.strip(">").split(DLM)
@@ -236,6 +216,34 @@ def nthelem(defline,delim,id_position,classification_position):
     return (l[id_position].strip(),l[classification_position].strip())
 
 def id_and_classification(l):
+    """
+
+<table class="helpdocs">
+<tr><th>VIAMICS SUPPORTED DEFLINE FORMATS:</th></tr>
+<tr><td>GenBank</td><td>                        gi|gi-number|gb|accession|locus</td></tr>
+<tr><td> EMBL Data Library</td><td>                 gi|gi-number|emb|accession|locus</td></tr>
+<tr><td> DDBJ, DNA Database of Japan</td><td>       gi|gi-number|dbj|accession|locus</td></tr>
+<tr><td> General database identifier   </td><td>    gnl|database|identifier</td></tr>
+<tr><td> NCBI Reference Sequence  </td><td>         ref|accession|locus</td></tr>
+<tr><td> Local Sequence identifier   </td><td>      lcl|identifier</td></tr>
+<tr><td> Interim (CHNOLA)   </td><td>    identifier|xxx|xxx|locus</td></tr>
+<tr><td> Local (CHNOLA)   </td><td>     lcl|unique id|locus</td></tr>
+<tr><td> GenInfo Backbone Id       </td><td>        bbs|number</td></tr>
+<tr><td> ID only </td><td>   id </td></tr>
+
+<tr><th>NOT SUPPORTED: </th></tr>
+<tr><td>NBRF PIR </td><td>                          pir||entry</td></tr>
+<tr><td> Protein Research Foundation</td><td>       prf||name</td></tr>
+<tr><td> SWISS-PROT</td><td>                        sp|accession|name</td></tr>
+<tr><td> Brookhaven Protein Data Bank (1)</td><td>  pdb|entry|chain</td></tr>
+<tr><td> Brookhaven Protein Data Bank (2)</td><td>  entry:chain|PDBID|CHAIN|SEQUENCE</td></tr>
+<tr><td> Patents     </td><td>               pat|country|number</td></tr>
+
+ </table>
+ <p>
+ in most cases what we want for the classification is 'locus'. This is the taxonomic placement of the sequence. The other necessary information is an identifier, or id number. The only requirement for this is that it be unique for each sequence in the uploaded database.
+</p>
+    """
     tag = l.strip('>').split(DLM)[0].strip()
     if tag in ID_GETTERS:
         return ID_GETTERS[tag](l)

@@ -22,4 +22,4 @@ framework/trash/*
 .#*
 
 #R command history
-.Rhistory
+.Rhistoryplaydata/*

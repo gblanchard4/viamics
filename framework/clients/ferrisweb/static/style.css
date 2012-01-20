@@ -384,3 +384,8 @@ li.feedback {
     list-style: none;
     padding-left: 10px;
     }
+table.helpdocs {
+    font-family: monospace;
+    font-weight: normal;
+    font-size: 9pt;
+}
