@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os, subprocess
+from datetime import datetime
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -16,7 +17,7 @@ for f in os.listdir(sys.argv[1]):
     if not os.path.isdir(os.path.join(sys.argv[1],f)):
         print "_"*80
         
-        print OKGREEN+f+":"+ENDC
+        print OKGREEN+datetime.fromtimestamp(float(f)).strftime("%A, %b %d %Y, %X %p")+":"+ENDC
         print "_"*80
 
         for line in open(os.path.join(sys.argv[1],f)).readlines():
