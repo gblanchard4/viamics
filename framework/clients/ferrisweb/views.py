@@ -275,7 +275,7 @@ def create_sample_map(request, analysis_id, step):
                 valid_name = numeric_name
             else:                
                 raise ValueError(line[0]+' is not a valid sample name for this analysis')
-            line[0] = valid_name
+            line = (valid_name,)+line[1:]
             yield line
         
 
