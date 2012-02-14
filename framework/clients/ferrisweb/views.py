@@ -105,7 +105,8 @@ def sample_map_instance(request, analysis_id, instance):
 def sample_map_dot(request, analysis_id, instance, rank, real_abundance = False):
     server_request = {'request': 'get_otu_t_p_tuples', 'analysis_id': analysis_id, 'instance': instance, 'rank': rank}
     server_response = server(server_request)
-    otu_t_p_tuple_list = server_response['otu_t_p_tuple_list']
+    tpls = server_response['otu_t_p_tuple_list']
+    otu_t_p_tuple_list = sorted(tpls, key=lambda x: float(x[3]))
 
     server_request = {'request': 'get_analysis_name', 'analysis_id': analysis_id}
     server_response = server(server_request)
