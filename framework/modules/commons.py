@@ -88,6 +88,13 @@ def t_test_values_and_probabilities_dict(p):
     otu_library  = DeserializeFromFile(p.files.otu_library_file_path)
     debug("Generating t-test values and probabilities dict", p.files.log_file)
     otu_t_p_tuples_dict = framework.tools.taxons.get_t_p_values_dict_for_subset(samples_dict, otu_library, p.files.sample_map_file_path, ranks = GetCopy(c.ranks[p.type]))
+    for rank in c.ranks[p.type]:
+        framework.tools.taxons.generate_data_files(samples_dict,
+                                                   otu_t_p_tuples_dict,
+                                                   p.files.sample_map_file_path,
+                                                   rank=rank,
+                                                   save_dir=p.dirs.sample_map_taxon_charts_dir)
+        
     SerializeToFile(otu_t_p_tuples_dict, p.files.sample_map_otu_t_p_tuples_dict_file_path)
 
 def dot_plots(p):

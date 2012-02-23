@@ -22,6 +22,7 @@ import numpy
 import random as r
 import sys
 import pylab
+import itertools
 from cogent.maths.stats.test import t_two_sample as t_test
 
 sys.path.append("../../")
@@ -109,6 +110,24 @@ def get_t_p_values_dict_for_subset(samples_dict, otu_library, sample_map_file_pa
                 otu_t_p_tuples_dict[rank].append((otu, otu_fs, None, None),)
 
     return otu_t_p_tuples_dict
+
+def generate_data_files(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank='genus', save_dir=''):
+    sample_groups, group_colors = helper_functions.get_groups_colors_from_sample_map_file(sample_map_file_path)
+
+    for otu in [t[0] for t in otu_t_p_tuples_dict[rank]]:
+        otu_table = [[]]
+        cols = list(sample_groups.iteritems())
+        otu_table[0] = list(itertools.chain(*[(k,'') for k,v in cols]))
+        for row in itertools.izip_longest(*[v for k,v in cols],fillvalue=''):
+            otu_table.append(itertools.chain(*[(s,samples_dict[s][rank].get(otu,0)
+                                                if samples_dict.get(s) else '')
+                                               for s in row]))
+
+        with open(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '.csv'),'w') as f:
+            for r in otu_table:
+                f.write(str.join("\t",map(str,r))+"\n")
+                
+            
 
 def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "genus", save_dir = None, is_transparent = False, real_abundance = False):
     sample_groups, group_colors = helper_functions.get_groups_colors_from_sample_map_file(sample_map_file_path)
