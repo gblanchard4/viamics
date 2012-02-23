@@ -18,13 +18,14 @@
 import os
 import sys
 import cPickle
+from helper_functions import clean_species_name
 
 def create_samples_dictionary(qpcr_file):
     """this function reads $qpcr_file and parses it to create a sample map from it"""
     samples_dict = {}
     lines = open(qpcr_file).readlines()
 
-    species_array = [s.strip() for s in lines[0].split("\t")[1:]]
+    species_array = [clean_species_name(s.strip()) for s in lines[0].split("\t")[1:]]
 
     for line in lines[1:]:
         sample = line.split("\t")[0]
@@ -46,7 +47,7 @@ def extract_sample_names(qpcr_file):
 
 def get_otu_library(qpcr_file):
     lines = open(qpcr_file).readlines()
-    otu_library = [[s.strip()] for s in lines[0].split("\t")[1:]]
+    otu_library = [[clean_species_name(s.strip())] for s in lines[0].split("\t")[1:]]
     otu_library.sort()
     return otu_library
 
