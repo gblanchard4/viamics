@@ -32,6 +32,15 @@ class cluster_node:
         self.distance = distance
         self.count = count #only used for weighted average 
 
+    @classmethod
+    def from_cogent(cls, children, name, attributes):
+        """A constructor suitable for passing to cogent.parse.newick.parse_string """
+        l,r = children if children else (None,None)
+        id = -1 if children else 1 # basically functions as isleaf(node)
+        return cls(name, left=l, right=r, distance=attributes.get("length"), id=id)
+
+
+
 def L2dist(v1, v2):
     return sqrt(sum((v1 - v2)**2))
 
@@ -152,6 +161,8 @@ def getdepth(clust):
 
 
 def drawdendrogram(clust, image_list, sample_list, dendrogram_out = 'clusters.png', map = None):
+    """Map looks like this: {"sample_groups":{0:[1,3,5,6], 1:[2,4,7]}, "group_colors":["#bb2233","#22bb33"]} 
+In this example, sa"""
     # height and width
     h = getheight(clust)*180 + 100
     w = 900
@@ -222,6 +233,81 @@ def drawnode(draw, clust, x, y, scaling, image_list, sample_list, img, map = Non
             draw = ImageDraw.Draw(img)
             draw.line((th, (se + fo)/2.0, 1050, (se + fo)/2.0), fill = "#DDD", width = 4)
             draw.rectangle((1050, se, 1100, fo), fill=map["group_colors"][group], outline="#DDD")
+
+def drawnode_sanemap(draw, clust, x, y, scaling, image_list, img, map = None):
+    """This is not used by the framework at them moment, (2/24/2012) but is useful in more generic contexts """
+    if clust.id<0:
+        h1 = getheight(clust.left)*180
+        h2 = getheight(clust.right)*180
+        top = y - (h1 + h2)/2
+        bottom = y + (h1 + h2)/2
+        # Line length
+        ll = clust.distance*scaling
+        # Vertical line from this cluster to children
+        draw.line((x, top + h1/2, x, bottom - h2/2), fill = (0, 0, 0))
+
+        # Horizontal line to left item
+        draw.line((x, top + h1/2, x + ll, top + h1/2), fill = (0, 0, 0), width = 3)
+
+        # Horizontal line to right item
+        draw.line((x, bottom - h2/2, x + ll, bottom - h2/2), fill = (0, 0, 0), width = 3)
+
+        # Call the function to draw the left and right nodes
+        drawnode_sanemap(draw, clust.left, x + ll, top + h1/2, scaling, image_list, img, map = map)
+        drawnode_sanemap(draw, clust.right, x + ll, bottom - h2/2, scaling, image_list, img, map = map)
+    else:
+        # If this is an endpoint, draw a thumbnail image
+        nodeim = Image.open(image_list[clust.id])
+        nodeim.thumbnail((300, 300))
+        ns = nodeim.size
+
+        fi = int(x + 0.1)
+        se = int((y - ns[1]//2) + 0.1)
+        th = int(x + ns[0] + 0.1)
+        fo = int((y + ns[1] - ns[1]//2) + 0.1)
+
+        #print (x, y - ns[1]//2, x + ns[0], y + ns[1] - ns[1]//2), img.size
+        try:
+            img.paste(nodeim, (fi, se, th, fo))
+        except:
+            print "sic"
+            print (fi, se, th, fo)
+
+        if map:
+
+            draw = ImageDraw.Draw(img)
+            draw.line((th, (se + fo)/2.0, 1950, (se + fo)/2.0), fill = "#DDD", width = 4)
+            draw.rectangle((1950, se, 2000, fo), fill=map[clust.id], outline="#DDD")
+            draw.text((th, (se + fo)/2.0), clust.id)
+
+
+def drawdendrogram_sanemap(clust, image_list, dendrogram_out = 'clusters.png', map = None):
+    """The 'map' arg looks like this: {clustid:color}"""
+    # height and width
+    h = getheight(clust)*180 + 100
+    w = 1800
+    depth = getdepth(clust)
+
+    # width is fixed, so scale distances accordingly
+    if(depth == 0):
+        scaling = 1
+    else:
+        scaling = float(w - 150)/depth
+
+    # Create a new image with a white background
+    if map:
+        img = Image.new('RGB', (w + 250, h), (255, 255, 255))
+    else:
+        img = Image.new('RGB', (w + 100, h), (255, 255, 255))
+
+    draw = ImageDraw.Draw(img)
+    draw.line((0, h/2, 10, h/2), fill = (0, 0, 0), width = 3)
+
+    # Draw the first node
+    drawnode_sanemap(draw, clust, 10, (h/2), scaling, image_list, img, map = map)
+    img.save(dendrogram_out)
+
+
 
 def m(tree):
     """just get the list of ids"""
