@@ -498,6 +498,19 @@ def get_sha1sum(file_path):
     filehash = h.hexdigest()
     return filehash.lower()
 
+def is_taxonomy_string(s):
+    """Returns True if s is an RDP taxonomy string.
+    e.g. Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Actinomycetaceae;Actinomyces"""
+    return (';' in s) and (s.split(';')[0].upper() == "BACTERIA") 
+
+def clean_species_name(s):
+    """Sometimes species names that are too long cause problems. This fixes a common case
+    where they are too long"""
+    if is_taxonomy_string(s):
+        return s.split(';')[-1].strip()
+    else:
+        return s
+
 def sorted_copy(alist):
     # inspired by Alex Martelli
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52234
@@ -509,7 +522,7 @@ def sorted_copy(alist):
 def _generate_index(str):
     """
     Splits a string into alpha and numeric elements, which
-    is used as an index for sorting"
+    is used as an index for sorting
     """
     #
     # the index is built progressively
