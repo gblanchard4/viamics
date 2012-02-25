@@ -22,7 +22,8 @@
         <td style="width: 330px; text-align: center;">
             <img src="{{ request.META.HTTP_HOST }}/media/{{ taxon_charts_dir }}/{{ rank }}_{{ tuple.1 }}.png" title="{{ tuple.0 }}">
             <br />
-            <i>t: <b>{{ tuple.2 }}</b>, p: <b>{{ tuple.3 }}</b></i>
+            <i>t: <b>{{ tuple.2 }}</b>, p: <b>{{ tuple.3 }}</b></i><br />
+	    <a href="{{ request.META.HTTP_HOST }}/media/{{ taxon_charts_dir }}/{{ rank }}_{{ tuple.1 }}.csv">Download data</a>
     {% endfor %}
         </div>
     </tr>
