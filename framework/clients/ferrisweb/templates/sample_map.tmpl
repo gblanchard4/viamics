@@ -1,6 +1,7 @@
 {% extends "base.tmpl" %}
 {% load tablecols %}
 {% load dict_get %}
+{% load loop_operators %}
 
 {% block title %}Sample Map: {{ map.name }}{% endblock %}
 
@@ -81,6 +82,9 @@
     <table style="width: 100%;">
     <tr>
     {% for rank in map.ranks %}
+        {% if analysis_info.type == "rdp" and rank == "domain" %}
+            {{ forloop|continue }}
+        {% endif %}
         <td width="199">
             <p align="center"><b>{{ rank|capfirst }}</b> {% for k, v in map.percent_abundance_files.items %}{% ifequal k rank %}<small><a href="{{ request.META.HTTP_HOST }}/media/{{ v }}" title="download percent abundance file">#</small></a>{% endifequal %}{% endfor %}
             <p align="center"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/{{ map.instance }}/heatmap/{{ rank }}/"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.heatmaps|dict_get:rank }}" style="max-height: 200px; max-width: 200px; overflow: none;" border="0"></a>
@@ -100,6 +104,9 @@
     <table style="width: 100%;">
     <tr>
     {% for rank in map.ranks %}
+        {% if analysis_info.type == "rdp" and rank == "domain" %}
+            {{ forloop|continue }}
+        {% endif %}
         <td width="199">
             <p align="center"><b>{{ rank|capfirst }}</b>
             <p align="center"><a href="{{ request.META.HTTP_HOST }}/info/{{ analysis_id }}/{{ map.instance }}/dendrogram/{{ rank }}/"><img src="{{ request.META.HTTP_HOST }}/media/{{ map.dendrograms|dict_get:rank }}" style="max-height: 300px; max-width: 200px; overflow: none;" border="0"></a>
@@ -132,6 +139,9 @@
 <br />
 
 {% for rank in map.ranks %}
+    {% if analysis_info.type == "rdp" and rank == "domain" %}
+        {{ forloop|continue }}
+    {% endif %}
     <p class="smallsmallheadtitle">» {{ rank|capfirst }} Level (<a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ map.instance }}/dot/{{ rank }}/">show all</a>)
     <center>
     <table style="text-align: left; width 1000px;">
@@ -157,6 +167,9 @@
 <br />
 
 {% for rank in map.ranks %}
+    {% if analysis_info.type == "rdp" and rank == "domain" %}
+        {{ forloop|continue }}
+    {% endif %}
     <p class="smallsmallheadtitle">» {{ rank|capfirst }} Level (<a href="{{ request.META.HTTP_HOST }}/maps/{{ analysis_id }}/{{ map.instance }}/dot/{{ rank }}/real/">show all</a>)
     <center>
     <table style="text-align: left; width 1000px;">
