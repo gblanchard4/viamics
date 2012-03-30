@@ -207,8 +207,8 @@ def read_samples_dictionary(serialized_object_file):
 
 def get_otu_library(rdp_output_file):
     """returns a unique list of OTUs that were found in the library"""
-    #poor mans enum:
-    PHYLUM, CLASS, ORDER, FAMILY, GENUS = range(0, 5)
+    
+    taxonomic_ranks = ['domain', 'phylum', 'class', 'order', 'family', 'genus']
 
     genuses = []
     otu_library = []
@@ -217,6 +217,7 @@ def get_otu_library(rdp_output_file):
         #sometimes taxonomic names are empty! gotta fix that!
         #TODO use filled_ranks instead of this
         last_non_empty_rank = ''
+
         for i in result.classifications.values():
             if i == "":
                 i = "(%s)" % (last_non_empty_rank)
@@ -225,7 +226,7 @@ def get_otu_library(rdp_output_file):
 
         if result.classifications['genus'] not in genuses:
             genuses.append(result.classifications['genus'])
-            otu_library.append(result.classifications.values())
+            otu_library.append([result.classifications[r] for r in taxonomic_ranks])
 
     otu_library.sort()
 
