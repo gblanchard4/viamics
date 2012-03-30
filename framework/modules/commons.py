@@ -99,12 +99,19 @@ def dot_plots(p):
     otu_t_p_tuples_dict = DeserializeFromFile(p.files.sample_map_otu_t_p_tuples_dict_file_path)
     for rank in c.ranks[p.type]:
         #taxon charts
+        if p.type == 'rdp' and rank == 'domain':
+            debug("Skipping domain level taxon charts.", p.files.log_file)
+            continue
         debug("Generating dot plots for '%s' level" % rank, p.files.log_file)
         framework.tools.taxons.generate(samples_dict, otu_t_p_tuples_dict, p.files.sample_map_file_path, rank, p.dirs.sample_map_taxon_charts_dir)
 
 def heatmaps(p):
     samples_dict = DeserializeFromFile(p.files.sample_map_filtered_samples_dict_file_path)
     for rank in c.ranks[p.type]:
+        if p.type == 'rdp' and rank == 'domain':
+            debug("Skipping domain level heatmap.", p.files.log_file)
+            continue
+
         debug("Creating percent abundance for '%s' level" % rank, p.files.log_file)
         percent_abundance_file_path = vars(p.files)[c.percent_abundance_file_prefix + rank + '_file_path']
         framework.tools.helper_functions.create_percent_abundance_file(samples_dict, percent_abundance_file_path, rank = rank)
@@ -122,13 +129,16 @@ def heatmaps(p):
 def sample_dendrograms(p):
     samples_dict = DeserializeFromFile(p.files.sample_map_filtered_samples_dict_file_path)
     debug("Generating dendrograms for sample map...", p.files.log_file)
+    ranks = GetCopy(c.ranks[p.type])
+    if p.type == 'rdp':
+        ranks.remove('domain')
     framework.tools.hcluster.generate(samples_dict,
                                             DeserializeFromFile(p.files.otu_library_file_path),
                                             pie_charts_dir = p.dirs.pie_charts_dir,
                                             dendrogram_prefix = c.pie_chart_dendrogram_file_prefix,
                                             save_dir = p.dirs.sample_map_dendrograms_dir,
                                             map = helper_functions.get_sample_map_dict(p),
-                                            ranks = GetCopy(c.ranks[p.type]))
+                                            ranks = ranks)
 
 def shannon_diversity_dot_plot(p):
     samples_dict = DeserializeFromFile(p.files.sample_map_filtered_samples_dict_file_path)

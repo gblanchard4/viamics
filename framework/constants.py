@@ -66,7 +66,7 @@ templates_dir = join(web_dir, "templates")
 
 
 ranks = {}
-ranks['rdp'] = ['genus', 'family', 'order', 'class', 'phylum']
+ranks['rdp'] = ['genus', 'family', 'order', 'class', 'phylum', 'domain']
 ranks['qpcr'] = ['species']
 ranks['env'] = ['species']
 ranks['vamps'] = ['species']
