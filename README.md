@@ -1,5 +1,6 @@
 
   Viamics
+===============================================================================
 
   "Visual and statistical analysis framework for microbial communities, and more".
 
