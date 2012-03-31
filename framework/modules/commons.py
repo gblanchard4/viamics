@@ -192,7 +192,10 @@ def pie_charts(p):
 def pie_chart_dendrograms(p):
     samples_dict = DeserializeFromFile(p.files.samples_serialized_file_path)
     debug("Generating piechart dendrograms", p.files.log_file)
-    framework.tools.hcluster.generate(samples_dict, DeserializeFromFile(p.files.otu_library_file_path), pie_charts_dir = p.dirs.pie_charts_dir, dendrogram_prefix = c.pie_chart_dendrogram_file_prefix, ranks = GetCopy(c.ranks[p.type]))
+    ranks = GetCopy(c.ranks[p.type])
+    if p.type == 'rdp':
+        ranks.remove('domain')
+    framework.tools.hcluster.generate(samples_dict, DeserializeFromFile(p.files.otu_library_file_path), pie_charts_dir = p.dirs.pie_charts_dir, dendrogram_prefix = c.pie_chart_dendrogram_file_prefix, ranks = ranks)
 
 
 def env_file(p):

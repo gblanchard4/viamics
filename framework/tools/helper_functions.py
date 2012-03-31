@@ -222,7 +222,7 @@ def se(l):
     return sum([-p*log2(p) for p in l if p > 0])
 
 def generate_feature_vectors_from_samples_dict(samples_dict, otu_library, rank = "genus"):
-    enum_ranks = {'species': 0, 'phylum': 0, 'class': 1, 'order': 2, 'family': 3, 'genus': 4}
+    enum_ranks = {'species': 0, 'phylum': 1, 'class': 2, 'order': 3, 'family': 4, 'genus': 5}
     components = list(set([o[enum_ranks[rank]] for o in otu_library]))
     samples = sorted_copy(samples_dict.keys())
 
