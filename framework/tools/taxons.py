@@ -125,6 +125,7 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             max_y *= 10
 
     for otu in [t[0] for t in otu_t_p_tuples_dict[rank]]:
+        txt_output = ''
         plot_dict = {}
         for group in sample_groups.keys():
             plot_dict[group] = []
@@ -132,13 +133,16 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
                 if samples_dict[sample][rank].has_key(otu):
                     if real_abundance:
                         plot_dict[group].append([samples_dict[sample][rank][otu], sample],)
+                        txt_output += '%s\t%s\t%f\n' % (group, sample, samples_dict[sample][rank][otu])
                     else:
                         if samples_dict[sample]['tr'] == 0:
                             otu_vectors[group].append(0.0)
                         else:
                             plot_dict[group].append([samples_dict[sample][rank][otu] * 100.0 / samples_dict[sample]['tr'], sample],)
+                            txt_output += '%s\t%s\t%f\n' % (group, sample, samples_dict[sample][rank][otu] * 100.0 / samples_dict[sample]['tr'])
                 else:
                     plot_dict[group].append([0.0, sample],)
+                    txt_output += '%s\t%s\t0.0\n' % (group, sample)
 
         fig = pylab.figure(figsize=(3, 6))
         if real_abundance:
@@ -153,6 +157,8 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
 
         keys = helper_functions.sorted_copy(plot_dict.keys())
 
+        presence = []
+
         for key in keys:
             i = keys.index(key)
             if real_abundance:
@@ -162,6 +168,9 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
                         plot_dict[key][j][0] = 1.0
 
             pylab.title(otu)
+
+            
+            presence.append('%.3f' % (len([t[0] for t in plot_dict[key] if t[0] > 0.01]) * 100.0 / len(plot_dict[key])) )
 
             # scattering the samples in X axis, so it would be easier to see them when there are a bunch of them
             # at the same spot. instead of this, i * len(plot_dict[key]) could be used to plot them.
@@ -189,13 +198,17 @@ def generate(samples_dict, otu_t_p_tuples_dict, sample_map_file_path, rank = "ge
             pylab.xticks(pylab.arange(len(plot_dict)), keys, rotation=90)
             pylab.yticks(pylab.arange(0, 101, 10))
 
+        print '%s,%s' % (otu, ','.join(presence))
+
         if not save_dir:
             pylab.show()
         else:
             if real_abundance:
                 pylab.savefig(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '_real_abundance' + '.png'), transparent = is_transparent)
+                open(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '_real_abundance.txt'), 'w').write(txt_output)
             else:
                 pylab.savefig(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '.png'), transparent = is_transparent)
+                open(os.path.join(save_dir, rank + "_" + helper_functions.get_fs_compatible_name(otu) + '.txt'), 'w').write(txt_output)
 
         # clean memory
         try:

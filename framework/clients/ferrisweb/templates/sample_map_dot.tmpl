@@ -20,7 +20,7 @@
     <tr>
     {% for tuple in row %}
         <td style="width: 330px; text-align: center;">
-            <img src="{{ request.META.HTTP_HOST }}/media/{{ taxon_charts_dir }}/{{ rank }}_{{ tuple.1 }}.png" title="{{ tuple.0 }}">
+            <a href="{{ request.META.HTTP_HOST }}/media/{{ taxon_charts_dir }}/{{ rank }}_{{ tuple.1 }}.txt"><img src="{{ request.META.HTTP_HOST }}/media/{{ taxon_charts_dir }}/{{ rank }}_{{ tuple.1 }}.png" title="{{ tuple.0 }}" border=0></a>
             <br />
             <i>t: <b>{{ tuple.2 }}</b>, p: <b>{{ tuple.3 }}</b></i>
     {% endfor %}
